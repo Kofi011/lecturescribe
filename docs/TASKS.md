@@ -41,13 +41,13 @@ git push origin main
 - [x] Set up base theme in Tailwind config per `DESIGN.md` (black/white palette, pill button styles, font choices) → commit + push
 
 ## Phase 2 — Upload
-- [ ] Build landing/upload page per `DESIGN.md` (hero headline with italic accent word, pill buttons, bordered upload card) → commit + push
-- [ ] Build upload UI (file picker, mobile-friendly) → commit + push
-- [ ] Accept mp3 → commit + push
-- [ ] Accept wav → commit + push
-- [ ] Accept m4a → commit + push
-- [ ] Add 10-minute duration validation (client + server) → commit + push
-- [ ] Add file-size validation with clear error message → commit + push
+- [x] Build landing/upload page per `DESIGN.md` (hero headline with italic accent word, pill buttons, bordered upload card) → commit + push
+- [x] Build upload UI (file picker, mobile-friendly) → commit + push
+- [x] Accept mp3 → commit + push
+- [x] Accept wav → commit + push
+- [x] Accept m4a → commit + push
+- [x] Add 10-minute duration validation (client + server) → commit + push
+- [x] Add file-size validation with clear error message → commit + push
 
 ## Phase 3 — Transcription
 - [ ] Integrate Groq Whisper API on backend → commit + push

@@ -1,18 +1,46 @@
-import './App.css'
-
 /**
- * App.jsx — root component.
- * Phase 1: minimal skeleton to confirm the app boots.
- * Actual pages/routing wired up in Phase 2+.
+ * App.jsx — root component with simple page state machine
+ *
+ * Pages:
+ *   landing    → LandingPage (Phase 2)
+ *   processing → ProcessingPage (Phase 6)
+ *   results    → ResultsPage (Phase 5)
+ *
+ * Phase 2: only 'landing' is rendered; the other pages are stubs
+ * wired up in later phases.
  */
-function App() {
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center">
-      {/* Wordmark — italic serif per DESIGN.md */}
-      <span className="wordmark text-4xl mb-4">LectureScribe</span>
-      <p className="text-gray-500 text-sm">Phase 1 — project skeleton running ✓</p>
-    </div>
-  )
-}
 
-export default App
+import './App.css'
+import { useState } from 'react'
+import LandingPage from './pages/LandingPage'
+
+export default function App() {
+  // Page state: 'landing' | 'processing' | 'results'
+  const [page, setPage]         = useState('landing')
+  // Result data passed from upload → results page
+  const [result, setResult]     = useState(null)
+
+  /** Called when upload succeeds — in Phase 3 will switch to processing/results */
+  const handleUploadSuccess = (data) => {
+    // Phase 2: data is a stub validation response
+    // Phase 3+: will set page to 'processing' then 'results' with real transcript/notes
+    console.log('[app] upload validated:', data)
+    // Future: setPage('processing')
+    //         setResult(data)
+  }
+
+  if (page === 'landing') {
+    return <LandingPage onUploadSuccess={handleUploadSuccess} />
+  }
+
+  // Stubs — replaced in Phase 5 & 6
+  if (page === 'processing') {
+    return <div className="min-h-screen flex items-center justify-center"><p>Processing… (Phase 6)</p></div>
+  }
+
+  if (page === 'results') {
+    return <div className="min-h-screen flex items-center justify-center"><p>Results (Phase 5)</p></div>
+  }
+
+  return null
+}
