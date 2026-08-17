@@ -25,13 +25,13 @@ git push origin main
 ---
 
 ## Phase 0 — Repo setup
-- [ ] Create GitHub repo (e.g. `lecturescribe`) ← _needs remote URL from you_
+- [x] Create GitHub repo (`lecturescribe` — https://github.com/Kofi011/lecturescribe)
 - [x] `git init`, add `.gitignore` (node_modules, .env, dist/build folders)
 - [x] Create and switch to `dev` branch: `git checkout -b dev`
 - [x] Add this set of `.md` files to the repo root
 - [x] Initial commit: `docs: add project planning docs`
-- [ ] Push `dev` to GitHub: `git push -u origin dev` ← _needs remote URL from you_
-- [ ] (Optional) Push an empty/initial `main` too so both branches exist on GitHub
+- [x] Push `dev` to GitHub: `git push -u origin dev`
+- [x] Push `master` so both branches exist on GitHub
 
 ## Phase 1 — Project setup
 - [x] Initialize frontend (React + Tailwind) → commit + push
