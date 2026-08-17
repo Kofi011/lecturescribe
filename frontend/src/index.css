@@ -1,0 +1,85 @@
+/* DESIGN.md base CSS — black/white palette, Inter font, Tailwind directives */
+
+/* Import Inter from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Base resets ─────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: 'Inter', Helvetica Neue, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    margin: 0;
+    background-color: #ffffff;
+    color: #000000;
+  }
+
+  /* Italic serif accent — used inside headlines per DESIGN.md */
+  em {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+  }
+}
+
+/* ─── Component layer: reusable design-system classes ───────── */
+@layer components {
+
+  /* Primary pill button: solid black, white text */
+  .btn-primary {
+    @apply inline-flex items-center justify-center
+           px-6 py-3
+           bg-black text-white font-semibold
+           rounded-pill
+           transition-opacity duration-150
+           cursor-pointer;
+  }
+  .btn-primary:hover {
+    @apply opacity-80;
+  }
+
+  /* Secondary pill button: outline, black text */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center
+           px-6 py-3
+           bg-white text-black font-semibold
+           border border-black
+           rounded-pill
+           transition-colors duration-150
+           cursor-pointer;
+  }
+  .btn-secondary:hover {
+    @apply bg-black text-white;
+  }
+
+  /* Card: white bg, light border, rounded corners per DESIGN.md */
+  .card {
+    @apply bg-white border border-gray-200 rounded-card p-6;
+  }
+
+  /* Dark hero card (Processing page) */
+  .card-dark {
+    @apply bg-black text-white border-0 rounded-card p-8;
+  }
+
+  /* Nav wordmark: italic serif */
+  .wordmark {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    font-weight: 700;
+  }
+
+  /* Status indicator dots */
+  .status-done    { @apply text-white; }
+  .status-active  { @apply text-white; }
+  .status-pending { @apply text-gray-400; }
+}

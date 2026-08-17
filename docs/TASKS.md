@@ -25,20 +25,20 @@ git push origin main
 ---
 
 ## Phase 0 — Repo setup
-- [ ] Create GitHub repo (e.g. `lecturescribe`)
-- [ ] `git init`, add `.gitignore` (node_modules, .env, dist/build folders)
-- [ ] Create and switch to `dev` branch: `git checkout -b dev`
-- [ ] Add this set of `.md` files to the repo root
-- [ ] Initial commit: `docs: add project planning docs`
-- [ ] Push `dev` to GitHub: `git push -u origin dev`
+- [ ] Create GitHub repo (e.g. `lecturescribe`) ← _needs remote URL from you_
+- [x] `git init`, add `.gitignore` (node_modules, .env, dist/build folders)
+- [x] Create and switch to `dev` branch: `git checkout -b dev`
+- [x] Add this set of `.md` files to the repo root
+- [x] Initial commit: `docs: add project planning docs`
+- [ ] Push `dev` to GitHub: `git push -u origin dev` ← _needs remote URL from you_
 - [ ] (Optional) Push an empty/initial `main` too so both branches exist on GitHub
 
 ## Phase 1 — Project setup
-- [ ] Initialize frontend (React + Tailwind) → commit + push
-- [ ] Initialize backend (Node/Express) → commit + push
-- [ ] Configure environment variables (`.env.example` with placeholder keys, real `.env` gitignored) → commit + push
-- [ ] Confirm frontend and backend run locally together → commit + push
-- [ ] Set up base theme in Tailwind config per `DESIGN.md` (black/white palette, pill button styles, font choices) → commit + push
+- [x] Initialize frontend (React + Tailwind) → commit + push
+- [x] Initialize backend (Node/Express) → commit + push
+- [x] Configure environment variables (`.env.example` with placeholder keys, real `.env` gitignored) → commit + push
+- [x] Confirm frontend and backend run locally together → commit + push
+- [x] Set up base theme in Tailwind config per `DESIGN.md` (black/white palette, pill button styles, font choices) → commit + push
 
 ## Phase 2 — Upload
 - [ ] Build landing/upload page per `DESIGN.md` (hero headline with italic accent word, pill buttons, bordered upload card) → commit + push
