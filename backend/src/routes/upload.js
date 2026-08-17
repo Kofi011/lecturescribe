@@ -1,12 +1,14 @@
 /**
  * routes/upload.js — POST /api/upload
  *
- * Handles audio file upload with full server-side validation:
- *   1. File format (mp3 / wav / m4a only)
- *   2. File size (≤ 15 MB)
- *   3. Audio duration (≤ 10 minutes)
+ * Full synchronous processing pipeline (per ARCHITECTURE.md):
+ *   1. Validate file (format, size via multer; duration via music-metadata)
+ *   2. Transcribe audio → Groq Whisper  (Phase 3)
+ *   3. Generate notes  → Groq LLM       (Phase 4)
+ *   4. Return { status, title, transcript, notes_markdown } to frontend
  *
- * Actual transcription + note generation wired up in Phase 3+.
+ * All errors return specific, human-readable JSON messages.
+ * Temp files are deleted after processing (or on any error).
  */
 
 import express from 'express'
@@ -14,6 +16,8 @@ import multer from 'multer'
 import path from 'path'
 import fs from 'fs'
 import { parseBuffer } from 'music-metadata'
+import { transcribeAudio } from '../services/transcribe.js'
+import { generateNotes }   from '../services/generateNotes.js'
 
 const router = express.Router()
 
@@ -21,13 +25,13 @@ const router = express.Router()
 const ALLOWED_MIMES = [
   'audio/mpeg',       // mp3
   'audio/wav',        // wav
-  'audio/x-wav',      // wav (alternate MIME)
+  'audio/x-wav',      // wav (alternate)
   'audio/mp4',        // m4a
-  'audio/x-m4a',      // m4a (alternate MIME)
+  'audio/x-m4a',      // m4a (alternate)
   'audio/m4a',        // m4a (some browsers)
 ]
-const ALLOWED_EXTS  = ['.mp3', '.wav', '.m4a']
-const MAX_SIZE_MB   = 15
+const ALLOWED_EXTS   = ['.mp3', '.wav', '.m4a']
+const MAX_SIZE_MB    = 15
 const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024
 const MAX_DURATION_SECONDS = 10 * 60   // 10 minutes
 
@@ -35,7 +39,6 @@ const MAX_DURATION_SECONDS = 10 * 60   // 10 minutes
 const storage = multer.diskStorage({
   destination: 'uploads/',
   filename: (_req, file, cb) => {
-    // Unique filename — avoids collisions and path-traversal issues
     const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`
     cb(null, unique + path.extname(file.originalname).toLowerCase())
   },
@@ -45,16 +48,15 @@ const upload = multer({
   storage,
   limits: { fileSize: MAX_SIZE_BYTES },
   fileFilter: (_req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase()
+    const ext  = path.extname(file.originalname).toLowerCase()
     const mimeOk = ALLOWED_MIMES.includes(file.mimetype)
     const extOk  = ALLOWED_EXTS.includes(ext)
-
     if (mimeOk || extOk) {
       cb(null, true)
     } else {
-      // This error is caught in the route wrapper below
       const err = new Error(
-        `Unsupported file format "${ext || file.mimetype}". Please upload an MP3, WAV, or M4A file.`
+        `Unsupported file format "${ext || file.mimetype}". ` +
+        'Please upload an MP3, WAV, or M4A file.'
       )
       err.code = 'UNSUPPORTED_FORMAT'
       cb(err)
@@ -62,7 +64,7 @@ const upload = multer({
   },
 })
 
-// ─── Helper: cleanup temp file safely ─────────────────────────────
+// ─── Helper: safe temp-file cleanup ──────────────────────────────
 function removeTempFile(filePath) {
   try {
     if (filePath && fs.existsSync(filePath)) fs.unlinkSync(filePath)
@@ -71,11 +73,11 @@ function removeTempFile(filePath) {
   }
 }
 
-// ─── POST /api/upload ──────────────────────────────────────────────
+// ─── POST /api/upload ─────────────────────────────────────────────
 router.post('/upload', (req, res) => {
-  // Wrap multer in a callback so we can catch its errors as JSON
   upload.single('audio')(req, res, async (multerErr) => {
-    // ── Multer-level errors (wrong type / too large) ──────────────
+
+    // ── Multer-level errors ─────────────────────────────────────
     if (multerErr) {
       if (multerErr.code === 'LIMIT_FILE_SIZE') {
         return res.status(400).json({
@@ -88,7 +90,6 @@ router.post('/upload', (req, res) => {
       return res.status(400).json({ error: multerErr.message || 'Upload failed.' })
     }
 
-    // ── No file attached ─────────────────────────────────────────
     if (!req.file) {
       return res.status(400).json({ error: 'No audio file provided.' })
     }
@@ -96,10 +97,10 @@ router.post('/upload', (req, res) => {
     const filePath = req.file.path
 
     try {
-      // ── Duration check via music-metadata ────────────────────────
-      const fileBuffer = fs.readFileSync(filePath)
-      const metadata   = await parseBuffer(fileBuffer, { mimeType: req.file.mimetype })
-      const durationSec = metadata.format.duration   // may be undefined for some formats
+      // ── 1. Duration check ────────────────────────────────────
+      const fileBuffer  = fs.readFileSync(filePath)
+      const metadata    = await parseBuffer(fileBuffer, { mimeType: req.file.mimetype })
+      const durationSec = metadata.format.duration
 
       if (durationSec && durationSec > MAX_DURATION_SECONDS) {
         removeTempFile(filePath)
@@ -109,24 +110,30 @@ router.post('/upload', (req, res) => {
         })
       }
 
-      // ── Validation passed ─────────────────────────────────────────
-      // Phase 3 will replace this stub with Whisper + LLM calls.
-      // Keep the file alive for Phase 3; for now clean up immediately.
+      // ── 2. Transcribe ────────────────────────────────────────
+      console.log(`[upload] transcribing: ${req.file.originalname}`)
+      const transcript = await transcribeAudio(filePath, req.file.mimetype)
+
+      // ── 3. Generate notes ────────────────────────────────────
+      console.log('[upload] generating notes…')
+      const { title, notes_markdown } = await generateNotes(transcript)
+
+      // ── 4. Clean up + respond ────────────────────────────────
       removeTempFile(filePath)
+      console.log(`[upload] done — "${title}"`)
 
       return res.json({
-        status: 'validated',
-        message: 'File validated. Transcription will be wired up in Phase 3.',
-        originalName: req.file.originalname,
-        sizeMB: (req.file.size / 1024 / 1024).toFixed(2),
-        durationSec: durationSec ? Math.round(durationSec) : null,
+        status:         'complete',
+        title,
+        transcript,
+        notes_markdown,
       })
+
     } catch (err) {
       removeTempFile(filePath)
-      console.error('[upload] processing error:', err)
-      return res.status(500).json({
-        error: 'A server error occurred while processing your file. Please try again.',
-      })
+      console.error('[upload] error:', err.message)
+      // Return the service's human-readable message directly
+      return res.status(500).json({ error: err.message })
     }
   })
 })

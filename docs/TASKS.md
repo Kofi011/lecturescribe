@@ -50,29 +50,29 @@ git push origin main
 - [x] Add file-size validation with clear error message → commit + push
 
 ## Phase 3 — Transcription
-- [ ] Integrate Groq Whisper API on backend → commit + push
-- [ ] Implement transcription call + response handling → commit + push
-- [ ] Handle transcription errors (timeout, API failure) with specific messages → commit + push
-- [ ] Return transcript to frontend → commit + push
+- [x] Integrate Groq Whisper API on backend → commit + push
+- [x] Implement transcription call + response handling → commit + push
+- [x] Handle transcription errors (timeout, API failure) with specific messages → commit + push
+- [x] Return transcript to frontend → commit + push
 
 ## Phase 4 — Notes generation
-- [ ] Write and test the summarization prompt (headings + bullets + title) → commit + push
-- [ ] Generate suggested title → commit + push
-- [ ] Generate section headings → commit + push
-- [ ] Generate bullet points per section → commit + push
-- [ ] Generate "Key Takeaways" section → commit + push
+- [x] Write and test the summarization prompt (headings + bullets + title) → commit + push
+- [x] Generate suggested title → commit + push
+- [x] Generate section headings → commit + push
+- [x] Generate bullet points per section → commit + push
+- [x] Generate "Key Takeaways" section → commit + push
 
 ## Phase 5 — Results view
-- [ ] Build Transcript tab (pill-style tab switcher per `DESIGN.md`) → commit + push
-- [ ] Build Notes tab (bordered card, bold headings + bullets) → commit + push
-- [ ] Add Copy Notes button (solid pill) → commit + push
-- [ ] Add Download Notes button (outline pill, .txt or .md) → commit + push
+- [x] Build Transcript tab (pill-style tab switcher per `DESIGN.md`) → commit + push
+- [x] Build Notes tab (bordered card, bold headings + bullets) → commit + push
+- [x] Add Copy Notes button (solid pill) → commit + push
+- [x] Add Download Notes button (outline pill, .txt or .md) → commit + push
 
 ## Phase 6 — Processing status & error UI
-- [ ] Build staged processing indicator inside a dark rounded hero card per `DESIGN.md` (Uploaded → Transcribing → Summarizing → Complete) → commit + push
-- [ ] Build error state UI for each failure type → commit + push
-- [ ] Confirm mobile responsiveness across all screens → commit + push
-- [ ] Add loading states for all async actions → commit + push
+- [x] Build staged processing indicator inside a dark rounded hero card per `DESIGN.md` (Uploaded → Transcribing → Summarizing → Complete) → commit + push
+- [x] Build error state UI for each failure type → commit + push
+- [x] Confirm mobile responsiveness across all screens → commit + push
+- [x] Add loading states for all async actions → commit + push
 
 ## Phase 7 — Testing
 - [ ] Test with mp3 file → commit (fix any bugs found) + push
