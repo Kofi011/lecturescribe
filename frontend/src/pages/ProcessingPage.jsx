@@ -131,7 +131,7 @@ export default function ProcessingPage({ stage, error, onRetry }) {
           {isError && onRetry && (
             <button
               onClick={onRetry}
-              className="mt-8 w-full btn-secondary border-white text-white hover:bg-white hover:text-black"
+              className="mt-8 w-full inline-flex items-center justify-center px-6 py-3 bg-white text-black font-semibold rounded-pill hover:bg-gray-200 transition-colors cursor-pointer"
             >
               Try again
             </button>

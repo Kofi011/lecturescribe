@@ -17,15 +17,16 @@ const app = express()
 const PORT = process.env.PORT || 5000
 
 // ─── CORS ─────────────────────────────────────────────────────────
-// Only the known frontend origin can call the API
-const allowedOrigins = [
-  process.env.FRONTEND_ORIGIN || 'http://localhost:5173',
-]
+const allowedOriginEnv = process.env.FRONTEND_ORIGIN || 'http://localhost:5173'
 
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no Origin header (curl, Postman, server-to-server)
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin) return callback(null, true)
+
+    // Allow configured production/dev origin or any localhost / 127.0.0.1 in local development
+    const isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)
+    if (origin === allowedOriginEnv || isLocalhost) {
       callback(null, true)
     } else {
       callback(new Error(`CORS: origin ${origin} not allowed`))
