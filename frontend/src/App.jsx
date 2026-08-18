@@ -1,19 +1,8 @@
 /**
- * App.jsx — root component with page state machine
- *
- * Pages:
- *   landing    → LandingPage  (upload form)
- *   processing → ProcessingPage (status stages during API call)
- *   results    → ResultsPage  (transcript + notes tabs)
- *
- * Upload flow:
- *   1. User submits file from LandingPage
- *   2. App switches to ProcessingPage (stage: 'uploaded')
- *   3. POST /api/upload is called — backend runs synchronously:
- *        validates → transcribes (Whisper) → generates notes (LLM)
- *   4. While waiting, stages advance on a timer to give live feedback
- *   5. On success → ResultsPage with title + transcript + notes
- *   6. On error   → ProcessingPage error state with specific message + retry
+ * App.jsx — LectureScribe Root Application Controller
+ * Requirement 1: Animated flowing visual waveform motion
+ * Requirement 2: Every clickable element produces a relevant result
+ * Requirement 3: Internal transcription technology is not exposed
  */
 
 import './App.css'
@@ -21,42 +10,39 @@ import { useState, useEffect, useRef } from 'react'
 import LandingPage    from './pages/LandingPage'
 import ProcessingPage from './pages/ProcessingPage'
 import ResultsPage    from './pages/ResultsPage'
+import NavigationModal from './components/NavigationModal'
+import InfoModal       from './components/InfoModal'
+import { saveLecture, deleteLecture, SAMPLE_LECTURE } from './utils/lectureStorage'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
-// Stage progression timing (ms) — just for UX; actual progress is backend-driven
-const STAGE_DELAYS = {
-  uploaded:     0,
-  transcribing: 1500,
-  summarizing:  null,   // advanced when API call returns
-}
-
 export default function App() {
-  const [page,    setPage]    = useState('landing')
-  const [stage,   setStage]   = useState('uploaded')
-  const [error,   setError]   = useState(null)
-  const [result,  setResult]  = useState(null)
+  const [page,           setPage]           = useState('landing')
+  const [stage,          setStage]          = useState('uploaded')
+  const [error,          setError]          = useState(null)
+  const [currentLecture, setCurrentLecture] = useState(null)
 
-  // Ref to abort any in-flight fetch on unmount
+  // Interactive Modals
+  const [menuOpen,        setMenuOpen]        = useState(false)
+  const [menuInitialTab,  setMenuInitialTab]  = useState('lectures')
+  const [infoModalType,   setInfoModalType]   = useState(null)
+
   const abortRef = useRef(null)
 
-  // ── Upload handler — called from LandingPage → UploadCard ────────────────
+  // ─── Upload Handler ────────────────────────────────────────────────────────
   const handleUpload = async (file) => {
-    // Reset state
     setError(null)
-    setResult(null)
+    setCurrentLecture(null)
     setStage('uploaded')
     setPage('processing')
 
-    // Small delay so 'uploaded' stage is visible before advancing
-    await new Promise((r) => setTimeout(r, STAGE_DELAYS.transcribing))
+    // Visual progression state
+    await new Promise((r) => setTimeout(r, 1200))
     setStage('transcribing')
 
-    // Build form data
     const formData = new FormData()
     formData.append('audio', file)
 
-    // Set up abort controller for cleanup
     const controller = new AbortController()
     abortRef.current = controller
 
@@ -70,71 +56,115 @@ export default function App() {
       data = await res.json()
 
       if (!res.ok) {
-        // Server returned a specific error — show it
-        setError(data.error || 'An error occurred. Please try again.')
-        setStage('transcribing')  // mark the failing stage
+        setError(data.error || 'Unable to process lecture audio. Please try again.')
+        setStage('transcribing')
         setPage('processing')
-        // Small delay so user sees the error state before it stabilises
         return
       }
     } catch (err) {
-      if (err.name === 'AbortError') return   // component unmounted
-      setError('Network error — check your connection and try again.')
+      if (err.name === 'AbortError') return
+      setError('Connection to LectureScribe server failed. Please ensure the backend is running and try again.')
       setStage('transcribing')
       setPage('processing')
       return
     }
 
-    // Success — advance stage to summarizing then complete
+    // Advance stages smoothly
     setStage('summarizing')
-    await new Promise((r) => setTimeout(r, 800))
+    await new Promise((r) => setTimeout(r, 900))
     setStage('complete')
     await new Promise((r) => setTimeout(r, 600))
 
-    // Store result and switch to results page
-    setResult(data)
+    // Persist to local client storage
+    saveLecture(data)
+    setCurrentLecture(data)
     setPage('results')
   }
 
-  // ── Retry — go back to landing, clear state ──────────────────────────────
+  // ─── Load Interactive Example ──────────────────────────────────────────────
+  const handleSelectExample = () => {
+    saveLecture(SAMPLE_LECTURE)
+    setCurrentLecture(SAMPLE_LECTURE)
+    setPage('results')
+  }
+
+  // ─── Navigation / Menu triggers ────────────────────────────────────────────
+  const handleOpenMenu = (tab = 'lectures') => {
+    setMenuInitialTab(tab)
+    setMenuOpen(true)
+  }
+
+  const handleSelectLectureFromMenu = (lec) => {
+    setCurrentLecture(lec)
+    setPage('results')
+  }
+
+  const handleDeleteLecture = (id) => {
+    deleteLecture(id)
+    if (currentLecture?.id === id) {
+      setCurrentLecture(null)
+      setPage('landing')
+    }
+  }
+
   const handleRetry = () => {
     abortRef.current?.abort()
     setPage('landing')
     setStage('uploaded')
     setError(null)
-    setResult(null)
+    setCurrentLecture(null)
   }
 
-  // ── Cleanup on unmount ───────────────────────────────────────────────────
   useEffect(() => {
     return () => abortRef.current?.abort()
   }, [])
 
-  // ── Render ───────────────────────────────────────────────────────────────
-  if (page === 'landing') {
-    return <LandingPage onUpload={handleUpload} />
-  }
+  return (
+    <div className="min-h-screen bg-white">
+      {/* ─── PAGES ──────────────────────────────────────────────────────────── */}
+      {page === 'landing' && (
+        <LandingPage
+          onUpload={handleUpload}
+          onOpenMenu={handleOpenMenu}
+          onOpenInfo={(type) => setInfoModalType(type)}
+          onSelectExample={handleSelectExample}
+        />
+      )}
 
-  if (page === 'processing') {
-    return (
-      <ProcessingPage
-        stage={error ? 'error' : stage}
-        error={error}
-        onRetry={handleRetry}
+      {page === 'processing' && (
+        <ProcessingPage
+          stage={error ? 'error' : stage}
+          error={error}
+          onRetry={handleRetry}
+          onOpenMenu={handleOpenMenu}
+          onOpenInfo={(type) => setInfoModalType(type)}
+        />
+      )}
+
+      {page === 'results' && currentLecture && (
+        <ResultsPage
+          lecture={currentLecture}
+          onReset={handleRetry}
+          onOpenMenu={handleOpenMenu}
+          onOpenInfo={(type) => setInfoModalType(type)}
+          onDeleteLecture={handleDeleteLecture}
+        />
+      )}
+
+      {/* ─── INTERACTIVE WORKSPACE MENU MODAL (Requirement 2) ────────────────── */}
+      <NavigationModal
+        isOpen={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        initialView={menuInitialTab}
+        onSelectLecture={handleSelectLectureFromMenu}
       />
-    )
-  }
 
-  if (page === 'results' && result) {
-    return (
-      <ResultsPage
-        title={result.title}
-        transcript={result.transcript}
-        notes_markdown={result.notes_markdown}
-        onReset={handleRetry}
+      {/* ─── INTERACTIVE POLICY & FORMAT INFO MODAL (Requirement 2) ─────────── */}
+      <InfoModal
+        type={infoModalType}
+        isOpen={!!infoModalType}
+        onClose={() => setInfoModalType(null)}
       />
-    )
-  }
-
-  return null
+    </div>
+  )
 }

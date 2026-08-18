@@ -44,7 +44,7 @@ function StageIcon({ status }) {
   )
 }
 
-export default function ProcessingPage({ stage, error, onRetry }) {
+export default function ProcessingPage({ stage, error, onRetry, onOpenMenu, onOpenInfo }) {
   const currentIdx = STAGE_ORDER.indexOf(stage)
   const isError    = stage === 'error'
 
@@ -62,7 +62,7 @@ export default function ProcessingPage({ stage, error, onRetry }) {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-neutral-100">
-        <Nav />
+        <Nav onOpenMenu={onOpenMenu} onOpenInfo={onOpenInfo} onGoHome={onRetry} />
       </header>
 
       <main className="flex-1 flex items-center justify-center px-6 py-16">

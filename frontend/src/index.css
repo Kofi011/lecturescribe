@@ -27,6 +27,35 @@
     letter-spacing: -0.01em;
   }
 
+  /* Animated Waveform keyframes */
+  @keyframes flowWave {
+    0% {
+      stroke-dashoffset: 0;
+      transform: translateY(0px) scaleY(1);
+    }
+    50% {
+      stroke-dashoffset: 80;
+      transform: translateY(-8px) scaleY(1.04);
+    }
+    100% {
+      stroke-dashoffset: 160;
+      transform: translateY(0px) scaleY(1);
+    }
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% { opacity: 0.05; }
+    50% { opacity: 0.12; }
+  }
+
+  .animate-flowing-wave {
+    animation: flowWave 12s ease-in-out infinite, pulseGlow 6s ease-in-out infinite;
+  }
+
+  .animate-flowing-wave-delayed {
+    animation: flowWave 16s ease-in-out infinite reverse, pulseGlow 8s ease-in-out infinite 2s;
+  }
+
   /* Italic serif accent font — exact match for SasuSync italic serif */
   em, .font-serif-accent {
     font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;

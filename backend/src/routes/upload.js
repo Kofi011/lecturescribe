@@ -1,14 +1,9 @@
 /**
- * routes/upload.js — POST /api/upload
+ * routes/upload.js — Upload, Analysis, and Interactive Lecture Q&A
  *
- * Full synchronous processing pipeline (per ARCHITECTURE.md):
- *   1. Validate file (format, size via multer; duration via music-metadata)
- *   2. Transcribe audio → Groq Whisper  (Phase 3)
- *   3. Generate notes  → Groq LLM       (Phase 4)
- *   4. Return { status, title, transcript, notes_markdown } to frontend
- *
- * All errors return specific, human-readable JSON messages.
- * Temp files are deleted after processing (or on any error).
+ * Endpoints:
+ *   POST /api/upload — Process lecture audio -> structured knowledge
+ *   POST /api/chat   — Interactive Q&A about a lecture transcript
  */
 
 import express from 'express'
@@ -18,24 +13,23 @@ import fs from 'fs'
 import { parseBuffer } from 'music-metadata'
 import { transcribeAudio } from '../services/transcribe.js'
 import { generateNotes }   from '../services/generateNotes.js'
+import { askAboutLecture } from '../services/askLecture.js'
 
 const router = express.Router()
 
-// ─── Constants ────────────────────────────────────────────────────
 const ALLOWED_MIMES = [
-  'audio/mpeg',       // mp3
-  'audio/wav',        // wav
-  'audio/x-wav',      // wav (alternate)
-  'audio/mp4',        // m4a
-  'audio/x-m4a',      // m4a (alternate)
-  'audio/m4a',        // m4a (some browsers)
+  'audio/mpeg',
+  'audio/wav',
+  'audio/x-wav',
+  'audio/mp4',
+  'audio/x-m4a',
+  'audio/m4a',
 ]
 const ALLOWED_EXTS   = ['.mp3', '.wav', '.m4a']
 const MAX_SIZE_MB    = 15
 const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024
 const MAX_DURATION_SECONDS = 10 * 60   // 10 minutes
 
-// ─── Multer setup ─────────────────────────────────────────────────
 const storage = multer.diskStorage({
   destination: 'uploads/',
   filename: (_req, file, cb) => {
@@ -55,8 +49,8 @@ const upload = multer({
       cb(null, true)
     } else {
       const err = new Error(
-        `Unsupported file format "${ext || file.mimetype}". ` +
-        'Please upload an MP3, WAV, or M4A file.'
+        `Unsupported audio format "${ext || file.mimetype}". ` +
+        'Please upload an MP3, WAV, or M4A lecture file.'
       )
       err.code = 'UNSUPPORTED_FORMAT'
       cb(err)
@@ -64,7 +58,6 @@ const upload = multer({
   },
 })
 
-// ─── Helper: safe temp-file cleanup ──────────────────────────────
 function removeTempFile(filePath) {
   try {
     if (filePath && fs.existsSync(filePath)) fs.unlinkSync(filePath)
@@ -76,12 +69,10 @@ function removeTempFile(filePath) {
 // ─── POST /api/upload ─────────────────────────────────────────────
 router.post('/upload', (req, res) => {
   upload.single('audio')(req, res, async (multerErr) => {
-
-    // ── Multer-level errors ─────────────────────────────────────
     if (multerErr) {
       if (multerErr.code === 'LIMIT_FILE_SIZE') {
         return res.status(400).json({
-          error: `File is too large. Maximum size is ${MAX_SIZE_MB} MB.`,
+          error: `Audio file is too large. Maximum supported size is ${MAX_SIZE_MB} MB.`,
         })
       }
       if (multerErr.code === 'UNSUPPORTED_FORMAT') {
@@ -91,13 +82,13 @@ router.post('/upload', (req, res) => {
     }
 
     if (!req.file) {
-      return res.status(400).json({ error: 'No audio file provided.' })
+      return res.status(400).json({ error: 'No audio file was attached.' })
     }
 
     const filePath = req.file.path
 
     try {
-      // ── 1. Duration check ────────────────────────────────────
+      // 1. Duration check
       const fileBuffer  = fs.readFileSync(filePath)
       const metadata    = await parseBuffer(fileBuffer, { mimeType: req.file.mimetype })
       const durationSec = metadata.format.duration
@@ -106,36 +97,57 @@ router.post('/upload', (req, res) => {
         removeTempFile(filePath)
         const mins = Math.round(durationSec / 60)
         return res.status(400).json({
-          error: `Lecture is too long (${mins} min). Maximum is 10 minutes.`,
+          error: `Lecture audio is too long (${mins} min). Maximum duration is 10 minutes.`,
         })
       }
 
-      // ── 2. Transcribe ────────────────────────────────────────
-      console.log(`[upload] transcribing: ${req.file.originalname}`)
+      // 2. Transcribe speech
+      console.log(`[upload] processing speech: ${req.file.originalname}`)
       const transcript = await transcribeAudio(filePath, req.file.mimetype)
 
-      // ── 3. Generate notes ────────────────────────────────────
-      console.log('[upload] generating notes…')
-      const { title, notes_markdown } = await generateNotes(transcript)
+      // 3. Generate structured study intelligence
+      console.log('[upload] analyzing concepts & synthesizing notes…')
+      const result = await generateNotes(transcript)
 
-      // ── 4. Clean up + respond ────────────────────────────────
       removeTempFile(filePath)
-      console.log(`[upload] done — "${title}"`)
+      console.log(`[upload] lecture ready — "${result.title}"`)
 
       return res.json({
-        status:         'complete',
-        title,
+        status: 'complete',
+        id: `lec_${Date.now()}`,
+        date: new Date().toISOString(),
+        durationSec: durationSec ? Math.round(durationSec) : null,
+        fileName: req.file.originalname,
         transcript,
-        notes_markdown,
+        ...result,
       })
 
     } catch (err) {
       removeTempFile(filePath)
       console.error('[upload] error:', err.message)
-      // Return the service's human-readable message directly
       return res.status(500).json({ error: err.message })
     }
   })
+})
+
+// ─── POST /api/chat — Ask About This Lecture ──────────────────────
+router.post('/chat', async (req, res) => {
+  const { transcript, question, history } = req.body
+
+  if (!transcript) {
+    return res.status(400).json({ error: 'Lecture transcript is required for context.' })
+  }
+  if (!question || !question.trim()) {
+    return res.status(400).json({ error: 'Question cannot be empty.' })
+  }
+
+  try {
+    const answer = await askAboutLecture(transcript, question.trim(), history || [])
+    return res.json({ answer })
+  } catch (err) {
+    console.error('[chat] error:', err.message)
+    return res.status(500).json({ error: err.message || 'Failed to answer question.' })
+  }
 })
 
 export default router

@@ -1,5 +1,8 @@
 /**
- * LandingPage.jsx — Assembles the complete SasuSync-inspired experience
+ * LandingPage.jsx — Interactive Landing Experience with Animated Waveforms & SasuSync Layout
+ * Requirement 1: Animated curly line visual motion
+ * Requirement 2: Every clickable element produces a relevant result
+ * Requirement 3: Internal transcription tech is not exposed
  */
 
 import { useRef } from 'react'
@@ -10,37 +13,55 @@ import DarkHeroCard from '../components/DarkHeroCard'
 import UploadCard   from '../components/UploadCard'
 import Footer       from '../components/Footer'
 
-export default function LandingPage({ onUpload }) {
+export default function LandingPage({
+  onUpload,
+  onOpenMenu,
+  onOpenInfo,
+  onSelectExample,
+}) {
   const uploadRef     = useRef(null)
   const howItWorksRef = useRef(null)
 
   const scrollToUpload  = () => uploadRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  const scrollToExample = () => howItWorksRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  const scrollToHowItWorks = () => howItWorksRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
   return (
     <div className="min-h-screen flex flex-col bg-white selection:bg-black selection:text-white">
-      {/* Top Header */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md">
-        <Nav />
+      {/* Sticky Header */}
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md">
+        <Nav
+          onOpenMenu={onOpenMenu}
+          onOpenInfo={onOpenInfo}
+          onGoHome={scrollToUpload}
+        />
       </header>
 
       <main className="flex-1">
-        {/* 1. Hero Section (Image 4 style) */}
+        {/* 1. Hero Section with Animated Waveforms */}
         <HeroSection
           onUploadClick={scrollToUpload}
-          onExampleClick={scrollToExample}
+          onExampleClick={onSelectExample}
         />
 
-        {/* 2. Feature Section: "Three things, done properly." (Image 2 style) */}
-        <HowItWorks sectionRef={howItWorksRef} />
+        {/* 2. Feature Section: "Three things, done properly." */}
+        <HowItWorks
+          sectionRef={howItWorksRef}
+          onExploreFeature={(actionKey) => {
+            if (actionKey === 'topics') {
+              onOpenMenu('topics')
+            } else {
+              onOpenInfo(actionKey)
+            }
+          }}
+        />
 
-        {/* 3. Dark Hero Card: "Studying with an AI scribe?" (Image 1 style) */}
+        {/* 3. Dark Hero Card: "Studying with an AI scribe?" */}
         <DarkHeroCard
           onGetStarted={scrollToUpload}
-          onSeeExample={scrollToExample}
+          onSeeExample={onSelectExample}
         />
 
-        {/* 4. Upload Card Studio */}
+        {/* 4. Studio Upload Card */}
         <UploadCard
           cardRef={uploadRef}
           onSubmit={onUpload}
@@ -48,7 +69,7 @@ export default function LandingPage({ onUpload }) {
       </main>
 
       {/* 5. Minimal Footer */}
-      <Footer />
+      <Footer onOpenInfo={onOpenInfo} />
     </div>
   )
 }
