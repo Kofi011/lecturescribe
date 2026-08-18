@@ -33,8 +33,8 @@ export default function LandingPage({
       <AnimatedWaveform side="left" />
       <AnimatedWaveform side="right" />
 
-      {/* Transparent Sticky Header — Allows waveforms to show through marquee & nav */}
-      <header className="sticky top-0 z-40 bg-white/40 backdrop-blur-sm">
+      {/* Transparent Header — Waveforms flow directly through marquee & nav with zero blur */}
+      <header className="sticky top-0 z-40 bg-transparent">
         <Nav
           onOpenMenu={onOpenMenu}
           onOpenInfo={onOpenInfo}
