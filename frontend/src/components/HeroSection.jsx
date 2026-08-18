@@ -1,17 +1,11 @@
 /**
- * HeroSection.jsx — Hero section with side-margin waveforms and transparent marquee
+ * HeroSection.jsx — Focused hero section with clean text spacing and action buttons
  */
-
-import AnimatedWaveform from './AnimatedWaveform'
 
 export default function HeroSection({ onUploadClick, onExampleClick }) {
   return (
-    <section className="relative text-center px-4 sm:px-6 pt-16 pb-16 md:pt-24 md:pb-24 overflow-hidden">
-      {/* Flowing spline waveforms strictly framing the left and right margins */}
-      <AnimatedWaveform side="left" />
-      <AnimatedWaveform side="right" />
-
-      {/* Central Content Area — protected from waveform overlap */}
+    <section className="relative text-center px-4 sm:px-6 pt-16 pb-16 md:pt-24 md:pb-24">
+      {/* Central Content Area */}
       <div className="relative max-w-3xl mx-auto z-10 px-4 sm:px-6">
         {/* Main Headline */}
         <h1 className="text-5xl sm:text-6xl md:text-7xl font-black text-black tracking-tight leading-[1.05] mb-6">

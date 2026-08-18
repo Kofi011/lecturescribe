@@ -1,17 +1,19 @@
 /**
- * LandingPage.jsx — Interactive Landing Experience with Animated Waveforms & SasuSync Layout
- * Requirement 1: Animated curly line visual motion
- * Requirement 2: Every clickable element produces a relevant result
- * Requirement 3: Internal transcription tech is not exposed
+ * LandingPage.jsx — Full-page experience with continuous flowing spline waveforms
+ * Requirements:
+ *   1. Faster animation pace
+ *   2. Spline lines visible throughout entire page (from top to bottom)
+ *   3. Motion clearly visible behind transparent marquee & nav
  */
 
 import { useRef } from 'react'
-import Nav          from '../components/Nav'
-import HeroSection  from '../components/HeroSection'
-import HowItWorks   from '../components/HowItWorks'
-import DarkHeroCard from '../components/DarkHeroCard'
-import UploadCard   from '../components/UploadCard'
-import Footer       from '../components/Footer'
+import Nav              from '../components/Nav'
+import HeroSection      from '../components/HeroSection'
+import HowItWorks       from '../components/HowItWorks'
+import DarkHeroCard     from '../components/DarkHeroCard'
+import UploadCard       from '../components/UploadCard'
+import Footer           from '../components/Footer'
+import AnimatedWaveform from '../components/AnimatedWaveform'
 
 export default function LandingPage({
   onUpload,
@@ -22,13 +24,17 @@ export default function LandingPage({
   const uploadRef     = useRef(null)
   const howItWorksRef = useRef(null)
 
-  const scrollToUpload  = () => uploadRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  const scrollToUpload     = () => uploadRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   const scrollToHowItWorks = () => howItWorksRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
   return (
-    <div className="min-h-screen flex flex-col bg-white selection:bg-black selection:text-white">
-      {/* Sticky Header */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md">
+    <div className="min-h-screen relative flex flex-col bg-white selection:bg-black selection:text-white overflow-x-hidden">
+      {/* Full-page continuous flowing spline waveforms along left & right margins */}
+      <AnimatedWaveform side="left" />
+      <AnimatedWaveform side="right" />
+
+      {/* Transparent Sticky Header — Allows waveforms to show through marquee & nav */}
+      <header className="sticky top-0 z-40 bg-white/40 backdrop-blur-sm">
         <Nav
           onOpenMenu={onOpenMenu}
           onOpenInfo={onOpenInfo}
@@ -36,8 +42,8 @@ export default function LandingPage({
         />
       </header>
 
-      <main className="flex-1">
-        {/* 1. Hero Section with Animated Waveforms */}
+      <main className="flex-1 relative z-10">
+        {/* 1. Hero Section */}
         <HeroSection
           onUploadClick={scrollToUpload}
           onExampleClick={onSelectExample}

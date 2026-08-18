@@ -27,34 +27,34 @@
     letter-spacing: -0.01em;
   }
 
-  /* Animated Waveform keyframes — high visibility, smooth flowing motion */
-  @keyframes flowWave {
+  /* Animated Waveform keyframes — faster, lively pace across full page */
+  @keyframes flowWaveFast {
     0% {
-      transform: translateY(0px) scaleX(1);
+      transform: translateY(0px) scaleX(1) skewY(0deg);
     }
     50% {
-      transform: translateY(-16px) scaleX(1.06);
+      transform: translateY(-28px) scaleX(1.08) skewY(1.2deg);
     }
     100% {
-      transform: translateY(0px) scaleX(1);
+      transform: translateY(0px) scaleX(1) skewY(0deg);
     }
   }
 
-  @keyframes waveFloat {
+  @keyframes wavePulse {
     0%, 100% {
-      transform: translateY(0px) rotate(0deg);
+      opacity: 0.18;
     }
     50% {
-      transform: translateY(-12px) rotate(1.5deg);
+      opacity: 0.28;
     }
   }
 
   .animate-flowing-wave {
-    animation: flowWave 10s ease-in-out infinite alternate;
+    animation: flowWaveFast 4.2s ease-in-out infinite alternate, wavePulse 3s ease-in-out infinite alternate;
   }
 
   .animate-flowing-wave-delayed {
-    animation: flowWave 14s ease-in-out infinite alternate-reverse;
+    animation: flowWaveFast 5.2s ease-in-out infinite alternate-reverse, wavePulse 3.8s ease-in-out infinite alternate-reverse;
   }
 
   /* Seamless Infinite Marquee with generous spacing */
