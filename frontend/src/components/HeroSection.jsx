@@ -1,21 +1,20 @@
 /**
- * HeroSection.jsx — Hero section with continuous animated waveform motion and interactive actions
- * Requirement 1: Animated Curly Line / Visual Motion
- * Requirement 2: Every Clickable Element Must Produce a Relevant Result
+ * HeroSection.jsx — Hero section with side-margin waveforms and transparent marquee
  */
 
 import AnimatedWaveform from './AnimatedWaveform'
 
 export default function HeroSection({ onUploadClick, onExampleClick }) {
   return (
-    <section className="relative text-center px-6 pt-20 pb-16 md:pt-28 md:pb-24 overflow-hidden">
-      {/* Requirement 1: Animated flowing spline waveform motion */}
+    <section className="relative text-center px-4 sm:px-6 pt-16 pb-16 md:pt-24 md:pb-24 overflow-hidden">
+      {/* Flowing spline waveforms strictly framing the left and right margins */}
       <AnimatedWaveform side="left" />
       <AnimatedWaveform side="right" />
 
-      <div className="relative max-w-4xl mx-auto z-10">
+      {/* Central Content Area — protected from waveform overlap */}
+      <div className="relative max-w-3xl mx-auto z-10 px-4 sm:px-6">
         {/* Main Headline */}
-        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-black tracking-tight leading-[1.04] mb-8">
+        <h1 className="text-5xl sm:text-6xl md:text-7xl font-black text-black tracking-tight leading-[1.05] mb-6">
           Turn your lecture into{' '}
           <span className="font-serif italic font-normal text-[1.12em] tracking-tight inline-block pr-1">
             notes.
@@ -23,7 +22,7 @@ export default function HeroSection({ onUploadClick, onExampleClick }) {
         </h1>
 
         {/* Subtext */}
-        <p className="text-neutral-500 text-lg md:text-xl font-normal mb-12 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-neutral-500 text-base sm:text-lg md:text-xl font-normal mb-10 max-w-xl mx-auto leading-relaxed">
           Upload any lecture recording and get a full transcript, structured study
           notes, key concepts, and revision questions in seconds.
         </p>

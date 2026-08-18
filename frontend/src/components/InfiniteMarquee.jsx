@@ -1,11 +1,5 @@
 /**
- * InfiniteMarquee.jsx — Generously spaced seamless marquee
- *
- * Requirements:
- *   1. Generous spacing between items
- *   2. The repeated sequence only becomes visible after the original instance
- *      has completely exited the viewport (using full-viewport trailing buffer)
- *   3. Smooth, steady, premium motion with ✦ separators
+ * InfiniteMarquee.jsx — Generously spaced seamless marquee in a transparent container
  */
 
 export default function InfiniteMarquee({ onOpenInfo, onOpenMenu }) {
@@ -24,7 +18,7 @@ export default function InfiniteMarquee({ onOpenInfo, onOpenMenu }) {
 
   return (
     <div
-      className="w-full border-y border-neutral-200/80 bg-neutral-50/90 backdrop-blur-sm py-3 overflow-hidden select-none marquee-mask"
+      className="w-full bg-transparent py-2.5 overflow-hidden select-none marquee-mask"
       aria-label="Features and format compatibility"
     >
       <div className="marquee-track flex items-center">
@@ -44,7 +38,7 @@ export default function InfiniteMarquee({ onOpenInfo, onOpenMenu }) {
                   </span>
                 </button>
 
-                {/* Refined subtle symbol separator with generous spacing */}
+                {/* Refined subtle symbol separator */}
                 <span
                   className="text-xs text-neutral-400 px-4 md:px-8 select-none"
                   aria-hidden="true"
