@@ -9,10 +9,13 @@
     "start": "node src/server.js"
   },
   "dependencies": {
+    "@ffmpeg/ffmpeg": "^0.12.15",
+    "@ffmpeg/util": "^0.12.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "groq-sdk": "^1.5.0",
+    "lamejs": "^1.2.1",
     "multer": "^2.2.0",
     "music-metadata": "^11.14.0"
   }

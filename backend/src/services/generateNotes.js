@@ -81,30 +81,41 @@ export async function generateNotes(transcript) {
   const client = getClient()
 
   let raw
-  try {
-    const completion = await client.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user',   content: userPrompt(transcript) },
-      ],
-      temperature: 0.3,       // low temp = consistent structure
-      max_tokens: 2048,
-      response_format: { type: 'json_object' },  // enforce JSON mode
-    })
-    raw = completion.choices[0]?.message?.content ?? ''
-  } catch (err) {
-    const status = err?.status ?? err?.statusCode
+  const models = ['openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'qwen/qwen3.6-27b']
+  let lastErr = null
+
+  for (const model of models) {
+    try {
+      const completion = await client.chat.completions.create({
+        model,
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user',   content: userPrompt(transcript) },
+        ],
+        temperature: 0.3,       // low temp = consistent structure
+        max_tokens: 2048,
+        response_format: { type: 'json_object' },  // enforce JSON mode
+      })
+      raw = completion.choices[0]?.message?.content ?? ''
+      if (raw) break
+    } catch (err) {
+      lastErr = err
+      console.warn(`[generateNotes] model ${model} failed, trying next:`, err.message)
+    }
+  }
+
+  if (!raw && lastErr) {
+    const status = lastErr?.status ?? lastErr?.statusCode
     if (status === 401) {
       throw new Error('Invalid Groq API key. Check GROQ_API_KEY in your .env file.')
     }
     if (status === 429) {
       throw new Error('Groq API rate limit reached. Please wait a moment and try again.')
     }
-    if (err?.code === 'ECONNRESET' || err?.code === 'ETIMEDOUT') {
+    if (lastErr?.code === 'ECONNRESET' || lastErr?.code === 'ETIMEDOUT') {
       throw new Error('Note generation timed out. Please try again.')
     }
-    throw new Error(`Note generation failed: ${err?.message || 'Unknown API error.'}`)
+    throw new Error(`Note generation failed: ${lastErr?.message || 'Unknown API error.'}`)
   }
 
   // Parse and validate the JSON response

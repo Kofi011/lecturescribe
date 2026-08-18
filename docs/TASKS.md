@@ -75,13 +75,13 @@ git push origin main
 - [x] Add loading states for all async actions → commit + push
 
 ## Phase 7 — Testing
-- [ ] Test with mp3 file → commit (fix any bugs found) + push
-- [ ] Test with wav file → commit + push
-- [ ] Test with m4a file → commit + push
-- [ ] Test invalid/unsupported file type → commit + push
-- [ ] Test file over 10 minutes → commit + push
-- [ ] Test API failure (simulate by breaking key temporarily) → commit + push
-- [ ] Test on an actual mobile device or dev-tools mobile view → commit + push
+- [x] Test with mp3 file → commit (fix any bugs found) + push
+- [x] Test with wav file → commit + push
+- [x] Test with m4a file → commit + push
+- [x] Test invalid/unsupported file type → commit + push
+- [x] Test file over 10 minutes → commit + push
+- [x] Test API failure (simulate by breaking key temporarily) → commit + push
+- [x] Test on an actual mobile device or dev-tools mobile view → commit + push
 
 ## Phase 8 — Deployment
 - [ ] Merge `dev` into `main` (deployment should run off `main`, not `dev`)
