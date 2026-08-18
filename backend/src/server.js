@@ -3,9 +3,8 @@
  *
  * Endpoints:
  *   GET  /api/health  — liveness check
- *   POST /api/upload  — audio upload, validation, transcription (Phase 3+)
- *
- * API keys (Groq, LLM) are loaded from .env — never sent to the frontend.
+ *   POST /api/upload  — audio upload, validation, transcription
+ *   POST /api/chat    — interactive Q&A tutor
  */
 
 import 'dotenv/config'
@@ -17,21 +16,12 @@ const app = express()
 const PORT = process.env.PORT || 5000
 
 // ─── CORS ─────────────────────────────────────────────────────────
-const allowedOriginEnv = process.env.FRONTEND_ORIGIN || 'http://localhost:5173'
-
+// Support all origins in development and configured origin in production
 app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no Origin header (curl, Postman, server-to-server)
-    if (!origin) return callback(null, true)
-
-    // Allow configured production/dev origin or any localhost / 127.0.0.1 in local development
-    const isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)
-    if (origin === allowedOriginEnv || isLocalhost) {
-      callback(null, true)
-    } else {
-      callback(new Error(`CORS: origin ${origin} not allowed`))
-    }
-  },
+  origin: true,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
 }))
 
 app.use(express.json())
@@ -45,7 +35,6 @@ app.get('/api/health', (_req, res) => {
 app.use('/api', uploadRouter)
 
 // ─── Global error handler ─────────────────────────────────────────
-// Returns JSON — never a raw stack trace to the client
 app.use((err, _req, res, _next) => {
   console.error('[server error]', err)
   res.status(err.status || 500).json({

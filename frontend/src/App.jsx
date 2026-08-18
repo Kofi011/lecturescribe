@@ -14,7 +14,7 @@ import NavigationModal from './components/NavigationModal'
 import InfoModal       from './components/InfoModal'
 import { saveLecture, deleteLecture, SAMPLE_LECTURE } from './utils/lectureStorage'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const API_URL = import.meta.env.VITE_API_URL || ''
 
 export default function App() {
   const [page,           setPage]           = useState('landing')
@@ -48,22 +48,36 @@ export default function App() {
 
     let data
     try {
-      const res = await fetch(`${API_URL}/api/upload`, {
+      const endpoint = API_URL ? `${API_URL}/api/upload` : '/api/upload'
+      const res = await fetch(endpoint, {
         method: 'POST',
         body: formData,
         signal: controller.signal,
       })
-      data = await res.json()
+
+      // Parse JSON response or fallback to text error
+      const contentType = res.headers.get('content-type') || ''
+      if (contentType.includes('application/json')) {
+        data = await res.json()
+      } else {
+        const text = await res.text()
+        data = { error: text || `Server error (${res.status})` }
+      }
 
       if (!res.ok) {
-        setError(data.error || 'Unable to process lecture audio. Please try again.')
+        setError(data?.error || `Processing failed with status ${res.status}. Please try again.`)
         setStage('transcribing')
         setPage('processing')
         return
       }
     } catch (err) {
       if (err.name === 'AbortError') return
-      setError('Connection to LectureScribe server failed. Please ensure the backend is running and try again.')
+      console.error('[upload error]', err)
+      setError(
+        err.message?.includes('Failed to fetch') || err.message?.includes('NetworkError')
+          ? 'Connection to LectureScribe server failed. Please ensure the backend is running and try again.'
+          : `Upload error: ${err.message}`
+      )
       setStage('transcribing')
       setPage('processing')
       return
@@ -73,6 +87,7 @@ export default function App() {
     setStage('summarizing')
     await new Promise((r) => setTimeout(r, 900))
     setStage('complete')
+    await new Promise((r) => setTimeout(r, 600))
     await new Promise((r) => setTimeout(r, 600))
 
     // Persist to local client storage
