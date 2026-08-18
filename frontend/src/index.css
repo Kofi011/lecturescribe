@@ -56,6 +56,32 @@
     animation: flowWave 16s ease-in-out infinite reverse, pulseGlow 8s ease-in-out infinite 2s;
   }
 
+  /* Seamless Infinite Marquee */
+  @keyframes infiniteMarquee {
+    0% {
+      transform: translate3d(0, 0, 0);
+    }
+    100% {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    will-change: transform;
+    animation: infiniteMarquee 34s linear infinite;
+  }
+
+  .marquee-track:hover {
+    animation-play-state: paused;
+  }
+
+  .marquee-mask {
+    mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,1) 4%, rgba(0,0,0,1) 96%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,1) 4%, rgba(0,0,0,1) 96%, transparent 100%);
+  }
+
   /* Italic serif accent font — exact match for SasuSync italic serif */
   em, .font-serif-accent {
     font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
