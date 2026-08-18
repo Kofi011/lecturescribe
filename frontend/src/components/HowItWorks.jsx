@@ -1,47 +1,41 @@
 /**
- * HowItWorks.jsx — dark alternating section explaining the 3-step flow
- * Per DESIGN.md: dark full-width section, 3-column card grid (stacks on mobile)
- * Mirrors "Transcribe / Summarize / Export" cards like reference site's feature row
+ * HowItWorks.jsx — "Three things, done properly." section matching SasuSync Image 2
+ * Features:
+ *   - Bold headline with italic serif accent word
+ *   - 3 clean white cards with line icons, bold headers, and gray descriptions
  */
 
-const steps = [
+const items = [
   {
     id: 'transcribe',
     icon: (
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-        <circle cx="16" cy="16" r="10" />
-        <line x1="16" y1="10" x2="16" y2="16" />
-        <circle cx="16" cy="16" r="2" fill="currentColor" stroke="none" />
-        <path d="M10 26 Q16 28 22 26" strokeLinecap="round" />
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
       </svg>
     ),
-    heading: 'Transcribe',
-    body: 'Your lecture audio is transcribed word-for-word using Whisper AI — accurate even with accents and technical terms.',
+    heading: 'Whisper Transcription',
+    body: 'Your lecture is transcribed word-for-word using Groq Whisper Large-v3. Fast, accurate, and resilient against background noise or heavy accents.',
   },
   {
     id: 'summarize',
     icon: (
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-        <rect x="6" y="4" width="20" height="24" rx="3" />
-        <line x1="10" y1="11" x2="22" y2="11" strokeLinecap="round" />
-        <line x1="10" y1="16" x2="22" y2="16" strokeLinecap="round" />
-        <line x1="10" y1="21" x2="17" y2="21" strokeLinecap="round" />
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
       </svg>
     ),
-    heading: 'Summarize',
-    body: 'Key concepts are distilled into headed sections, bullet points, and a concise Key Takeaways block you can actually study from.',
+    heading: 'Structured Notes',
+    body: 'Key concepts are distilled into headed sections, bulleted notes, and an essential Key Takeaways block ready for exam prep.',
   },
   {
     id: 'export',
     icon: (
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-        <path d="M10 20 L16 26 L22 20" strokeLinecap="round" strokeLinejoin="round" />
-        <line x1="16" y1="26" x2="16" y2="10" strokeLinecap="round" />
-        <path d="M8 6 h16 a2 2 0 0 1 2 2 v2 H6 V8 a2 2 0 0 1 2-2z" />
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
       </svg>
     ),
-    heading: 'Export',
-    body: 'Copy your notes to the clipboard or download them as a Markdown file. Ready for Notion, Obsidian, or any note app.',
+    heading: 'Export & Copy',
+    body: 'Copy notes directly to your clipboard or download as clean Markdown (.md). Perfectly formatted for Notion, Obsidian, or Apple Notes.',
   },
 ]
 
@@ -50,27 +44,38 @@ export default function HowItWorks({ sectionRef }) {
     <section
       ref={sectionRef}
       id="how-it-works"
-      className="bg-black text-white px-6 py-20 md:py-28"
+      className="px-6 py-20 md:py-28 bg-white border-t border-neutral-100"
     >
-      <div className="max-w-5xl mx-auto">
-        {/* Section heading — bold sans */}
-        <h2 className="text-3xl md:text-5xl font-black tracking-tight mb-4 text-center">
-          Three things, done <em style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>properly.</em>
-        </h2>
-        <p className="text-gray-400 text-center mb-14 text-base md:text-lg max-w-lg mx-auto">
-          No magic. Just good AI, good design, and a clean output you can use immediately.
-        </p>
+      <div className="max-w-6xl mx-auto">
+        {/* Section Heading matching SasuSync Image 2 */}
+        <div className="text-center mb-16">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-black tracking-tight mb-4 leading-tight">
+            Three things, done{' '}
+            <span className="font-serif italic font-normal text-[1.12em] tracking-tight">
+              properly.
+            </span>
+          </h2>
+          <p className="text-neutral-500 text-base md:text-lg max-w-xl mx-auto font-normal">
+            One upload, one transcript, one structured summary for every lecture.
+          </p>
+        </div>
 
-        {/* 3-column card grid — stacks to 1 column on mobile */}
+        {/* 3-column card grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {steps.map((step) => (
+          {items.map((item) => (
             <div
-              key={step.id}
-              className="border border-white/20 rounded-card p-8 flex flex-col gap-4"
+              key={item.id}
+              className="bg-white border border-neutral-200/90 rounded-[28px] p-8 md:p-10 flex flex-col gap-6 shadow-[0_2px_16px_rgba(0,0,0,0.02)] hover:border-black transition-all duration-200"
             >
-              <div className="text-white opacity-90">{step.icon}</div>
-              <h3 className="text-xl font-bold">{step.heading}</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">{step.body}</p>
+              <div className="text-black w-10 h-10 flex items-center justify-center">
+                {item.icon}
+              </div>
+              <h3 className="text-xl font-bold text-black tracking-tight">
+                {item.heading}
+              </h3>
+              <p className="text-neutral-500 text-sm md:text-[15px] leading-relaxed font-normal">
+                {item.body}
+              </p>
             </div>
           ))}
         </div>

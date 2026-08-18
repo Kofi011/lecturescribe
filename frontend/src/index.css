@@ -1,85 +1,112 @@
-/* DESIGN.md base CSS — black/white palette, Inter font, Tailwind directives */
+/* DESIGN.md & sms.sasusync.com inspired design system */
 
-/* Import Inter from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+/* Google Fonts: Inter (Sans) + Instrument Serif (Serif Italic) */
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Base resets ─────────────────────────────────────────── */
+/* ─── Base Resets ─────────────────────────────────────────── */
 @layer base {
   *, *::before, *::after {
     box-sizing: border-box;
   }
 
   html {
-    font-family: 'Inter', Helvetica Neue, Helvetica, Arial, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
   }
 
   body {
     margin: 0;
     background-color: #ffffff;
     color: #000000;
+    letter-spacing: -0.01em;
   }
 
-  /* Italic serif accent — used inside headlines per DESIGN.md */
-  em {
-    font-family: Georgia, 'Times New Roman', serif;
+  /* Italic serif accent font — exact match for SasuSync italic serif */
+  em, .font-serif-accent {
+    font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
     font-style: italic;
+    font-weight: 400;
+    letter-spacing: -0.01em;
   }
 }
 
-/* ─── Component layer: reusable design-system classes ───────── */
+/* ─── Component Layer ───────────────────────────────────────── */
 @layer components {
 
-  /* Primary pill button: solid black, white text */
+  /* Wordmark logo styling */
+  .wordmark {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+
+  /* Primary solid black pill button */
   .btn-primary {
     @apply inline-flex items-center justify-center
-           px-6 py-3
-           bg-black text-white font-semibold
-           rounded-pill
-           transition-opacity duration-150
-           cursor-pointer;
-  }
-  .btn-primary:hover {
-    @apply opacity-80;
+           px-7 py-3.5
+           bg-black text-white font-semibold text-[15px]
+           rounded-full
+           hover:bg-neutral-800 active:scale-[0.98]
+           transition-all duration-150
+           cursor-pointer select-none shadow-sm;
   }
 
-  /* Secondary pill button: outline, black text */
+  /* Secondary outline pill button */
   .btn-secondary {
     @apply inline-flex items-center justify-center
-           px-6 py-3
-           bg-white text-black font-semibold
-           border border-black
-           rounded-pill
-           transition-colors duration-150
-           cursor-pointer;
-  }
-  .btn-secondary:hover {
-    @apply bg-black text-white;
+           px-7 py-3.5
+           bg-white text-black font-semibold text-[15px]
+           border border-neutral-300
+           rounded-full
+           hover:border-black hover:bg-neutral-50 active:scale-[0.98]
+           transition-all duration-150
+           cursor-pointer select-none;
   }
 
-  /* Card: white bg, light border, rounded corners per DESIGN.md */
-  .card {
-    @apply bg-white border border-gray-200 rounded-card p-6;
+  /* White pill on dark backgrounds (Get the brief / Try again) */
+  .btn-white {
+    @apply inline-flex items-center justify-center
+           px-7 py-3.5
+           bg-white text-black font-semibold text-[15px]
+           rounded-full
+           hover:bg-neutral-100 active:scale-[0.98]
+           transition-all duration-150
+           cursor-pointer select-none;
   }
 
-  /* Dark hero card (Processing page) */
+  /* Outline pill on dark backgrounds (See an example) */
+  .btn-dark-outline {
+    @apply inline-flex items-center justify-center
+           px-7 py-3.5
+           bg-transparent text-white font-semibold text-[15px]
+           border border-white/20
+           rounded-full
+           hover:border-white hover:bg-white/5 active:scale-[0.98]
+           transition-all duration-150
+           cursor-pointer select-none;
+  }
+
+  /* Cards */
+  .card-white {
+    @apply bg-white border border-neutral-200/90 rounded-[28px] p-8 md:p-10 shadow-[0_4px_24px_rgba(0,0,0,0.02)];
+  }
+
   .card-dark {
-    @apply bg-black text-white border-0 rounded-card p-8;
+    @apply bg-[#0c0c0c] text-white border border-neutral-800 rounded-[32px] p-10 md:p-16 shadow-2xl;
   }
 
-  /* Nav wordmark: italic serif */
-  .wordmark {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-style: italic;
-    font-weight: 700;
+  /* Pill badge sitting above cards (Starter / Popular / Best value style) */
+  .pill-badge {
+    @apply inline-flex items-center justify-center
+           px-4 py-1
+           bg-black text-white text-xs font-semibold
+           rounded-full tracking-wide;
   }
-
-  /* Status indicator dots */
-  .status-done    { @apply text-white; }
-  .status-active  { @apply text-white; }
-  .status-pending { @apply text-gray-400; }
 }

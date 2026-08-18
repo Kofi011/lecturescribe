@@ -1,27 +1,16 @@
 /**
- * UploadCard.jsx — bordered white card with audio file picker + client validation
- *
- * Client-side validation (before any network request):
- *   1. Format: MP3, WAV, M4A only (checked via MIME type + extension)
- *   2. Size:   ≤ 15 MB
- *   3. Duration: ≤ 10 minutes (via HTMLMediaElement metadata)
- *
- * On submit → calls onSubmit(file) — App.jsx handles the actual fetch.
- * This keeps the upload card pure UI/validation; no network calls here.
+ * UploadCard.jsx — Audio file upload card styled with SasuSync visual language
  */
 
 import { useState, useRef, useCallback } from 'react'
 
-// ─── Constants ───────────────────────────────────────────────────────────────
 const ALLOWED_MIMES = new Set([
   'audio/mpeg', 'audio/wav', 'audio/x-wav',
   'audio/mp4', 'audio/x-m4a', 'audio/m4a',
 ])
-const ALLOWED_EXTS    = new Set(['.mp3', '.wav', '.m4a'])
-const MAX_SIZE_MB     = 15
+const ALLOWED_EXTS     = new Set(['.mp3', '.wav', '.m4a'])
+const MAX_SIZE_MB      = 15
 const MAX_DURATION_MIN = 10
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function getAudioDuration(file) {
   return new Promise((resolve, reject) => {
@@ -46,7 +35,6 @@ function formatSize(bytes) {
   return (bytes / 1024 / 1024).toFixed(1) + ' MB'
 }
 
-// ─── Component ───────────────────────────────────────────────────────────────
 export default function UploadCard({ cardRef, onSubmit }) {
   const fileInputRef = useRef(null)
   const [file,       setFile]       = useState(null)
@@ -54,14 +42,12 @@ export default function UploadCard({ cardRef, onSubmit }) {
   const [checking,   setChecking]   = useState(false)
   const [isDragging, setIsDragging] = useState(false)
 
-  // ── Validate candidate file ───────────────────────────────────────────────
   const validateFile = useCallback(async (candidate) => {
     setError(null)
     setFile(null)
     if (!candidate) return
 
-    // 1. Format
-    const ext  = getExt(candidate.name)
+    const ext = getExt(candidate.name)
     if (!ALLOWED_MIMES.has(candidate.type) && !ALLOWED_EXTS.has(ext)) {
       setError(
         `Unsupported format (${ext || candidate.type || 'unknown'}). ` +
@@ -70,7 +56,6 @@ export default function UploadCard({ cardRef, onSubmit }) {
       return
     }
 
-    // 2. Size
     if (candidate.size > MAX_SIZE_MB * 1024 * 1024) {
       setError(
         `File is too large (${formatSize(candidate.size)}). ` +
@@ -79,7 +64,6 @@ export default function UploadCard({ cardRef, onSubmit }) {
       return
     }
 
-    // 3. Duration (async)
     setChecking(true)
     try {
       const dur = await getAudioDuration(candidate)
@@ -100,7 +84,6 @@ export default function UploadCard({ cardRef, onSubmit }) {
     setFile(candidate)
   }, [])
 
-  // ── Event handlers ────────────────────────────────────────────────────────
   const handleChange = (e) => {
     validateFile(e.target.files[0] ?? null)
     e.target.value = ''
@@ -118,71 +101,76 @@ export default function UploadCard({ cardRef, onSubmit }) {
 
   const handleSubmit = () => {
     if (!file) return
-    onSubmit(file)   // hand the validated File object up to App.jsx
+    onSubmit(file)
   }
 
-  // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <section ref={cardRef} id="upload-section" className="px-6 py-16 md:py-20 bg-white">
-      <div className="max-w-2xl mx-auto">
-        <p className="text-center text-[#6B7280] text-sm font-medium uppercase tracking-widest mb-8">
-          Upload your lecture
-        </p>
+    <section ref={cardRef} id="upload-section" className="px-6 py-20 bg-neutral-50/50 border-t border-neutral-100">
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center mb-10">
+          <span className="pill-badge mb-4">
+            STUDIO UPLOAD
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-black text-black tracking-tight mt-2">
+            Ready to transcribe?
+          </h2>
+          <p className="text-neutral-500 text-sm md:text-base mt-2 font-normal">
+            Select an audio file from your device to begin.
+          </p>
+        </div>
 
-        <div className="card p-8 md:p-12">
-
-          {/* Drop zone */}
+        {/* Upload Card */}
+        <div className="bg-white border border-neutral-200/90 rounded-[28px] p-8 md:p-12 shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
+          {/* Drop area */}
           <div
             role="button"
             tabIndex={0}
-            aria-label="Click or drag an audio file here"
+            aria-label="Upload audio file"
             onClick={() => !file && !checking && fileInputRef.current?.click()}
             onKeyDown={(e) => e.key === 'Enter' && fileInputRef.current?.click()}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             className={[
-              'border-2 border-dashed rounded-card p-10 text-center transition-colors duration-150 select-none',
+              'border-2 border-dashed rounded-[22px] p-10 md:p-14 text-center transition-all duration-200 select-none',
               isDragging
-                ? 'border-black bg-gray-50'
+                ? 'border-black bg-neutral-50 scale-[1.01]'
                 : file
-                ? 'border-black bg-white cursor-default'
-                : 'border-gray-300 hover:border-black cursor-pointer',
+                ? 'border-black bg-neutral-50/40 cursor-default'
+                : 'border-neutral-200 hover:border-black hover:bg-neutral-50/50 cursor-pointer',
             ].join(' ')}
           >
-            {/* Upload icon */}
-            <div className="flex justify-center mb-4">
-              <svg
-                width="40" height="40" viewBox="0 0 40 40"
-                fill="none" stroke="black" strokeWidth="1.6"
-                className={`transition-opacity ${file ? 'opacity-100' : 'opacity-40'}`}
-                aria-hidden="true"
-              >
-                <path d="M20 8 v16 M13 15 l7-7 7 7" strokeLinecap="round" strokeLinejoin="round" />
-                <rect x="6" y="28" width="28" height="6" rx="3" />
+            {/* Upload Icon */}
+            <div className="w-14 h-14 rounded-full bg-neutral-100 flex items-center justify-center mx-auto mb-5 text-black">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
               </svg>
             </div>
 
             {checking ? (
-              <p className="text-[#6B7280] text-sm">Checking audio…</p>
+              <p className="text-neutral-600 font-medium text-sm">Analyzing audio duration…</p>
             ) : file ? (
-              <>
-                <p className="font-semibold text-black text-base mb-1 break-all">{file.name}</p>
-                <p className="text-[#6B7280] text-sm">{formatSize(file.size)}</p>
-              </>
+              <div className="flex flex-col items-center">
+                <span className="font-bold text-black text-base md:text-lg break-all">{file.name}</span>
+                <span className="text-neutral-500 text-xs font-semibold mt-1 px-3 py-1 bg-neutral-100 rounded-full">
+                  {formatSize(file.size)}
+                </span>
+              </div>
             ) : (
               <>
-                <p className="font-semibold text-black text-base mb-1">
-                  Click to select or drag &amp; drop
+                <p className="font-bold text-black text-base md:text-lg mb-1 tracking-tight">
+                  Click to select audio or drag and drop
                 </p>
-                <p className="text-[#6B7280] text-sm">
-                  MP3, WAV, or M4A · Max {MAX_DURATION_MIN} min · Max {MAX_SIZE_MB} MB
+                <p className="text-neutral-400 text-xs md:text-sm font-normal">
+                  MP3, WAV, or M4A · Max {MAX_DURATION_MIN} minutes · Max {MAX_SIZE_MB} MB
                 </p>
               </>
             )}
           </div>
 
-          {/* Hidden file input — accept mp3, wav, m4a */}
+          {/* Hidden File Input */}
           <input
             ref={fileInputRef}
             type="file"
@@ -192,27 +180,27 @@ export default function UploadCard({ cardRef, onSubmit }) {
             onChange={handleChange}
           />
 
-          {/* Error message */}
+          {/* Error Message */}
           {error && (
-            <div role="alert" className="mt-4 px-4 py-3 border border-black rounded-card text-sm flex items-start gap-2">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" className="shrink-0 mt-0.5" aria-hidden="true">
-                <circle cx="8" cy="8" r="6.5" />
-                <line x1="8" y1="5" x2="8" y2="8.5" strokeLinecap="round" />
-                <circle cx="8" cy="11" r="0.7" fill="currentColor" stroke="none" />
+            <div role="alert" className="mt-5 px-5 py-3.5 border border-red-500/20 bg-red-50/50 rounded-[18px] text-sm text-red-900 flex items-start gap-3">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 mt-0.5 text-red-600">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
               </svg>
-              {error}
+              <span className="font-medium leading-relaxed">{error}</span>
             </div>
           )}
 
-          {/* Action buttons */}
-          <div className="mt-6 flex gap-3 flex-wrap">
+          {/* Actions */}
+          <div className="mt-8 flex gap-3 flex-wrap">
             <button
               id="upload-submit-btn"
               onClick={handleSubmit}
               disabled={!file || checking}
               className={[
-                'btn-primary flex-1 text-base py-4',
-                (!file || checking) ? 'opacity-40 cursor-not-allowed' : '',
+                'btn-primary flex-1 py-4 text-base tracking-tight',
+                (!file || checking) ? 'opacity-40 cursor-not-allowed hover:bg-black' : '',
               ].join(' ')}
             >
               Upload &amp; Transcribe
@@ -221,7 +209,7 @@ export default function UploadCard({ cardRef, onSubmit }) {
               <button
                 id="upload-clear-btn"
                 onClick={handleClear}
-                className="btn-secondary px-6 py-4 text-base"
+                className="btn-secondary px-7 py-4 text-base"
               >
                 Clear
               </button>

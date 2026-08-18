@@ -1,21 +1,9 @@
 /**
- * ProcessingPage.jsx — dark rounded hero card showing live processing stages
- *
- * Per DESIGN.md / ARCHITECTURE.md:
- *   Dark rounded card on a white page, white headline
- *   Status stages: ✓ done  ●  in progress  ○ pending  ✗ error
- *
- * Stages:
- *   uploaded    → Transcribing → Summarizing → Complete (or Error)
- *
- * Props:
- *   stage: 'uploaded' | 'transcribing' | 'summarizing' | 'complete' | 'error'
- *   error: string | null  — specific error message when stage === 'error'
+ * ProcessingPage.jsx — Dark rounded container matching SasuSync Image 1
  */
 
 import Nav from '../components/Nav'
 
-// Stage definitions — order matters
 const STAGES = [
   { key: 'uploaded',     label: 'Audio uploaded' },
   { key: 'transcribing', label: 'Transcribing lecture…' },
@@ -36,22 +24,21 @@ function StageIcon({ status }) {
   if (status === 'active') {
     return (
       <span
-        className="block w-3 h-3 rounded-full bg-white animate-pulse select-none"
+        className="block w-2.5 h-2.5 rounded-full bg-white animate-pulse select-none"
         aria-label="In progress"
       />
     )
   }
   if (status === 'error') {
     return (
-      <span className="text-white font-bold text-base leading-none select-none" aria-label="Error">
-        ✗
+      <span className="text-red-400 font-bold text-base leading-none select-none" aria-label="Error">
+        ✕
       </span>
     )
   }
-  // pending
   return (
     <span
-      className="block w-3 h-3 rounded-full border-2 border-white/30 select-none"
+      className="block w-2.5 h-2.5 rounded-full border border-neutral-600 select-none"
       aria-label="Pending"
     />
   )
@@ -61,10 +48,8 @@ export default function ProcessingPage({ stage, error, onRetry }) {
   const currentIdx = STAGE_ORDER.indexOf(stage)
   const isError    = stage === 'error'
 
-  // Determine status for each row
   function getStatus(stageKey, idx) {
     if (isError) {
-      // Mark the active stage as error, prior stages as done, later as pending
       if (idx < currentIdx)  return 'done'
       if (idx === currentIdx) return 'error'
       return 'pending'
@@ -76,29 +61,29 @@ export default function ProcessingPage({ stage, error, onRetry }) {
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      <header className="sticky top-0 z-10 bg-white/90 backdrop-blur border-b border-gray-100">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-neutral-100">
         <Nav />
       </header>
 
       <main className="flex-1 flex items-center justify-center px-6 py-16">
-        {/* Dark rounded hero card per DESIGN.md */}
         <div
-          className="card-dark w-full max-w-lg"
+          className="card-dark w-full max-w-xl"
           role="status"
           aria-live="polite"
-          aria-label={`Processing stage: ${stage}`}
         >
-          {/* Headline */}
-          <h1 className="text-3xl md:text-4xl font-black text-white mb-10 tracking-tight">
-            {isError
-              ? 'Something went wrong.'
-              : stage === 'complete'
-              ? 'Done.'
-              : 'Processing your lecture.'}
+          {/* Headline with italic serif accent */}
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-10 tracking-tight leading-tight">
+            {isError ? (
+              <>Something went <span className="font-serif italic font-normal text-[1.12em]">wrong.</span></>
+            ) : stage === 'complete' ? (
+              <>All <span className="font-serif italic font-normal text-[1.12em]">done.</span></>
+            ) : (
+              <>Processing your <span className="font-serif italic font-normal text-[1.12em]">lecture.</span></>
+            )}
           </h1>
 
-          {/* Stage list */}
-          <ol className="space-y-5">
+          {/* Status Stage List */}
+          <ol className="space-y-6">
             {STAGES.map(({ key, label }, idx) => {
               const status = getStatus(key, idx)
               return (
@@ -112,7 +97,7 @@ export default function ProcessingPage({ stage, error, onRetry }) {
                   <span className="w-5 h-5 flex items-center justify-center shrink-0">
                     <StageIcon status={status} />
                   </span>
-                  <span className={status === 'active' ? 'text-white font-semibold' : 'text-white/80'}>
+                  <span className={status === 'active' ? 'text-white font-semibold' : 'text-neutral-300 font-normal'}>
                     {label}
                   </span>
                 </li>
@@ -120,18 +105,18 @@ export default function ProcessingPage({ stage, error, onRetry }) {
             })}
           </ol>
 
-          {/* Error details */}
+          {/* Error Details */}
           {isError && error && (
-            <div className="mt-8 border border-white/20 rounded-card p-4 text-sm text-white/80 leading-relaxed">
+            <div className="mt-8 border border-neutral-800 bg-neutral-900/50 rounded-[20px] p-5 text-sm text-neutral-300 leading-relaxed font-normal">
               {error}
             </div>
           )}
 
-          {/* Retry button (error state only) */}
+          {/* Retry Button */}
           {isError && onRetry && (
             <button
               onClick={onRetry}
-              className="mt-8 w-full inline-flex items-center justify-center px-6 py-3 bg-white text-black font-semibold rounded-pill hover:bg-gray-200 transition-colors cursor-pointer"
+              className="mt-8 w-full btn-white"
             >
               Try again
             </button>

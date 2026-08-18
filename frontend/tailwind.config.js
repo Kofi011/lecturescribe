@@ -6,24 +6,35 @@ export default {
   ],
   theme: {
     extend: {
-      // DESIGN.md: black/white palette only
       colors: {
         primary: '#000000',
         secondary: '#FFFFFF',
-        gray: {
-          subtle: '#6B7280',   // subtext / captions
-          border: '#E5E7EB',   // card borders
+        neutral: {
+          50: '#F9FAFB',
+          100: '#F3F4F6',
+          200: '#E5E7EB',
+          300: '#D1D5DB',
+          400: '#9CA3AF',
+          500: '#6B7280',
+          600: '#4B5563',
+          700: '#374151',
+          800: '#1F2937',
+          900: '#111827',
+          950: '#0B0F17',
         },
       },
-      // DESIGN.md: Inter for headlines + body; Georgia/serif for italic accent word
       fontFamily: {
-        sans: ['Inter', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
-        serif: ['Georgia', 'Times New Roman', 'serif'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        serif: ['"Instrument Serif"', 'Georgia', 'Times New Roman', 'serif'],
       },
-      // Generous pill border-radius
       borderRadius: {
         pill: '9999px',
-        card: '1rem',   // ~16px, per DESIGN.md card spec
+        card: '28px',
+        hero: '32px',
+      },
+      letterSpacing: {
+        tighter: '-0.04em',
+        tight: '-0.02em',
       },
     },
   },

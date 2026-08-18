@@ -1,56 +1,49 @@
 /**
- * ResultsPage.jsx — shows transcript and notes in pill-tab switcher
- *
- * Per DESIGN.md:
- *   Light background, tab pills (Transcript / Notes) styled like Menu pill
- *   Content in a bordered white card — bold headings, bullets
- *   Buttons below card: solid Copy, outline Download
- *
- * Props:
- *   title:          string
- *   transcript:     string
- *   notes_markdown: string (Markdown with ## headings and - bullets)
- *   onReset:        () => void  — start over
+ * ResultsPage.jsx — Transcript & Notes view matching SasuSync visual language
  */
 
 import { useState } from 'react'
 import Nav from '../components/Nav'
 import Footer from '../components/Footer'
 
-// ─── Simple Markdown renderer ─────────────────────────────────────────────────
-// Renders ## headings and - bullets from the LLM output.
-// Not a full MD parser — just enough for our known output structure.
 function renderMarkdown(md) {
   if (!md) return null
   return md.split('\n').map((line, i) => {
     if (/^# (.+)/.test(line)) {
-      return <h1 key={i} className="text-2xl font-black mt-6 mb-3 first:mt-0">{line.slice(2)}</h1>
+      return (
+        <h1 key={i} className="text-2xl sm:text-3xl font-black text-black tracking-tight mt-8 mb-4 first:mt-0">
+          {line.slice(2)}
+        </h1>
+      )
     }
     if (/^## (.+)/.test(line)) {
-      return <h2 key={i} className="text-lg font-bold mt-6 mb-2 first:mt-0">{line.slice(3)}</h2>
+      return (
+        <h2 key={i} className="text-lg sm:text-xl font-bold text-black tracking-tight mt-7 mb-3 first:mt-0 flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-black"></span>
+          {line.slice(3)}
+        </h2>
+      )
     }
     if (/^- (.+)/.test(line)) {
       return (
-        <li key={i} className="ml-5 list-disc text-[15px] leading-relaxed text-gray-800 mb-1">
+        <li key={i} className="ml-5 list-disc text-[15px] leading-relaxed text-neutral-700 mb-2 font-normal">
           {line.slice(2)}
         </li>
       )
     }
-    if (line.trim() === '') return <div key={i} className="h-2" />
-    return <p key={i} className="text-[15px] leading-relaxed text-gray-800 mb-1">{line}</p>
+    if (line.trim() === '') return <div key={i} className="h-3" />
+    return <p key={i} className="text-[15px] leading-relaxed text-neutral-700 mb-2 font-normal">{line}</p>
   })
 }
 
-// ─── Component ───────────────────────────────────────────────────────────────
 export default function ResultsPage({ title, transcript, notes_markdown, onReset }) {
   const [activeTab, setActiveTab] = useState('notes')
   const [copyLabel, setCopyLabel] = useState('Copy notes')
 
-  // ── Copy to clipboard ──────────────────────────────────────────────────────
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(notes_markdown)
-      setCopyLabel('Copied ✓')
+      setCopyLabel('Copied to clipboard ✓')
       setTimeout(() => setCopyLabel('Copy notes'), 2500)
     } catch {
       setCopyLabel('Copy failed')
@@ -58,12 +51,10 @@ export default function ResultsPage({ title, transcript, notes_markdown, onReset
     }
   }
 
-  // ── Download as .md ────────────────────────────────────────────────────────
   const handleDownload = () => {
     const blob = new Blob([notes_markdown], { type: 'text/markdown' })
     const url  = URL.createObjectURL(blob)
     const a    = document.createElement('a')
-    // Sanitise the title to make a safe filename
     const safeName = (title || 'lecture-notes')
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
@@ -76,26 +67,28 @@ export default function ResultsPage({ title, transcript, notes_markdown, onReset
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      <header className="sticky top-0 z-10 bg-white/90 backdrop-blur border-b border-gray-100">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-neutral-100">
         <Nav />
       </header>
 
-      <main className="flex-1 px-6 py-12 md:py-16 max-w-3xl mx-auto w-full">
+      <main className="flex-1 px-6 py-12 md:py-16 max-w-4xl mx-auto w-full">
+        {/* Title */}
+        <div className="mb-8">
+          <span className="pill-badge mb-3">GENERATED SUMMARY</span>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-black tracking-tight leading-tight mt-2">
+            {title || 'Lecture Summary'}
+          </h1>
+        </div>
 
-        {/* Lecture title */}
-        <h1 className="text-3xl md:text-4xl font-black tracking-tight mb-8 leading-tight">
-          {title || 'Your lecture notes'}
-        </h1>
-
-        {/* Tab switcher — pill style per DESIGN.md */}
+        {/* Tab Switcher Pills */}
         <div
-          className="inline-flex gap-2 mb-6 bg-gray-100 p-1 rounded-pill"
+          className="inline-flex gap-1.5 mb-6 bg-neutral-100 p-1.5 rounded-full border border-neutral-200/80"
           role="tablist"
-          aria-label="View toggle"
+          aria-label="View mode toggle"
         >
           {[
-            { key: 'notes',      label: 'Notes'      },
-            { key: 'transcript', label: 'Transcript'  },
+            { key: 'notes',      label: 'Structured Notes' },
+            { key: 'transcript', label: 'Raw Transcript'   },
           ].map(({ key, label }) => (
             <button
               key={key}
@@ -105,10 +98,10 @@ export default function ResultsPage({ title, transcript, notes_markdown, onReset
               aria-controls={`panel-${key}`}
               onClick={() => setActiveTab(key)}
               className={[
-                'px-5 py-2 text-sm font-semibold rounded-pill transition-colors duration-150',
+                'px-6 py-2.5 text-sm font-semibold rounded-full transition-all duration-150 cursor-pointer',
                 activeTab === key
-                  ? 'bg-black text-white'
-                  : 'bg-transparent text-gray-500 hover:text-black',
+                  ? 'bg-black text-white shadow-sm'
+                  : 'bg-transparent text-neutral-500 hover:text-black',
               ].join(' ')}
             >
               {label}
@@ -116,52 +109,52 @@ export default function ResultsPage({ title, transcript, notes_markdown, onReset
           ))}
         </div>
 
-        {/* Content card */}
+        {/* Card Content */}
         <div
           id={`panel-${activeTab}`}
           role="tabpanel"
           aria-labelledby={`tab-${activeTab}`}
-          className="card min-h-64"
+          className="bg-white border border-neutral-200/90 rounded-[28px] p-8 md:p-12 shadow-[0_4px_24px_rgba(0,0,0,0.03)] min-h-[300px]"
         >
           {activeTab === 'notes' ? (
             <ul className="list-none">
               {renderMarkdown(notes_markdown)}
             </ul>
           ) : (
-            <p className="text-[15px] leading-relaxed text-gray-800 whitespace-pre-wrap">
+            <div className="text-[15px] leading-relaxed text-neutral-700 whitespace-pre-wrap font-normal">
               {transcript}
-            </p>
+            </div>
           )}
         </div>
 
-        {/* Action buttons — only shown on Notes tab */}
+        {/* Action Buttons */}
         {activeTab === 'notes' && (
-          <div className="flex gap-3 mt-6 flex-wrap">
+          <div className="flex items-center gap-3.5 mt-8 flex-wrap">
             <button
               id="copy-notes-btn"
               onClick={handleCopy}
-              className="btn-primary px-8 py-3 text-sm"
+              className="btn-primary"
             >
               {copyLabel}
             </button>
             <button
               id="download-notes-btn"
               onClick={handleDownload}
-              className="btn-secondary px-8 py-3 text-sm"
+              className="btn-secondary"
             >
               Download .md
             </button>
           </div>
         )}
 
-        {/* Start over */}
-        <div className="mt-10 pt-8 border-t border-gray-100">
+        {/* Reset / Start Over link */}
+        <div className="mt-12 pt-8 border-t border-neutral-100 flex items-center justify-between">
           <button
             id="start-over-btn"
             onClick={onReset}
-            className="text-sm text-[#6B7280] hover:text-black transition-colors underline underline-offset-2"
+            className="text-sm font-medium text-neutral-500 hover:text-black transition-colors inline-flex items-center gap-2 cursor-pointer"
           >
-            ← Upload another lecture
+            <span>←</span> Upload another lecture
           </button>
         </div>
       </main>
