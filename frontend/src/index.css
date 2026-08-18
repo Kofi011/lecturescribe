@@ -27,36 +27,37 @@
     letter-spacing: -0.01em;
   }
 
-  /* Animated Waveform keyframes */
+  /* Animated Waveform keyframes — high visibility, smooth flowing motion */
   @keyframes flowWave {
     0% {
-      stroke-dashoffset: 0;
-      transform: translateY(0px) scaleY(1);
+      transform: translateY(0px) scaleX(1);
     }
     50% {
-      stroke-dashoffset: 80;
-      transform: translateY(-8px) scaleY(1.04);
+      transform: translateY(-16px) scaleX(1.06);
     }
     100% {
-      stroke-dashoffset: 160;
-      transform: translateY(0px) scaleY(1);
+      transform: translateY(0px) scaleX(1);
     }
   }
 
-  @keyframes pulseGlow {
-    0%, 100% { opacity: 0.05; }
-    50% { opacity: 0.12; }
+  @keyframes waveFloat {
+    0%, 100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-12px) rotate(1.5deg);
+    }
   }
 
   .animate-flowing-wave {
-    animation: flowWave 12s ease-in-out infinite, pulseGlow 6s ease-in-out infinite;
+    animation: flowWave 10s ease-in-out infinite alternate;
   }
 
   .animate-flowing-wave-delayed {
-    animation: flowWave 16s ease-in-out infinite reverse, pulseGlow 8s ease-in-out infinite 2s;
+    animation: flowWave 14s ease-in-out infinite alternate-reverse;
   }
 
-  /* Seamless Infinite Marquee */
+  /* Seamless Infinite Marquee with generous spacing */
   @keyframes infiniteMarquee {
     0% {
       transform: translate3d(0, 0, 0);
@@ -70,7 +71,7 @@
     display: flex;
     width: max-content;
     will-change: transform;
-    animation: infiniteMarquee 34s linear infinite;
+    animation: infiniteMarquee 42s linear infinite;
   }
 
   .marquee-track:hover {
@@ -78,8 +79,8 @@
   }
 
   .marquee-mask {
-    mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,1) 4%, rgba(0,0,0,1) 96%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,1) 4%, rgba(0,0,0,1) 96%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,1) 3%, rgba(0,0,0,1) 97%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,1) 3%, rgba(0,0,0,1) 97%, transparent 100%);
   }
 
   /* Italic serif accent font — exact match for SasuSync italic serif */

@@ -1,17 +1,11 @@
 /**
- * InfiniteMarquee.jsx — Seamless infinite horizontal scrolling marquee
- * Positioned directly below the LectureScribe logo.
+ * InfiniteMarquee.jsx — Generously spaced seamless marquee
  *
- * Items:
- *   - Speech Intelligence
- *   - MP3 Audio
- *   - WAV Lossless
- *   - M4A Apple Audio
- *   - Structured Markdown
- *   - Concept Explorer
- *
- * Separator: Subtle ✦ symbol
- * Behavior: Mathematically seamless loop (0% to -50%), smooth reading speed, pauses on hover.
+ * Requirements:
+ *   1. Generous spacing between items
+ *   2. The repeated sequence only becomes visible after the original instance
+ *      has completely exited the viewport (using full-viewport trailing buffer)
+ *   3. Smooth, steady, premium motion with ✦ separators
  */
 
 export default function InfiniteMarquee({ onOpenInfo, onOpenMenu }) {
@@ -24,31 +18,35 @@ export default function InfiniteMarquee({ onOpenInfo, onOpenMenu }) {
     { label: 'Concept Explorer',     action: () => onOpenMenu('topics') },
   ]
 
-  // We render 4 identical sets so the strip is wide enough for any viewport and translates seamlessly by 50%
-  const repeatedSets = [0, 1, 2, 3]
+  // Two identical instances: Instance A followed by a full viewport trailing spacer,
+  // then Instance B followed by a full viewport trailing spacer.
+  const instances = [0, 1]
 
   return (
     <div
-      className="w-full border-y border-neutral-100 bg-neutral-50/80 backdrop-blur-sm py-2.5 overflow-hidden select-none marquee-mask"
+      className="w-full border-y border-neutral-200/80 bg-neutral-50/90 backdrop-blur-sm py-3 overflow-hidden select-none marquee-mask"
       aria-label="Features and format compatibility"
     >
       <div className="marquee-track flex items-center">
-        {repeatedSets.map((setIndex) => (
-          <div key={setIndex} className="flex items-center shrink-0">
+        {instances.map((instanceIndex) => (
+          <div
+            key={instanceIndex}
+            className="flex items-center shrink-0 pr-[100vw]"
+          >
             {marqueeItems.map((item, itemIndex) => (
               <div key={itemIndex} className="flex items-center">
                 <button
                   onClick={item.action}
-                  className="px-4 py-0.5 text-xs font-semibold text-neutral-700 hover:text-black transition-colors whitespace-nowrap cursor-pointer flex items-center gap-2 group"
+                  className="px-6 md:px-12 py-1 text-xs md:text-sm font-semibold text-neutral-800 hover:text-black transition-colors whitespace-nowrap cursor-pointer flex items-center gap-2 group"
                 >
                   <span className="group-hover:underline underline-offset-4 tracking-tight">
                     {item.label}
                   </span>
                 </button>
 
-                {/* Subtle refined symbol separator */}
+                {/* Refined subtle symbol separator with generous spacing */}
                 <span
-                  className="text-[10px] text-neutral-400/80 px-2 select-none"
+                  className="text-xs text-neutral-400 px-4 md:px-8 select-none"
                   aria-hidden="true"
                 >
                   ✦
