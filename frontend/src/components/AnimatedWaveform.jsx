@@ -1,5 +1,5 @@
 /**
- * AnimatedWaveform.jsx — Full-page flowing curly spline waveforms with enhanced visibility
+ * AnimatedWaveform.jsx — Full-page flowing curly spline waveforms (calibrated subtle visibility)
  */
 
 export default function AnimatedWaveform({ side = 'left' }) {
@@ -21,14 +21,14 @@ export default function AnimatedWaveform({ side = 'left' }) {
       >
         <defs>
           <linearGradient id={`fullpage-wave-${side}`} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#000000" stopOpacity="0.55" />
-            <stop offset="25%" stopColor="#000000" stopOpacity="0.45" />
-            <stop offset="60%" stopColor="#000000" stopOpacity="0.38" />
-            <stop offset="100%" stopColor="#000000" stopOpacity="0.48" />
+            <stop offset="0%" stopColor="#000000" stopOpacity="0.36" />
+            <stop offset="25%" stopColor="#000000" stopOpacity="0.28" />
+            <stop offset="60%" stopColor="#000000" stopOpacity="0.22" />
+            <stop offset="100%" stopColor="#000000" stopOpacity="0.30" />
           </linearGradient>
         </defs>
 
-        {/* 6 full-height organic flowing spline paths with crisp line weight */}
+        {/* 6 full-height organic flowing spline paths with refined subtle line weight */}
         {[18, 52, 86, 120, 154, 188].map((offset, i) => {
           const xStart = isLeft ? offset : 220 - offset
           const cp1x   = isLeft ? offset + 35 : 220 - (offset + 35)
@@ -42,7 +42,7 @@ export default function AnimatedWaveform({ side = 'left' }) {
               key={i}
               d={`M${xStart},0 C${cp1x},250 ${cp2x},500 ${cp3x},750 C${cp4x},950 ${xEnd},1100 ${xEnd},1200`}
               stroke={`url(#fullpage-wave-${side})`}
-              strokeWidth={1.6 + (i % 2) * 0.4}
+              strokeWidth={1.4 + (i % 2) * 0.3}
               strokeLinecap="round"
               className="transition-all duration-300"
               style={{
