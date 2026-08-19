@@ -32,21 +32,7 @@ export default function NavigationModal({
     }
   }, [isOpen, initialView])
 
-  if (!isOpen) return null
-
-  // Filter lectures based on global search query
-  const filteredLectures = (lectures && lectures.length > 0 ? lectures : [SAMPLE_LECTURE]).filter((l) => {
-    if (!searchQuery.trim()) return true
-    const q = searchQuery.toLowerCase()
-    return (
-      l.title?.toLowerCase().includes(q) ||
-      l.overview?.toLowerCase().includes(q) ||
-      l.transcript?.toLowerCase().includes(q) ||
-      l.key_concepts?.some((c) => c.concept.toLowerCase().includes(q))
-    )
-  })
-
-  // Extract all topics/concepts across all lectures
+  // Extract all topics/concepts across all lectures (Hook called unconditionally)
   const allTopics = useMemo(() => {
     const list = []
     const sourceLectures = lectures && lectures.length > 0 ? lectures : [SAMPLE_LECTURE]
@@ -82,6 +68,20 @@ export default function NavigationModal({
     }
     return list
   }, [lectures])
+
+  if (!isOpen) return null
+
+  // Filter lectures based on global search query
+  const filteredLectures = (lectures && lectures.length > 0 ? lectures : [SAMPLE_LECTURE]).filter((l) => {
+    if (!searchQuery.trim()) return true
+    const q = searchQuery.toLowerCase()
+    return (
+      l.title?.toLowerCase().includes(q) ||
+      l.overview?.toLowerCase().includes(q) ||
+      l.transcript?.toLowerCase().includes(q) ||
+      l.key_concepts?.some((c) => c.concept.toLowerCase().includes(q))
+    )
+  })
 
   const filteredTopics = allTopics.filter((t) => {
     if (topicFilter === 'all') return true
