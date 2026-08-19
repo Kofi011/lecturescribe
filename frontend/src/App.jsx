@@ -111,6 +111,7 @@ export default function App() {
 
   const handleSelectLectureFromMenu = (lec) => {
     setCurrentLecture(lec)
+    setMenuOpen(false)
     setPage('results')
   }
 
