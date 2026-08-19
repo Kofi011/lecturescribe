@@ -11,7 +11,7 @@
  */
 
 import { useState, useMemo, useEffect } from 'react'
-import { getSavedLectures, deleteLecture, clearAllLectures } from '../utils/lectureStorage'
+import { getSavedLectures, deleteLecture, clearAllLectures, SAMPLE_LECTURE } from '../utils/lectureStorage'
 
 export default function NavigationModal({
   isOpen,
@@ -23,10 +23,11 @@ export default function NavigationModal({
   const [lectures, setLectures] = useState(() => getSavedLectures())
   const [searchQuery, setSearchQuery] = useState('')
   const [exportPref, setExportPref] = useState('md')
+  const [topicFilter, setTopicFilter] = useState('all')
 
   useEffect(() => {
     if (isOpen) {
-      setActiveTab(initialView)
+      setActiveTab(initialView || 'lectures')
       setLectures(getSavedLectures())
     }
   }, [isOpen, initialView])
@@ -34,7 +35,7 @@ export default function NavigationModal({
   if (!isOpen) return null
 
   // Filter lectures based on global search query
-  const filteredLectures = lectures.filter((l) => {
+  const filteredLectures = (lectures && lectures.length > 0 ? lectures : [SAMPLE_LECTURE]).filter((l) => {
     if (!searchQuery.trim()) return true
     const q = searchQuery.toLowerCase()
     return (
@@ -48,15 +49,44 @@ export default function NavigationModal({
   // Extract all topics/concepts across all lectures
   const allTopics = useMemo(() => {
     const list = []
-    for (const lec of lectures) {
+    const sourceLectures = lectures && lectures.length > 0 ? lectures : [SAMPLE_LECTURE]
+    for (const lec of sourceLectures) {
       if (Array.isArray(lec.key_concepts)) {
         for (const c of lec.key_concepts) {
-          list.push({ ...c, lectureTitle: lec.title, lectureId: lec.id, lecture: lec })
+          list.push({
+            concept: c.concept,
+            explanation: c.explanation,
+            lectureTitle: lec.title,
+            lectureId: lec.id,
+            lecture: lec,
+          })
         }
       }
     }
+    // Preload fallback concept items if list is small
+    if (list.length === 0) {
+      list.push(
+        {
+          concept: 'Algorithmic Complexity & Big-O',
+          explanation: 'Asymptotic analysis measuring algorithm scaling in time and space as input size n grows.',
+          lectureTitle: SAMPLE_LECTURE.title,
+          lecture: SAMPLE_LECTURE,
+        },
+        {
+          concept: 'Divide and Conquer Strategies',
+          explanation: 'Breaking a problem into smaller independent sub-problems, solving recursively, and combining.',
+          lectureTitle: SAMPLE_LECTURE.title,
+          lecture: SAMPLE_LECTURE,
+        }
+      )
+    }
     return list
   }, [lectures])
+
+  const filteredTopics = allTopics.filter((t) => {
+    if (topicFilter === 'all') return true
+    return t.concept.toLowerCase().includes(topicFilter.toLowerCase())
+  })
 
   const handleDelete = (id, e) => {
     e.stopPropagation()
@@ -105,8 +135,8 @@ export default function NavigationModal({
         <div className="px-8 pt-4 pb-2 border-b border-neutral-100 flex items-center gap-2 overflow-x-auto no-scrollbar">
           {[
             { id: 'lectures',  label: `My Lectures (${lectures.length})` },
+            { id: 'topics',    label: `Concept Explorer (${allTopics.length})` },
             { id: 'summaries', label: 'Summaries' },
-            { id: 'topics',    label: `Concepts & Topics (${allTopics.length})` },
             { id: 'search',    label: 'Search Library' },
             { id: 'settings',  label: 'Settings' },
           ].map((tab) => (
@@ -160,7 +190,7 @@ export default function NavigationModal({
                             {lec.isSample ? 'PRELOADED EXAMPLE' : 'PROCESSED'}
                           </span>
                           <span className="text-xs text-neutral-400">
-                            {new Date(lec.createdAt).toLocaleDateString()}
+                            {lec.createdAt ? new Date(lec.createdAt).toLocaleDateString() : 'Ready'}
                           </span>
                         </div>
                         <h4 className="font-bold text-black text-base group-hover:text-black mb-2 line-clamp-2">
@@ -191,7 +221,75 @@ export default function NavigationModal({
             </div>
           )}
 
-          {/* TAB 2: SUMMARIES */}
+          {/* TAB 2: CONCEPT EXPLORER (Rich Interactive Educational Knowledge Index) */}
+          {activeTab === 'topics' && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider block mb-1">
+                    Concept Knowledge Graph
+                  </span>
+                  <p className="text-xs text-neutral-500">
+                    Extracted academic concepts from your lecture transcripts. Click any concept to open its full study notes.
+                  </p>
+                </div>
+
+                <div className="flex gap-1.5 flex-wrap">
+                  {['all', 'Complexity', 'Sort', 'Stability'].map((tag) => (
+                    <button
+                      key={tag}
+                      onClick={() => setTopicFilter(tag === 'all' ? 'all' : tag)}
+                      className={[
+                        'text-xs px-3 py-1 rounded-full font-semibold transition-colors cursor-pointer',
+                        (tag === 'all' && topicFilter === 'all') || topicFilter === tag
+                          ? 'bg-black text-white'
+                          : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200',
+                      ].join(' ')}
+                    >
+                      {tag === 'all' ? 'All Concepts' : tag}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {filteredTopics.map((item, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => {
+                      onSelectLecture(item.lecture)
+                      onClose()
+                    }}
+                    className="border border-neutral-200 hover:border-black rounded-[22px] p-5 bg-white cursor-pointer transition-all hover:shadow-md group flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
+                          From: {item.lectureTitle}
+                        </span>
+                        <span className="text-[10px] bg-neutral-100 group-hover:bg-black group-hover:text-white px-2 py-0.5 rounded-full font-bold transition-colors">
+                          Open Study Note →
+                        </span>
+                      </div>
+                      <h5 className="font-bold text-base text-black mb-2">
+                        {item.concept}
+                      </h5>
+                      <p className="text-xs text-neutral-600 leading-relaxed font-normal">
+                        {item.explanation}
+                      </p>
+                    </div>
+
+                    <div className="mt-4 pt-3 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-400">
+                      <span>Interactive Syllabus Concept</span>
+                      <span className="text-black font-semibold">View in Hub</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: SUMMARIES */}
           {activeTab === 'summaries' && (
             <div className="space-y-6">
               <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider block mb-2">
@@ -234,37 +332,6 @@ export default function NavigationModal({
                   )}
                 </div>
               ))}
-            </div>
-          )}
-
-          {/* TAB 3: CONCEPTS & TOPICS */}
-          {activeTab === 'topics' && (
-            <div className="space-y-4">
-              <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider block mb-2">
-                Concept Knowledge Index ({allTopics.length})
-              </span>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {allTopics.map((item, idx) => (
-                  <div
-                    key={idx}
-                    onClick={() => {
-                      onSelectLecture(item.lecture)
-                      onClose()
-                    }}
-                    className="border border-neutral-200 hover:border-black rounded-[18px] p-4 bg-white cursor-pointer transition-all hover:shadow-sm"
-                  >
-                    <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block mb-1">
-                      From: {item.lectureTitle}
-                    </span>
-                    <h5 className="font-bold text-sm text-black mb-1">
-                      {item.concept}
-                    </h5>
-                    <p className="text-xs text-neutral-600 line-clamp-2 font-normal">
-                      {item.explanation}
-                    </p>
-                  </div>
-                ))}
-              </div>
             </div>
           )}
 

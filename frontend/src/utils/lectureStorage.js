@@ -193,8 +193,9 @@ export function getSavedLectures() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) {
-      // Seed with sample lecture if empty so features are immediately interactive
-      saveLecture(SAMPLE_LECTURE)
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify([SAMPLE_LECTURE]))
+      } catch {}
       return [SAMPLE_LECTURE]
     }
     const list = JSON.parse(raw)
@@ -206,7 +207,15 @@ export function getSavedLectures() {
 
 export function saveLecture(lecture) {
   try {
-    const existing = getSavedLectures().filter((l) => l.id !== lecture.id)
+    const raw = localStorage.getItem(STORAGE_KEY)
+    let list = []
+    if (raw) {
+      try {
+        list = JSON.parse(raw)
+      } catch {}
+    }
+    if (!Array.isArray(list)) list = []
+    const existing = list.filter((l) => l.id !== lecture.id)
     const updated = [lecture, ...existing]
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
     return updated
@@ -218,7 +227,15 @@ export function saveLecture(lecture) {
 
 export function deleteLecture(lectureId) {
   try {
-    const existing = getSavedLectures().filter((l) => l.id !== lectureId)
+    const raw = localStorage.getItem(STORAGE_KEY)
+    let list = []
+    if (raw) {
+      try {
+        list = JSON.parse(raw)
+      } catch {}
+    }
+    if (!Array.isArray(list)) list = []
+    const existing = list.filter((l) => l.id !== lectureId)
     localStorage.setItem(STORAGE_KEY, JSON.stringify(existing))
     return existing
   } catch (e) {
@@ -229,9 +246,9 @@ export function deleteLecture(lectureId) {
 
 export function clearAllLectures() {
   try {
-    localStorage.removeItem(STORAGE_KEY)
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([SAMPLE_LECTURE]))
     return [SAMPLE_LECTURE]
   } catch {
-    return []
+    return [SAMPLE_LECTURE]
   }
 }
