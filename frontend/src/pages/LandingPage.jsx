@@ -33,21 +33,23 @@ export default function LandingPage({
       <AnimatedWaveform side="left" />
       <AnimatedWaveform side="right" />
 
-      {/* Transparent Header — Waveforms flow directly through marquee & nav with zero blur */}
-      <header className="sticky top-0 z-40 bg-transparent">
+      {/* Clean Top Navigation Bar */}
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm">
         <Nav
           onOpenMenu={onOpenMenu}
-          onOpenInfo={onOpenInfo}
           onGoHome={scrollToUpload}
         />
       </header>
 
       <main className="flex-1 relative z-10">
-        {/* 1. Hero Section */}
+        {/* 1. Hero Section (with contained marquee above headline) */}
         <HeroSection
           onUploadClick={scrollToUpload}
           onExampleClick={onSelectExample}
+          onOpenInfo={onOpenInfo}
+          onOpenMenu={onOpenMenu}
         />
+
 
         {/* 2. Feature Section: "Three things, done properly." */}
         <HowItWorks

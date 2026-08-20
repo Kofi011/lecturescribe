@@ -1,10 +1,25 @@
 /**
- * HeroSection.jsx — Focused hero section with clean text spacing and action buttons
+ * HeroSection.jsx — Focused hero section with contained marquee above headline
  */
 
-export default function HeroSection({ onUploadClick, onExampleClick }) {
+import InfiniteMarquee from './InfiniteMarquee'
+
+export default function HeroSection({
+  onUploadClick,
+  onExampleClick,
+  onOpenInfo,
+  onOpenMenu,
+}) {
   return (
-    <section className="relative text-center px-4 sm:px-6 pt-16 pb-16 md:pt-24 md:pb-24">
+    <section className="relative text-center px-4 sm:px-6 pt-6 pb-16 md:pt-10 md:pb-24">
+      {/* Central Contained Marquee directly above the main headline */}
+      <div className="mb-6 md:mb-10 relative z-20">
+        <InfiniteMarquee
+          onOpenInfo={onOpenInfo}
+          onOpenMenu={onOpenMenu}
+        />
+      </div>
+
       {/* Central Content Area */}
       <div className="relative max-w-3xl mx-auto z-10 px-4 sm:px-6">
         {/* Main Headline */}
