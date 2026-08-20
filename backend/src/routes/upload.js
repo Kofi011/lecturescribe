@@ -101,16 +101,16 @@ router.post('/upload', (req, res) => {
         })
       }
 
-      // 2. Transcribe speech
+      // 2. Transcribe speech with dual-engine intelligence
       console.log(`[upload] processing speech: ${req.file.originalname}`)
-      const transcript = await transcribeAudio(filePath, req.file.mimetype)
+      const { transcript, language, engine } = await transcribeAudio(filePath, req.file.mimetype)
 
       // 3. Generate structured study intelligence
-      console.log('[upload] analyzing concepts & synthesizing notes…')
+      console.log(`[upload] analyzing concepts & synthesizing notes (engine: ${engine}, lang: ${language})…`)
       const result = await generateNotes(transcript)
 
       removeTempFile(filePath)
-      console.log(`[upload] lecture ready — "${result.title}"`)
+      console.log(`[upload] lecture ready — "${result.title}" (transcribed by ${engine})`)
 
       return res.json({
         status: 'complete',
@@ -118,9 +118,12 @@ router.post('/upload', (req, res) => {
         date: new Date().toISOString(),
         durationSec: durationSec ? Math.round(durationSec) : null,
         fileName: req.file.originalname,
+        engine_used: engine,
+        language,
         transcript,
         ...result,
       })
+
 
     } catch (err) {
       removeTempFile(filePath)

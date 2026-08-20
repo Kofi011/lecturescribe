@@ -49,11 +49,14 @@ git push origin main
 - [x] Add 10-minute duration validation (client + server) → commit + push
 - [x] Add file-size validation with clear error message → commit + push
 
-## Phase 3 — Transcription
-- [x] Integrate Groq Whisper API on backend → commit + push
-- [x] Implement transcription call + response handling → commit + push
-- [x] Handle transcription errors (timeout, API failure) with specific messages → commit + push
-- [x] Return transcript to frontend → commit + push
+## Phase 3 — Transcription (Dual Engine: Groq Whisper + Griot Nano 1)
+- [x] Build Python/FastAPI Griot Nano 1 sidecar service (`POST /transcribe`, `GET /health`) → commit + push
+- [x] Integrate Groq Whisper API on Node backend with `verbose_json` metadata → commit + push
+- [x] Implement language-detection & confidence routing logic (English vs dialectal/multilingual) → commit + push
+- [x] Normalize dual-engine output to `{ transcript, language, engine }` → commit + push
+- [x] Handle connection & speech errors with user-facing actionable messages → commit + push
+- [x] Return `engine_used` and language in API response and display in UI → commit + push
+
 
 ## Phase 4 — Notes generation
 - [x] Write and test the summarization prompt (headings + bullets + title) → commit + push

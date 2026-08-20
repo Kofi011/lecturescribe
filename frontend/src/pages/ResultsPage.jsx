@@ -353,20 +353,31 @@ export default function ResultsPage({
         {/* ─── TAB 5: RAW TRANSCRIPT ─────────────────────────────────────── */}
         {activeTab === 'transcript' && (
           <div className="space-y-4 animate-fade-in">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xl font-bold text-black">Verbatim Speech Transcript</h3>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h3 className="text-xl font-bold text-black">Verbatim Speech Transcript</h3>
+                {lecture?.engine_used && (
+                  <p className="text-xs text-neutral-500 font-medium mt-0.5 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+                    <span>Engine: {lecture.engine_used === 'griot-nano-1' ? 'Griot Nano 1 (African Accents & Dialects)' : 'Groq Whisper'}</span>
+                    {lecture?.language ? <span>• Language: {lecture.language.toUpperCase()}</span> : ''}
+                  </p>
+                )}
+              </div>
               <button
                 onClick={() => handleCopy(transcript)}
-                className="btn-secondary text-xs px-4 py-2"
+                className="btn-secondary text-xs px-4 py-2 self-start sm:self-auto"
               >
                 Copy Transcript
               </button>
             </div>
+
             <div className="bg-white border border-neutral-200/90 rounded-[28px] p-8 md:p-10 shadow-sm text-sm sm:text-base leading-relaxed text-neutral-700 whitespace-pre-wrap font-normal">
               {transcript || 'No transcript text available.'}
             </div>
           </div>
         )}
+
 
         {/* Bottom Actions Bar */}
         <div className="mt-12 pt-8 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-6">
