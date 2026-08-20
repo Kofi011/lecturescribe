@@ -5,22 +5,19 @@
 |-----------------------|----------------------------------|
 | Frontend              | React + Tailwind CSS            |
 | Backend                | Node.js + Express               |
-| Speech-to-text         | Groq Whisper API (whisper-large-v3-turbo) |
-| Note generation        | LLM API (Claude or GPT)         |
+| Primary Speech Engine  | Groq Whisper API (whisper-large-v3-turbo) |
+| Specialized Speech Engine | Griot Nano 1 FastAPI Sidecar (Qlerqly/griot-nano-1) |
+| Note generation        | LLM API (Groq Llama / Qwen)     |
 | Storage                | Temporary server-side storage only (no DB required for MVP) |
 | Deployment — frontend   | Vercel                          |
 | Deployment — backend    | Render or Railway               |
 
-Note: a database (PostgreSQL) is optional and NOT required for the MVP —
-add it later only if you need to persist past lectures.
-
-## Visual design
-Frontend styling follows `DESIGN.md` (inspired by sms.sasusync.com's
-layout/tone): black-and-white palette, bold sans headline + one italic
-serif accent word, pill buttons, minimal top nav with a single "Menu"
-button, alternating light/dark sections, bordered white cards for the
-upload widget and notes/transcript views. Read `DESIGN.md` before building
-any UI component.
+## Dual Transcription Engine: Groq Whisper + Griot Nano 1
+LectureScribe uses an intelligent dual-engine routing architecture:
+1. **Groq Whisper API**: Fast, high-throughput cloud ASR for standard clear English lectures.
+2. **Griot Nano 1 (`Qlerqly/griot-nano-1`)**: Local/Containerized Python FastAPI sidecar (`POST /transcribe`) specialized for African-accented English, diverse dialects, and multilingual speech.
+3. **Language & Confidence Routing**: A ~20–30s initial audio sample is analyzed with `verbose_json`. If English with high confidence (favorable `avg_logprob` / `no_speech_prob`), Whisper transcribes the full file; otherwise, the audio is routed to the Griot Nano 1 sidecar.
+4. **Normalized Output**: Both engines normalize results to `{ transcript, language, engine }` before forwarding to the study note generation service.
 
 ## System flow
 ```
@@ -31,17 +28,18 @@ Backend API (Node/Express)
         │
         ├─ 1. Validate file (type, size, duration)
         │
-        ├─ 2. Send audio → Groq Whisper API
-        │        └─ returns transcript
+        ├─ 2. Language & Confidence Sample Check (~20-30s sample)
+        │        ├─ English + High Confidence ──► Groq Whisper API
+        │        └─ Multilingual / Accented / Low Conf ──► Griot Nano 1 Sidecar
         │
-        ├─ 3. Send transcript → LLM API
-        │        └─ returns { title, notes_markdown }
-        │
-        ▼
-Response to frontend: { status, title, transcript, notes_markdown }
+        ├─ 3. Send normalized transcript → LLM API
+        │        └─ returns structured study knowledge { title, overview, concepts, notes, quiz }
         │
         ▼
-Results Page (tabs: Transcript | Notes) + Copy/Download buttons
+Response to frontend: { status, title, transcript, notes_markdown, engine_used }
+        │
+        ▼
+Results Page (Tabs: Overview & Concepts | Study Notes | Terms | Quiz | Transcript)
 ```
 
 ## Processing status states

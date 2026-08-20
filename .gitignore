@@ -30,3 +30,11 @@ yarn-error.log*
 
 # Temp audio uploads (server-side)
 backend/uploads/
+
+# Python sidecar
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+griot_sidecar/.venv/
+
