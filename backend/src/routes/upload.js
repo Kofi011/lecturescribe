@@ -203,14 +203,50 @@ router.post('/chat', async (req, res) => {
 })
 
 // ─── POST /api/contact — User / Institutional Inquiries ───────────
-router.post('/contact', (req, res) => {
+router.post('/contact', async (req, res) => {
   const { name, email, subject, message } = req.body || {}
 
   if (!name || !email || !message) {
     return res.status(400).json({ error: 'Name, email, and message are required.' })
   }
 
+  const web3Key = process.env.WEB3FORMS_ACCESS_KEY
+  const recipientEmail = process.env.CONTACT_RECIPIENT_EMAIL || 'richardspaul230@gmail.com'
+
   console.log(`[contact inquiry] from "${name}" <${email}> [${subject || 'General'}]: ${message.substring(0, 80)}...`)
+
+  if (web3Key) {
+    try {
+      const formRes = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          access_key: web3Key,
+          name,
+          email,
+          subject: `[LectureScribe Inquiry] ${subject || 'General'} - ${name}`,
+          message,
+          from_name: 'LectureScribe Contact',
+          replyto: email,
+        }),
+      })
+
+      const data = await formRes.json()
+      if (data.success) {
+        console.log(`[contact inquiry] successfully forwarded to ${recipientEmail} via Web3Forms ✓`)
+      } else {
+        console.warn(`[contact inquiry] Web3Forms response:`, data.message)
+      }
+    } catch (err) {
+      console.warn(`[contact inquiry] failed to reach Web3Forms (${err.message}). Logged inquiry locally.`)
+    }
+  } else {
+    console.log(`[contact inquiry] Note: WEB3FORMS_ACCESS_KEY not set in backend/.env. Inquiry logged to console.`)
+  }
+
   return res.json({
     status: 'received',
     message: 'Thank you for reaching out to LectureScribe. We have received your message.',

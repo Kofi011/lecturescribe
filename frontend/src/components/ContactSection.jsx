@@ -7,7 +7,6 @@
 import { useState } from 'react'
 
 const API_URL = import.meta.env.VITE_API_URL || ''
-const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY || ''
 const TARGET_EMAIL = 'richardspaul230@gmail.com'
 
 export default function ContactSection({ sectionRef }) {
@@ -32,39 +31,16 @@ export default function ContactSection({ sectionRef }) {
     setError(null)
 
     try {
-      if (WEB3FORMS_KEY) {
-        // Forward directly to richardspaul230@gmail.com via Web3Forms
-        const res = await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
-          body: JSON.stringify({
-            access_key: WEB3FORMS_KEY,
-            name: formData.name,
-            email: formData.email,
-            subject: `[LectureScribe Inquiry] ${formData.subject} - ${formData.name}`,
-            message: formData.message,
-            from_name: 'LectureScribe Contact',
-            replyto: formData.email,
-          }),
-        })
-
-        const data = await res.json()
-        if (data.success) {
-          setSubmitted(true)
-          return
-        }
-      }
-
-      // Backend fallback endpoint
       const endpoint = API_URL ? `${API_URL}/api/contact` : '/api/contact'
-      await fetch(endpoint, {
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       })
+
+      if (!res.ok) {
+        throw new Error('Failed to send message')
+      }
 
       setSubmitted(true)
     } catch (err) {
