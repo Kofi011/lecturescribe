@@ -1,9 +1,10 @@
 /**
- * routes/upload.js — Upload, Analysis, and Interactive Lecture Q&A
+ * routes/upload.js — Upload, Analysis, Trial Gating, and Interactive Lecture Q&A
  *
  * Endpoints:
- *   POST /api/upload — Process lecture audio -> structured knowledge
- *   POST /api/chat   — Interactive Q&A about a lecture transcript
+ *   GET  /api/trial-status — Returns trial credits or authenticated status
+ *   POST /api/upload       — Process lecture audio (with 3-trial limit enforcement)
+ *   POST /api/chat         — Interactive Q&A about a lecture transcript
  */
 
 import express from 'express'
@@ -14,6 +15,7 @@ import { parseBuffer } from 'music-metadata'
 import { transcribeAudio } from '../services/transcribe.js'
 import { generateNotes }   from '../services/generateNotes.js'
 import { askAboutLecture } from '../services/askLecture.js'
+import { getTrialStatus, incrementTrial, enforceTrialLimit } from '../services/trial.js'
 
 const router = express.Router()
 
@@ -66,8 +68,29 @@ function removeTempFile(filePath) {
   }
 }
 
+// ─── GET /api/trial-status ─────────────────────────────────────────
+router.get('/trial-status', (req, res) => {
+  const status = getTrialStatus(req)
+  return res.json({
+    status: 'ok',
+    ...status,
+  })
+})
+
 // ─── POST /api/upload ─────────────────────────────────────────────
 router.post('/upload', (req, res) => {
+  // 1. Enforce trial limit before processing file upload
+  const trialStatus = getTrialStatus(req)
+  if (!trialStatus.canUpload) {
+    return res.status(403).json({
+      error: 'You have completed your 3 free trial uploads. Please log in or create an account to continue unlimited processing.',
+      code: 'TRIAL_LIMIT_REACHED',
+      trialsUsed: trialStatus.trialsUsed,
+      trialsRemaining: 0,
+      maxTrials: trialStatus.maxTrials,
+    })
+  }
+
   upload.single('audio')(req, res, async (multerErr) => {
     if (multerErr) {
       if (multerErr.code === 'LIMIT_FILE_SIZE') {
@@ -88,7 +111,7 @@ router.post('/upload', (req, res) => {
     const filePath = req.file.path
 
     try {
-      // 1. Duration check
+      // 2. Duration check
       const fileBuffer  = fs.readFileSync(filePath)
       const metadata    = await parseBuffer(fileBuffer, { mimeType: req.file.mimetype })
       const durationSec = metadata.format.duration
@@ -101,16 +124,19 @@ router.post('/upload', (req, res) => {
         })
       }
 
-      // 2. Transcribe speech with dual-engine intelligence
+      // 3. Transcribe speech with dual-engine intelligence
       console.log(`[upload] processing speech: ${req.file.originalname}`)
       const { transcript, language, engine } = await transcribeAudio(filePath, req.file.mimetype)
 
-      // 3. Generate structured study intelligence
+      // 4. Generate structured study intelligence
       console.log(`[upload] analyzing concepts & synthesizing notes (engine: ${engine}, lang: ${language})…`)
       const result = await generateNotes(transcript)
 
       removeTempFile(filePath)
-      console.log(`[upload] lecture ready — "${result.title}" (transcribed by ${engine})`)
+
+      // 5. Update trial count for unauthenticated users
+      const trialResult = incrementTrial(req, res)
+      console.log(`[upload] lecture ready — "${result.title}" (transcribed by ${engine}) [trials remaining: ${trialResult.trialsRemaining}]`)
 
       return res.json({
         status: 'complete',
@@ -121,9 +147,14 @@ router.post('/upload', (req, res) => {
         engine_used: engine,
         language,
         transcript,
+        trial: {
+          isAuthenticated: !!req.user,
+          trialsUsed: trialResult.trialsUsed,
+          trialsRemaining: trialResult.trialsRemaining,
+          maxTrials: 3,
+        },
         ...result,
       })
-
 
     } catch (err) {
       removeTempFile(filePath)
