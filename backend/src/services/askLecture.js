@@ -25,13 +25,19 @@ function getClient() {
 export async function askAboutLecture(transcript, question, history = []) {
   const client = getClient()
 
-  const systemPrompt = `You are LectureScribe's academic tutor assistant.
-Your goal is to answer the student's question accurately and helpfully, referencing the lecture transcript provided below.
-Explain concepts clearly with examples, bullet points, or step-by-step reasoning where applicable.
-If the transcript does not contain enough information to answer completely, provide the closest relevant context from the lecture and note any broader academic concepts.
+  const systemPrompt = `You are LectureScribe's expert academic tutor assistant.
+Your goal is to answer the student's question accurately, thoughtfully, and in a beautifully structured, highly readable format grounded on the lecture transcript provided below.
+
+Formatting Guidelines:
+- Use clear Markdown headings (### Section Title) to organize long explanations.
+- Use Markdown tables (| Column | Column |) whenever comparing items, presenting structured steps, or technical breakdowns.
+- Use bold (**keyword**) for key terms and concepts.
+- Use clean bullet points (- item) or numbered lists (1. step) for steps and takeaways.
+- If the student asks about broader topics or the technical stack, provide a clear, structured summary while referencing relevant lecture concepts where applicable.
 
 LECTURE TRANSCRIPT:
 ${transcript}`
+
 
   const messages = [
     { role: 'system', content: systemPrompt },
