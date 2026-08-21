@@ -3,6 +3,7 @@
  */
 
 import Nav from '../components/Nav'
+import AnimatedWaveform from '../components/AnimatedWaveform'
 
 const STAGES = [
   { key: 'uploaded',     label: 'Audio uploaded' },
@@ -68,7 +69,8 @@ export default function ProcessingPage({
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen relative flex flex-col bg-white overflow-x-hidden selection:bg-black selection:text-white">
+      <AnimatedWaveform />
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-neutral-100">
         <Nav
           currentPage="processing"

@@ -28,9 +28,8 @@ export default function LandingPage({
 
   return (
     <div className="min-h-screen relative flex flex-col bg-white selection:bg-black selection:text-white overflow-x-hidden">
-      {/* Full-page continuous flowing spline waveforms along left & right margins */}
-      <AnimatedWaveform side="left" />
-      <AnimatedWaveform side="right" />
+      {/* Full-viewport flowing wave ribbon background */}
+      <AnimatedWaveform />
 
       {/* Clean Top Navigation Bar */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm">

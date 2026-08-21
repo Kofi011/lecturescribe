@@ -57,8 +57,7 @@ export default function WorkspacePage({
 
   return (
     <div className="min-h-screen relative flex flex-col bg-white selection:bg-black selection:text-white overflow-x-hidden">
-      <AnimatedWaveform side="left" />
-      <AnimatedWaveform side="right" />
+      <AnimatedWaveform />
 
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-neutral-100">
