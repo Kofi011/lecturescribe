@@ -35,6 +35,6 @@ backend/uploads/
 __pycache__/
 *.pyc
 *.pyo
-.venv/
-griot_sidecar/.venv/
+# Local database dev data
+backend/data/
 

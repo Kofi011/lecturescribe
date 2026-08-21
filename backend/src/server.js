@@ -10,13 +10,16 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
+import cookieParser from 'cookie-parser'
 import uploadRouter from './routes/upload.js'
+import { initDb } from './db/index.js'
 
 const app = express()
 const PORT = process.env.PORT || 5000
+const SESSION_SECRET = process.env.SESSION_SECRET || 'lecturescribe_session_secret_default_key'
 
 // ─── CORS ─────────────────────────────────────────────────────────
-// Support all origins in development and configured origin in production
+// Support credentials and origins for authenticated sessions and trial cookies
 app.use(cors({
   origin: true,
   credentials: true,
@@ -25,6 +28,7 @@ app.use(cors({
 }))
 
 app.use(express.json())
+app.use(cookieParser(SESSION_SECRET))
 
 // ─── Health check ──────────────────────────────────────────────────
 app.get('/api/health', (_req, res) => {
@@ -42,7 +46,9 @@ app.use((err, _req, res, _next) => {
   })
 })
 
-// ─── Start ────────────────────────────────────────────────────────
+// ─── Initialize Database & Start ──────────────────────────────────
+await initDb()
+
 app.listen(PORT, () => {
   console.log(`[lecturescribe] backend listening on http://localhost:${PORT}`)
   console.log(`[lecturescribe] GROQ_API_KEY: ${process.env.GROQ_API_KEY ? 'loaded ✓' : 'NOT SET — add to .env'}`)
