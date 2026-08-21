@@ -6,6 +6,7 @@ const STORAGE_KEY = 'lecturescribe_saved_lectures_v1'
 
 export const SAMPLE_LECTURE = {
   id: 'sample_cs101_sorting',
+  isSample: true,
   title: 'Introduction to Sorting Algorithms & Computational Complexity',
   date: new Date().toISOString(),
   durationSec: 142,
@@ -192,16 +193,18 @@ This lecture explores fundamental comparison-based sorting algorithms in compute
 export function getSavedLectures() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) {
+    if (raw === null) {
+      // First visit initialization
+      const initial = [SAMPLE_LECTURE]
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify([SAMPLE_LECTURE]))
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(initial))
       } catch {}
-      return [SAMPLE_LECTURE]
+      return initial
     }
     const list = JSON.parse(raw)
-    return Array.isArray(list) && list.length > 0 ? list : [SAMPLE_LECTURE]
+    return Array.isArray(list) ? list : []
   } catch {
-    return [SAMPLE_LECTURE]
+    return []
   }
 }
 
@@ -218,6 +221,7 @@ export function saveLecture(lecture) {
     const existing = list.filter((l) => l.id !== lecture.id)
     const updated = [lecture, ...existing]
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+    window.dispatchEvent(new Event('lecturescribe_storage_update'))
     return updated
   } catch (e) {
     console.warn('Failed to save lecture to localStorage:', e)
@@ -235,9 +239,10 @@ export function deleteLecture(lectureId) {
       } catch {}
     }
     if (!Array.isArray(list)) list = []
-    const existing = list.filter((l) => l.id !== lectureId)
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(existing))
-    return existing
+    const updated = list.filter((l) => l.id !== lectureId)
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+    window.dispatchEvent(new Event('lecturescribe_storage_update'))
+    return updated
   } catch (e) {
     console.warn('Failed to delete lecture:', e)
     return []
@@ -246,9 +251,12 @@ export function deleteLecture(lectureId) {
 
 export function clearAllLectures() {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([SAMPLE_LECTURE]))
-    return [SAMPLE_LECTURE]
-  } catch {
-    return [SAMPLE_LECTURE]
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([]))
+    window.dispatchEvent(new Event('lecturescribe_storage_update'))
+    return []
+  } catch (e) {
+    console.warn('Failed to clear lectures:', e)
+    return []
   }
 }
+

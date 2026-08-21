@@ -116,10 +116,16 @@ export default function App() {
   }
 
   const handleDeleteLecture = (id) => {
-    deleteLecture(id)
-    if (currentLecture?.id === id) {
+    if (id === 'all') {
+      clearAllLectures()
       setCurrentLecture(null)
       setPage('landing')
+    } else {
+      deleteLecture(id)
+      if (currentLecture?.id === id) {
+        setCurrentLecture(null)
+        setPage('landing')
+      }
     }
   }
 
@@ -173,6 +179,7 @@ export default function App() {
         onClose={() => setMenuOpen(false)}
         initialView={menuInitialTab}
         onSelectLecture={handleSelectLectureFromMenu}
+        onDeleteLecture={handleDeleteLecture}
       />
 
       {/* ─── INTERACTIVE POLICY & FORMAT INFO MODAL (Requirement 2) ─────────── */}

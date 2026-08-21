@@ -106,9 +106,6 @@ export default function LectureTutorDrawer({
         {/* Header */}
         <div className="px-6 py-4.5 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/70">
           <div className="flex items-center gap-3">
-            <span className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-xs font-serif italic">
-              AI
-            </span>
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-bold tracking-wider uppercase text-neutral-500">ACADEMIC TUTOR</span>

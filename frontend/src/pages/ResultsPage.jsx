@@ -81,11 +81,12 @@ export default function ResultsPage({
   }
 
   const handleDelete = () => {
-    if (confirm(`Are you sure you want to delete "${title}" from your library?`)) {
-      if (onDeleteLecture) onDeleteLecture(lecture?.id)
-      onReset()
+    if (onDeleteLecture && lecture?.id) {
+      onDeleteLecture(lecture.id)
     }
+    onReset?.()
   }
+
 
   return (
     <div className="min-h-screen flex flex-col bg-white selection:bg-black selection:text-white">

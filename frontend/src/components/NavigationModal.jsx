@@ -17,6 +17,7 @@ export default function NavigationModal({
   isOpen,
   onClose,
   onSelectLecture,
+  onDeleteLecture,
   initialView = 'lectures',
 }) {
   const [activeTab, setActiveTab] = useState(initialView)
@@ -32,7 +33,16 @@ export default function NavigationModal({
     }
   }, [isOpen, initialView])
 
-  // Extract all topics/concepts across all lectures (Hook called unconditionally)
+  // Sync across tabs and modal actions
+  useEffect(() => {
+    const handleStorageUpdate = () => {
+      setLectures(getSavedLectures())
+    }
+    window.addEventListener('lecturescribe_storage_update', handleStorageUpdate)
+    return () => window.removeEventListener('lecturescribe_storage_update', handleStorageUpdate)
+  }, [])
+
+  // Extract all topics/concepts across all lectures
   const allTopics = useMemo(() => {
     const list = []
     const sourceLectures = lectures && lectures.length > 0 ? lectures : [SAMPLE_LECTURE]
@@ -49,30 +59,13 @@ export default function NavigationModal({
         }
       }
     }
-    // Preload fallback concept items if list is small
-    if (list.length === 0) {
-      list.push(
-        {
-          concept: 'Algorithmic Complexity & Big-O',
-          explanation: 'Asymptotic analysis measuring algorithm scaling in time and space as input size n grows.',
-          lectureTitle: SAMPLE_LECTURE.title,
-          lecture: SAMPLE_LECTURE,
-        },
-        {
-          concept: 'Divide and Conquer Strategies',
-          explanation: 'Breaking a problem into smaller independent sub-problems, solving recursively, and combining.',
-          lectureTitle: SAMPLE_LECTURE.title,
-          lecture: SAMPLE_LECTURE,
-        }
-      )
-    }
     return list
   }, [lectures])
 
   if (!isOpen) return null
 
   // Filter lectures based on global search query
-  const filteredLectures = (lectures && lectures.length > 0 ? lectures : [SAMPLE_LECTURE]).filter((l) => {
+  const filteredLectures = lectures.filter((l) => {
     if (!searchQuery.trim()) return true
     const q = searchQuery.toLowerCase()
     return (
@@ -89,18 +82,17 @@ export default function NavigationModal({
   })
 
   const handleDelete = (id, e) => {
-    e.stopPropagation()
-    if (confirm('Delete this lecture summary and transcript?')) {
-      const updated = deleteLecture(id)
-      setLectures(updated)
-    }
+    e?.stopPropagation()
+    const updated = deleteLecture(id)
+    setLectures(updated)
+    onDeleteLecture?.(id)
   }
 
-  const handleClearAll = () => {
-    if (confirm('Clear all saved lectures? (Sample lecture will be restored)')) {
-      const updated = clearAllLectures()
-      setLectures(updated)
-    }
+  const handleClearAll = (e) => {
+    e?.stopPropagation()
+    const updated = clearAllLectures()
+    setLectures(updated)
+    onDeleteLecture?.('all')
   }
 
   return (
@@ -161,17 +153,28 @@ export default function NavigationModal({
           {activeTab === 'lectures' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
-                  Saved Sessions ({lectures.length})
-                </span>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider">
+                    Saved Sessions ({lectures.length})
+                  </span>
+                  {lectures.length > 0 && (
+                    <button
+                      onClick={handleClearAll}
+                      className="text-xs text-red-500 hover:text-red-700 font-semibold px-2 py-0.5 rounded hover:bg-red-50 transition-colors cursor-pointer"
+                    >
+                      Clear All
+                    </button>
+                  )}
+                </div>
                 <span className="text-xs text-neutral-500">
                   Click any lecture to view full notes &amp; transcript
                 </span>
               </div>
 
               {lectures.length === 0 ? (
-                <div className="text-center py-12 text-neutral-400 text-sm">
-                  No lectures in your library yet. Upload an audio recording to get started!
+                <div className="text-center py-12 text-neutral-400 text-sm space-y-2">
+                  <p>No lectures in your library.</p>
+                  <p className="text-xs text-neutral-400">Upload a new recording to begin.</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -205,14 +208,13 @@ export default function NavigationModal({
                         <span className="text-neutral-400 font-medium">
                           {lec.key_concepts?.length || 0} concepts • {lec.revision_questions?.length || 0} questions
                         </span>
-                        {!lec.isSample && (
-                          <button
-                            onClick={(e) => handleDelete(lec.id, e)}
-                            className="text-red-400 hover:text-red-600 font-medium cursor-pointer"
-                          >
-                            Delete
-                          </button>
-                        )}
+                        <button
+                          onClick={(e) => handleDelete(lec.id, e)}
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50 px-2.5 py-1 rounded font-semibold cursor-pointer transition-colors"
+                          title="Delete this lecture"
+                        >
+                          Delete
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -221,7 +223,7 @@ export default function NavigationModal({
             </div>
           )}
 
-          {/* TAB 2: CONCEPT EXPLORER (Rich Interactive Educational Knowledge Index) */}
+          {/* TAB 2: CONCEPT EXPLORER */}
           {activeTab === 'topics' && (
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -252,40 +254,46 @@ export default function NavigationModal({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {filteredTopics.map((item, idx) => (
-                  <div
-                    key={idx}
-                    onClick={() => {
-                      onSelectLecture(item.lecture)
-                      onClose()
-                    }}
-                    className="border border-neutral-200 hover:border-black rounded-[22px] p-5 bg-white cursor-pointer transition-all hover:shadow-md group flex flex-col justify-between"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
-                          From: {item.lectureTitle}
-                        </span>
-                        <span className="text-[10px] bg-neutral-100 group-hover:bg-black group-hover:text-white px-2 py-0.5 rounded-full font-bold transition-colors">
-                          Open Study Note →
-                        </span>
+              {filteredTopics.length === 0 ? (
+                <div className="text-center py-10 text-neutral-400 text-sm">
+                  No concepts found. Upload a lecture to generate academic concepts.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {filteredTopics.map((item, idx) => (
+                    <div
+                      key={idx}
+                      onClick={() => {
+                        onSelectLecture(item.lecture)
+                        onClose()
+                      }}
+                      className="border border-neutral-200 hover:border-black rounded-[22px] p-5 bg-white cursor-pointer transition-all hover:shadow-md group flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
+                            From: {item.lectureTitle}
+                          </span>
+                          <span className="text-[10px] bg-neutral-100 group-hover:bg-black group-hover:text-white px-2 py-0.5 rounded-full font-bold transition-colors">
+                            Open Study Note →
+                          </span>
+                        </div>
+                        <h5 className="font-bold text-base text-black mb-2">
+                          {item.concept}
+                        </h5>
+                        <p className="text-xs text-neutral-600 leading-relaxed font-normal">
+                          {item.explanation}
+                        </p>
                       </div>
-                      <h5 className="font-bold text-base text-black mb-2">
-                        {item.concept}
-                      </h5>
-                      <p className="text-xs text-neutral-600 leading-relaxed font-normal">
-                        {item.explanation}
-                      </p>
-                    </div>
 
-                    <div className="mt-4 pt-3 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-400">
-                      <span>Interactive Syllabus Concept</span>
-                      <span className="text-black font-semibold">View in Hub</span>
+                      <div className="mt-4 pt-3 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-400">
+                        <span>Interactive Syllabus Concept</span>
+                        <span className="text-black font-semibold">View in Hub</span>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -295,43 +303,49 @@ export default function NavigationModal({
               <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider block mb-2">
                 Executive Summaries &amp; Takeaways
               </span>
-              {lectures.map((lec) => (
-                <div
-                  key={lec.id}
-                  className="bg-neutral-50 border border-neutral-200/80 rounded-[20px] p-6 space-y-3"
-                >
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-bold text-black text-base">{lec.title}</h4>
-                    <button
-                      onClick={() => {
-                        onSelectLecture(lec)
-                        onClose()
-                      }}
-                      className="btn-secondary text-xs px-4 py-1.5 cursor-pointer"
-                    >
-                      Open Lecture →
-                    </button>
-                  </div>
-                  <p className="text-sm text-neutral-700 leading-relaxed font-normal">
-                    {lec.overview}
-                  </p>
-                  {lec.key_takeaways?.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-neutral-200/60">
-                      <span className="text-xs font-bold text-neutral-500 block mb-1">
-                        Key Takeaways:
-                      </span>
-                      <ul className="space-y-1">
-                        {lec.key_takeaways.map((t, idx) => (
-                          <li key={idx} className="text-xs text-neutral-600 flex items-start gap-2">
-                            <span className="text-emerald-500 font-bold">✓</span>
-                            <span>{t}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+              {lectures.length === 0 ? (
+                <div className="text-center py-10 text-neutral-400 text-sm">
+                  No lecture summaries available.
                 </div>
-              ))}
+              ) : (
+                lectures.map((lec) => (
+                  <div
+                    key={lec.id}
+                    className="bg-neutral-50 border border-neutral-200/80 rounded-[20px] p-6 space-y-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-bold text-black text-base">{lec.title}</h4>
+                      <button
+                        onClick={() => {
+                          onSelectLecture(lec)
+                          onClose()
+                        }}
+                        className="btn-secondary text-xs px-4 py-1.5 cursor-pointer"
+                      >
+                        Open Lecture →
+                      </button>
+                    </div>
+                    <p className="text-sm text-neutral-700 leading-relaxed font-normal">
+                      {lec.overview}
+                    </p>
+                    {lec.key_takeaways?.length > 0 && (
+                      <div className="mt-3 pt-3 border-t border-neutral-200/60">
+                        <span className="text-xs font-bold text-neutral-500 block mb-1">
+                          Key Takeaways:
+                        </span>
+                        <ul className="space-y-1">
+                          {lec.key_takeaways.map((t, idx) => (
+                            <li key={idx} className="text-xs text-neutral-600 flex items-start gap-2">
+                              <span className="text-emerald-500 font-bold">✓</span>
+                              <span>{t}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
             </div>
           )}
 
