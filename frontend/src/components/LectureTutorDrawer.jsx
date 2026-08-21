@@ -1,6 +1,6 @@
 /**
  * LectureTutorDrawer.jsx — Interactive AI Tutor for asking questions about a specific lecture
- * Features rich structured Markdown rendering for tables, checklists, headings, and code.
+ * Styled with exact font, spacing, and alignment matching LectureScribe Workspace.
  */
 
 import { useState, useRef, useEffect } from 'react'
@@ -94,49 +94,55 @@ export default function LectureTutorDrawer({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-fade-in"
       role="dialog"
       aria-modal="true"
       onClick={onClose}
     >
       <div
-        className="bg-white border border-neutral-200 rounded-[32px] w-full max-w-3xl lg:max-w-4xl h-[720px] max-h-[92vh] flex flex-col shadow-2xl overflow-hidden"
+        className="bg-white border border-neutral-200 rounded-[28px] w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-scale-up"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="px-6 py-4.5 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/70">
-          <div className="flex items-center gap-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold tracking-wider uppercase text-neutral-500">ACADEMIC TUTOR</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              </div>
-              <h3 className="font-bold text-black text-sm sm:text-base truncate max-w-md">
-                {lecture?.title || 'Interactive Lecture Scribe'}
-              </h3>
+        {/* Header matching Workspace style and font */}
+        <div className="px-8 py-6 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/50">
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-3">
+              <span className="font-serif text-2xl italic font-normal text-black">
+                Academic Tutor
+              </span>
+              <span className="pill-badge text-[10px]">
+                LIVE Q&amp;A
+              </span>
             </div>
+            {lecture?.title && (
+              <p className="text-xs text-neutral-500 font-normal truncate max-w-xl">
+                Focused on: {lecture.title}
+              </p>
+            )}
           </div>
+
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-neutral-200/70 hover:bg-black hover:text-white text-black flex items-center justify-center text-xs font-bold transition-colors cursor-pointer"
+            className="w-9 h-9 rounded-full bg-neutral-200/70 hover:bg-black hover:text-white text-black flex items-center justify-center transition-colors text-sm font-bold cursor-pointer"
+            aria-label="Close"
           >
             ✕
           </button>
         </div>
 
         {/* Message Log with Structured Markdown Output */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-neutral-50/40">
+        <div className="flex-1 overflow-y-auto p-8 space-y-4 bg-neutral-50/30">
           {messages.map((m, idx) => (
             <div
               key={idx}
               className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
             >
               {m.role === 'user' ? (
-                <div className="max-w-[85%] rounded-[22px] rounded-br-sm px-5 py-3 bg-black text-white text-sm font-medium leading-relaxed shadow-sm">
+                <div className="max-w-[80%] rounded-[20px] rounded-br-sm px-5 py-3 bg-black text-white text-sm font-medium leading-relaxed shadow-sm">
                   {m.content}
                 </div>
               ) : (
-                <div className="max-w-[95%] sm:max-w-[90%] rounded-[24px] rounded-bl-sm p-5 sm:p-6 bg-white border border-neutral-200/90 text-neutral-900 shadow-[0_2px_12px_rgba(0,0,0,0.03)] leading-relaxed">
+                <div className="max-w-[92%] rounded-[22px] rounded-bl-sm p-6 bg-white border border-neutral-200/90 text-neutral-900 shadow-[0_2px_10px_rgba(0,0,0,0.02)] leading-relaxed">
                   <MarkdownRenderer content={m.content} />
                 </div>
               )}
@@ -154,12 +160,12 @@ export default function LectureTutorDrawer({
         </div>
 
         {/* Suggested Quick Prompts */}
-        <div className="px-6 py-2.5 bg-white border-t border-neutral-100 flex gap-2 overflow-x-auto no-scrollbar">
+        <div className="px-8 py-3 bg-white border-t border-neutral-100 flex gap-2 overflow-x-auto no-scrollbar">
           {suggestedQuestions.map((sq, i) => (
             <button
               key={i}
               onClick={() => handleSend(sq)}
-              className="text-xs bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-medium px-3.5 py-1.5 rounded-full whitespace-nowrap transition-colors cursor-pointer"
+              className="text-xs bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-medium px-4 py-1.5 rounded-full whitespace-nowrap transition-colors cursor-pointer"
             >
               {sq}
             </button>
@@ -172,7 +178,7 @@ export default function LectureTutorDrawer({
             e.preventDefault()
             handleSend()
           }}
-          className="p-4 sm:p-5 bg-white border-t border-neutral-100 flex gap-3 items-center"
+          className="p-6 sm:p-8 bg-white border-t border-neutral-100 flex gap-3 items-center"
         >
           <input
             type="text"
