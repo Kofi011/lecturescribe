@@ -1,100 +1,96 @@
 # ARCHITECTURE.md — LectureScribe
 
 ## Tech stack
-| Layer                | Choice                          |
-|-----------------------|----------------------------------|
-| Frontend              | React + Tailwind CSS            |
-| Backend                | Node.js + Express               |
-| Primary Speech Engine  | Groq Whisper API (whisper-large-v3-turbo) |
-| Specialized Speech Engine | Griot Nano 1 FastAPI Sidecar (Qlerqly/griot-nano-1) |
-| Note generation        | LLM API (Groq Llama / Qwen)     |
-| Storage                | Temporary server-side storage only (no DB required for MVP) |
-| Deployment — frontend   | Vercel                          |
-| Deployment — backend    | Render or Railway               |
+| Layer                     | Choice                                                    |
+|---------------------------|-----------------------------------------------------------|
+| Frontend                  | React + Tailwind CSS                                      |
+| Backend                   | Node.js + Express                                         |
+| Database                  | PostgreSQL (Users table & authentication records)         |
+| Authentication            | bcrypt password hashing + JWT / HTTP-only signed cookies  |
+| Primary Speech Engine     | Groq Whisper API (`whisper-large-v3-turbo`)               |
+| Specialized Speech Engine | Griot Nano 1 FastAPI Sidecar (`Qlerqly/griot-nano-1`)      |
+| Note generation           | LLM API (Groq Llama / Qwen)                               |
+| Deployment — frontend     | Vercel                                                    |
+| Deployment — backend      | Render or Railway (with managed PostgreSQL)               |
 
 ## Dual Transcription Engine: Groq Whisper + Griot Nano 1
-LectureScribe uses an intelligent dual-engine routing architecture:
-1. **Groq Whisper API**: Fast, high-throughput cloud ASR for standard clear English lectures.
-2. **Griot Nano 1 (`Qlerqly/griot-nano-1`)**: Local/Containerized Python FastAPI sidecar (`POST /transcribe`) specialized for African-accented English, diverse dialects, and multilingual speech.
-3. **Language & Confidence Routing**: A ~20–30s initial audio sample is analyzed with `verbose_json`. If English with high confidence (favorable `avg_logprob` / `no_speech_prob`), Whisper transcribes the full file; otherwise, the audio is routed to the Griot Nano 1 sidecar.
-4. **Normalized Output**: Both engines normalize results to `{ transcript, language, engine }` before forwarding to the study note generation service.
+1. **Groq Whisper API**: Fast, high-throughput cloud ASR for standard English lectures.
+2. **Griot Nano 1 Sidecar**: FastAPI container running ConformerCTC model optimized for African-accented speech and multilingual audio.
+3. **Intelligent Router**: Initial ~20-30s audio sample evaluated for language and confidence metrics (`avg_logprob`, `no_speech_prob`). Dispatches to Whisper for confident English or Griot Nano 1 for accented/multilingual speech.
+4. **Normalized Output**: Both engines produce `{ transcript, language, engine }` before forwarding to note generation.
 
-## System flow
-```
-Mobile/Web Frontend (upload mp3/wav/m4a)
-        │
-        ▼
-Backend API (Node/Express)
-        │
-        ├─ 1. Validate file (type, size, duration)
-        │
-        ├─ 2. Language & Confidence Sample Check (~20-30s sample)
-        │        ├─ English + High Confidence ──► Groq Whisper API
-        │        └─ Multilingual / Accented / Low Conf ──► Griot Nano 1 Sidecar
-        │
-        ├─ 3. Send normalized transcript → LLM API
-        │        └─ returns structured study knowledge { title, overview, concepts, notes, quiz }
-        │
-        ▼
-Response to frontend: { status, title, transcript, notes_markdown, engine_used }
-        │
-        ▼
-Results Page (Tabs: Overview & Concepts | Study Notes | Terms | Quiz | Transcript)
+## Database Schema (PostgreSQL)
+```sql
+CREATE TABLE IF NOT EXISTS users (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 ```
 
-## Processing status states
-Shown to the user during processing (satisfies the "live processing status" story):
+## Authentication & 3-Attempt Trial Gating Flow
 ```
-✓ Audio uploaded
-✓ Validating file
-● Transcribing lecture...
-○ Generating notes
-○ Complete
+                     User Request (Upload Audio)
+                                │
+                                ▼
+                   Is user logged in (JWT Cookie)?
+                                │
+                 ┌──────────────┴──────────────┐
+                 ▼                             ▼
+             YES (Auth)                    NO (Trial)
+                 │                             │
+                 │                 Check signed trial cookie:
+                 │                 trials_used count (0..3)
+                 │                             │
+                 │                   ┌─────────┴─────────┐
+                 │                   ▼                   ▼
+                 │             trials_used >= 3      trials_used < 3
+                 │                   │                   │
+                 │           Reject with 403             │
+                 │           "TRIAL_EXHAUSTED"           │
+                 │           (Show Login CTA)            │
+                 │                                       │
+                 └──────────────┬────────────────────────┘
+                                │
+                                ▼
+                       Process Lecture Audio
+                   (Validate → Transcribe → Notes)
+                                │
+                                ▼
+                   Increment signed trial cookie
+                      (trials_used = count + 1)
 ```
-On failure, replace the current stage with an ✗ and a specific error message.
 
-## API endpoints (suggested)
-- `POST /api/upload` — accepts audio file, runs validation, kicks off processing
-- `GET /api/status/:jobId` — returns current stage (for polling) OR
-  process synchronously and skip polling for MVP simplicity (see note below)
-- `GET /api/result/:jobId` — returns `{ title, transcript, notes_markdown }`
+## API Endpoints
 
-### Simplification for the 10-minute demo cap
-Because files are capped at ~10 minutes, you can process **synchronously**:
-the frontend uploads, shows a spinner/staged progress bar, and waits for one
-response containing everything. This avoids building a job queue/polling
-system. Only build async polling if processing time becomes a real problem.
+### Authentication Endpoints
+- `POST /api/auth/signup` — `{ email, password }` → Creates user in PostgreSQL, sets auth cookie, returns `{ user: { id, email } }`
+- `POST /api/auth/login` — `{ email, password }` → Verifies bcrypt hash, sets auth cookie, returns `{ user: { id, email } }`
+- `POST /api/auth/logout` — Clears auth cookie, returns `{ message: 'Logged out' }`
+- `GET /api/auth/me` — Reads auth cookie, returns `{ user: { id, email } }` or 401
 
-## Security rules
-- API keys (Groq, LLM) live only in backend environment variables
-- Never send API keys to the frontend, never commit them to git
-- Use `.env` locally and platform secrets (Vercel/Render env vars) in production
-- Validate file type/size server-side, not just client-side (client checks are for UX only)
+### Lecture Processing Endpoints
+- `POST /api/upload` — Accepts audio file.
+  - If authenticated: processes lecture without restriction.
+  - If unauthenticated: verifies trial session cookie. If `trials_used < 3`, processes and increments trial cookie count. If `trials_used >= 3`, returns 403 `TRIAL_EXHAUSTED`.
+- `GET /api/trial-status` — Returns `{ trialsRemaining: number, trialsUsed: number, maxTrials: 3, isAuthenticated: boolean }`
+- `POST /api/chat` — Grounded academic tutor Q&A endpoint.
 
-## Data handling
-- Uploaded audio files are temporary — delete after processing completes
-- No user data persisted beyond the current session for MVP
-
-## Screen-by-screen (per DESIGN.md)
+## Frontend Page Routes & Structure
 ```
-Landing / Upload page (light bg)
-  Nav: "LectureScribe" wordmark (italic serif) | "Menu" pill, top-right
-  Headline: "Turn your lecture into *notes*."   ← italic serif on "notes"
-  Subtext: one line on what it does
-  Buttons: [ Upload a lecture ] (solid black)  [ See an example ] (outline)
-  Upload widget: bordered white card below hero
-
-Processing page (dark rounded hero card)
-  Headline (white): "Processing your lecture."
-  Status list inside the card:
-    ✓ Audio uploaded
-    ✓ Validating file
-    ● Transcribing...
-    ○ Generating notes
-    ○ Complete
-
-Results page (light bg)
-  Tabs (pill style): [ Transcript ]  [ Notes ]
-  Content: bordered white card, bold headings + bullets
-  Buttons below card: [ Copy notes ] (solid)  [ Download ] (outline)
+/           ── Landing Page (Hero, Feature Highlights, Example Notes, Menu Nav)
+/trial      ── Try LectureScribe (3-trial upload flow with remaining counter)
+/login      ── Auth Page (Create Account & Log in toggle)
+/workspace  ── Protected Student Workspace (Full unlimited uploads & study hub)
+/about      ── About Page (Static problem statement, mission & 3-card architecture)
 ```
+
+## Security Rules
+- Passwords must be hashed using bcrypt (rounds >= 10).
+- JWT secret (`JWT_SECRET`) and cookie signing secret (`SESSION_SECRET`) stored in backend `.env` only.
+- Authentication cookies set with `httpOnly: true`, `sameSite: 'lax'`, and `secure: true` in production.
+- API keys (Groq, HuggingFace) remain strictly backend-only.

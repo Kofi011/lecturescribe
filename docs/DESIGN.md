@@ -15,80 +15,61 @@ word for emphasis. Feels premium and simple, not "startup gradient."
 - No blue links, no brand accent color — contrast does the work
 
 ## Typography
-- Logo/wordmark: italic serif, e.g. *LectureScribe* — same treatment as
-  the "SasuSync" script logo
-- Headlines: large, bold, sans-serif (e.g. Inter/Helvetica-style, 700-800 weight)
+- Logo/wordmark: italic serif, e.g. *LectureScribe* — same treatment as the "SasuSync" script logo
+- Headlines: large, bold, sans-serif (Inter/Helvetica-style, 700-800 weight)
 - Emphasis word inside a headline: switch to italic serif for one key word
-  — e.g. "Turn your lecture into *notes*." (mirrors "Building with an
-  *AI agent*?" and "Messages that *arrive* in Ghana.")
-- Body/subtext: regular weight, gray, smaller size, centered under headlines
-  on landing sections
+  — e.g. "Turn your lecture into *notes*.", "Study without the *friction*."
+- Body/subtext: regular weight, gray, smaller size, centered under headlines on landing sections
 
 ## Buttons
 - Primary: solid black, fully rounded (pill shape), white bold text
-- Secondary: white/transparent background, thin black outline, black text,
-  same pill shape
+- Secondary: white/transparent background, thin black outline, black text, same pill shape
 - Nav "Menu" button: black pill, white text, chevron icon, top-right corner
 
-## Navigation
-- Simple top bar: wordmark logo on the left, single "Menu" pill button on
-  the right — no long inline nav link list
-- Optional horizontal scrollable pill/tab row below the nav for categories
-  (mirrors the network-name ticker in the reference)
+## Navigation & Menu Dropdown
+- Clean top bar: wordmark logo on the left, single "Menu" pill button on the right.
+- Clicking the "Menu" pill opens a sleek, high-contrast dropdown containing four items in exact order:
+  1. **HOME** — Returns to the landing page
+  2. **TRY LECTURESCRIBE** — Navigates to the trial page (3 free uploads)
+  3. **LOGIN** — Navigates to the account login/signup page
+  4. **ABOUT** — Navigates to the static mission and overview page
+- Styled with black/white high-contrast aesthetics, rounded borders, and subtle hover highlights.
 
-## Sections & layout
-- Alternate light and dark full-width sections down the page for rhythm
-  (e.g. dark rounded hero card on a white page, then a plain white section,
-  then a dark section again)
-- Hero sections: centered headline + subtext + two buttons (one solid, one
-  outline), generous vertical padding
-- Feature sections: 3-column card grid on desktop, stacks to 1 column on
-  mobile. Each card = icon (simple line icon) + short bold heading + 1-2
-  sentence gray description
-- Decorative subtle wavy line patterns can sit faded in the page margins on
-  light sections (optional, purely decorative, low opacity)
+## Page Layouts & Screens
 
-## Cards
-- White background, thin light-gray border, rounded corners (~16-20px)
-- Optional small black pill label above a card for a "highlighted" option
-  (e.g. "Popular" / "Best value" — same pattern for showcasing a
-  recommended plan or notes template)
+### 1. Landing Page (`/`)
+- Light background with subtle flowing spline waveforms below the header.
+- Centered contained marquee above the main headline.
+- Headline: "Turn your lecture into *notes*."
+- Action buttons: "Upload a lecture" (solid black) and "See an example" (pill outline with badge).
+- Feature cards: 3-column card grid ("Three things, done properly.").
+- Dark hero card: "Studying with an *AI scribe*?"
 
-## Footer
-- Minimal single row: copyright + short tagline on the left, a flat list of
-  text links on the right (no columns of links)
+### 2. Trial Page (`/trial`)
+- Reuses the core upload → status → results UI.
+- Gated by server-side signed trial session cookie tracking up to 3 uses:
+  - If < 3 uses: Shows the standard clean upload card with a badge indicating remaining credits (e.g. "Free Trial • 3 of 3 remaining").
+  - If 3 uses consumed: Displays a bordered card stating "You've completed your 3 free trials", highlighting the benefits of a full account, with a bold primary button: "Create an Account to Continue".
 
-## Applying this to LectureScribe
+### 3. About Page (`/about`)
+- Hero section: "Smarter lecture notes, built for *students*."
+- Problem & Solution narrative with clean typography.
+- 3-card "Architecture & Philosophy" grid (Speech Intelligence, Semantic Synthesis, Grounded Tutor).
+- Clean footer with navigation links.
 
-### Landing / Upload page
-- Light background, wavy line decoration faint in the margins
-- Headline: "Turn your lecture into **notes**." (italic serif on "notes")
-- Subtext: one sentence on what it does (upload, transcribe, summarize)
-- Two buttons: solid black "Upload a lecture", outline "See an example"
-- Upload widget sits in a bordered card below the hero
+### 4. Auth Page (`/login`)
+- Centered auth card on clean white background.
+- Pill toggle between "Log in" and "Create account".
+- Form inputs: Email address and Password with rounded pill outlines.
+- Primary pill submit button: "Sign in" / "Create my account".
+- Clean error messaging container for invalid credentials or email conflicts.
 
-### Processing page
-- Dark rounded hero card (like the reference's dark hero), white bold
-  headline e.g. "Processing your lecture."
-- Status stages listed inside the dark card, checkmarks/dots in white/gray
-  (✓ done, ● in progress, ○ pending) — same restrained, no-color approach
-
-### Results page
-- Light background
-- Tab pills (Transcript / Notes) styled like the black "Menu" pill /
-  network ticker tabs
-- Notes shown in a bordered white card, headings bold, bullets plain
-- Copy/Download as pill buttons (solid black + outline), placed together
-  under the notes card
-
-### Feature/how-it-works section (optional, for a marketing-style landing)
-- "Three things, done properly." style section: 3 cards — Transcribe,
-  Summarize, Export — each with a simple icon, bold heading, short
-  description, matching the reference's Bulk SMS / One-time codes / Voice
-  card layout
+### 5. Protected Workspace (`/workspace`)
+- Full academic hub for registered students.
+- Header displays user email badge and a "Log out" button.
+- Unlimited lecture upload zone, past lecture session history, and full study toolkit.
 
 ## What NOT to borrow
 - No SMS/telecom-specific content (networks, credits, pricing bundles)
 - No color accents beyond black/white/gray
-- Keep it to LectureScribe's own copy and features only — this file is a
-  **style** reference, not a content template
+- Keep it to LectureScribe's own copy and features only

@@ -57,7 +57,6 @@ git push origin main
 - [x] Handle connection & speech errors with user-facing actionable messages → commit + push
 - [x] Return `engine_used` and language in API response and display in UI → commit + push
 
-
 ## Phase 4 — Notes generation
 - [x] Write and test the summarization prompt (headings + bullets + title) → commit + push
 - [x] Generate suggested title → commit + push
@@ -77,18 +76,27 @@ git push origin main
 - [x] Confirm mobile responsiveness across all screens → commit + push
 - [x] Add loading states for all async actions → commit + push
 
-## Phase 7 — Testing
-- [x] Test with mp3 file → commit (fix any bugs found) + push
-- [x] Test with wav file → commit + push
-- [x] Test with m4a file → commit + push
-- [x] Test invalid/unsupported file type → commit + push
-- [x] Test file over 10 minutes → commit + push
-- [x] Test API failure (simulate by breaking key temporarily) → commit + push
-- [x] Test on an actual mobile device or dev-tools mobile view → commit + push
+## Phase 7 — Testing & UI Refinements
+- [x] Test with mp3, wav, and m4a files → commit + push
+- [x] Test invalid/unsupported file type and length validation → commit + push
+- [x] Test API failure and fallback behavior → commit + push
+- [x] Add structured markdown renderer and academic tutor interface → commit + push
 
-## Phase 8 — Deployment
+## Phase 8 — Navigation, Trial Mode, Authentication & Workspace
+- [x] Task 8.1: Update documentation specifications (PROJECT.md, REQUIREMENTS.md, ARCHITECTURE.md, DESIGN.md, TASKS.md) → commit + push
+- [ ] Task 8.2: Backend database setup with PostgreSQL (users table migration & connection pool) → commit + push
+- [ ] Task 8.3: Backend authentication service (bcrypt password hashing, JWT/cookie auth, `/api/auth/signup`, `/api/auth/login`, `/api/auth/logout`, `/api/auth/me`) → commit + push
+- [ ] Task 8.4: Backend trial tracking & gating (signed session cookie `lecture_trial_session`, 3-upload limit for anonymous users, bypass for authenticated users) → commit + push
+- [ ] Task 8.5: Frontend Menu dropdown navigation (HOME, TRY LECTURESCRIBE, LOGIN, ABOUT per DESIGN.md) → commit + push
+- [ ] Task 8.6: Frontend static About page (`/about` with hero and 3-card how-it-works architecture) → commit + push
+- [ ] Task 8.7: Frontend Auth page (`/login` with "Log in" and "Create account" toggle, form validation, and auth state) → commit + push
+- [ ] Task 8.8: Frontend Trial mode & gating (`/trial` reusing upload flow with 3-trial limit enforcement and Login CTA) → commit + push
+- [ ] Task 8.9: Frontend Protected Workspace (`/workspace` with full unlimited lecture pipeline and user logout) → commit + push
+- [ ] Task 8.10: End-to-end testing of navigation, trial gating, and authentication flows → commit + push
+
+## Phase 9 — Deployment
 - [ ] Merge `dev` into `main` (deployment should run off `main`, not `dev`)
-- [ ] Deploy backend (Render/Railway), set production env vars → commit + push
+- [ ] Deploy backend (Render/Railway with managed PostgreSQL), set production env vars → commit + push
 - [ ] Deploy frontend (Vercel), point to deployed backend URL → commit + push
 - [ ] Test the live deployed link end-to-end → commit + push
 - [ ] Update README.md with the live link → commit + push
@@ -96,7 +104,7 @@ git push origin main
 ---
 
 ## Notes for the agent
-- Don't jump ahead to Phase 3+ before Phase 1–2 are working and pushed.
+- Work through TASKS.md one task at a time, in order. Do not skip ahead.
 - Never mark a task `[x]` until it has actually been run and tested, not just written.
 - If a task breaks something already working, fix it before committing — don't push broken code.
 - Every "commit + push" above means push to `dev`, unless the task explicitly says to merge/deploy from `main`.
