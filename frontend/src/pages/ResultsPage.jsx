@@ -1,13 +1,14 @@
 /**
  * ResultsPage.jsx — Comprehensive Academic Study Hub for Processed Lectures
- * Requirement 2: Every Clickable Element Must Produce a Relevant Result
- * Requirement 3: Internal transcription technology is not exposed
+ * Includes Branded Stamped PDF Export, Interactive Audio Playback, and Persisted AI Tutor
  */
 
 import { useState } from 'react'
 import Nav from '../components/Nav'
 import Footer from '../components/Footer'
+import AudioPlayer from '../components/AudioPlayer'
 import LectureTutorDrawer from '../components/LectureTutorDrawer'
+import { exportLectureToPdf } from '../utils/pdfExport'
 
 export default function ResultsPage({
   lecture,
@@ -18,6 +19,7 @@ export default function ResultsPage({
   onOpenWorkspaceModal,
   onOpenInfo,
   onDeleteLecture,
+  onUpdateLecture,
 }) {
   const [activeTab, setActiveTab] = useState('overview')
   const [copyLabel, setCopyLabel] = useState('Copy Notes')
@@ -25,6 +27,7 @@ export default function ResultsPage({
   const [revealedAnswers, setRevealedAnswers] = useState({})
   const [showSummaryModal, setShowSummaryModal] = useState(false)
   const [exportDropdownOpen, setExportDropdownOpen] = useState(false)
+  const [isExportingPdf, setIsExportingPdf] = useState(false)
 
   const title              = lecture?.title || 'Lecture Summary'
   const overview           = lecture?.overview || ''
@@ -36,6 +39,7 @@ export default function ResultsPage({
   const revision_questions = lecture?.revision_questions || []
   const transcript         = lecture?.transcript || ''
   const notes_markdown     = lecture?.notes_markdown || ''
+  const audioUrl           = lecture?.audioUrl || null
 
   // ─── Actions ─────────────────────────────────────────────────────────────
 
@@ -51,6 +55,21 @@ export default function ResultsPage({
   }
 
   const handleDownload = (format = 'md') => {
+    setExportDropdownOpen(false)
+
+    if (format === 'pdf') {
+      setIsExportingPdf(true)
+      try {
+        exportLectureToPdf(lecture)
+      } catch (e) {
+        console.error('PDF export failed:', e)
+        alert('Failed to generate PDF. Please try again.')
+      } finally {
+        setIsExportingPdf(false)
+      }
+      return
+    }
+
     let content = notes_markdown
     let mime = 'text/markdown'
     let ext = 'md'
@@ -76,7 +95,6 @@ export default function ResultsPage({
     a.download = `${safeName}.${ext}`
     a.click()
     URL.revokeObjectURL(url)
-    setExportDropdownOpen(false)
   }
 
   const toggleAnswer = (idx) => {
@@ -89,7 +107,6 @@ export default function ResultsPage({
     }
     onReset?.()
   }
-
 
   return (
     <div className="min-h-screen flex flex-col bg-white selection:bg-black selection:text-white">
@@ -146,6 +163,15 @@ export default function ResultsPage({
             </button>
           </div>
         </div>
+
+        {/* Audio Player Widget (if audio is present or sample audio) */}
+        {(audioUrl || lecture?.durationSec) && (
+          <AudioPlayer
+            audioUrl={audioUrl}
+            fileName={lecture?.fileName}
+            durationSec={lecture?.durationSec}
+          />
+        )}
 
         {/* Interactive Tab Switcher */}
         <div
@@ -407,13 +433,23 @@ export default function ResultsPage({
                 id="download-notes-btn"
                 onClick={() => setExportDropdownOpen(!exportDropdownOpen)}
                 className="btn-secondary flex items-center gap-2"
+                disabled={isExportingPdf}
               >
-                <span>Download / Export</span>
+                <span>{isExportingPdf ? 'Generating PDF…' : 'Download / Export'}</span>
                 <span className="text-xs">▼</span>
               </button>
 
               {exportDropdownOpen && (
-                <div className="absolute left-0 bottom-full mb-2 w-48 bg-white border border-neutral-200 rounded-[20px] shadow-xl p-2 z-50 animate-scale-up">
+                <div className="absolute left-0 bottom-full mb-2 w-56 bg-white border border-neutral-200 rounded-[22px] shadow-2xl p-2 z-50 animate-scale-up">
+                  <button
+                    onClick={() => handleDownload('pdf')}
+                    className="w-full text-left px-4 py-2.5 text-xs font-bold text-black hover:bg-neutral-100 rounded-full transition-colors flex items-center justify-between"
+                  >
+                    <span>PDF Document (.pdf)</span>
+                    <span className="text-[9px] bg-black text-white px-1.5 py-0.5 rounded-full font-bold">
+                      STAMPED
+                    </span>
+                  </button>
                   <button
                     onClick={() => handleDownload('md')}
                     className="w-full text-left px-4 py-2.5 text-xs font-semibold text-neutral-800 hover:bg-neutral-100 rounded-full transition-colors"
@@ -469,6 +505,8 @@ export default function ResultsPage({
         isOpen={isTutorOpen}
         onClose={() => setIsTutorOpen(false)}
         lecture={lecture}
+        currentUser={currentUser}
+        onUpdateLecture={onUpdateLecture}
       />
 
       {/* Quick Summary Modal */}

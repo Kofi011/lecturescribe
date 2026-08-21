@@ -125,9 +125,20 @@ export default function App() {
     setStage('complete')
     await new Promise((r) => setTimeout(r, 600))
 
-    // Persist to local client storage
-    saveLecture(data)
-    setCurrentLecture(data)
+    // Create object URL for audio playback
+    let audioUrl = null
+    try {
+      audioUrl = URL.createObjectURL(file)
+    } catch {}
+
+    const completeLecture = {
+      ...data,
+      audioUrl,
+    }
+
+    // Persist to local client and cloud storage
+    saveLecture(completeLecture, currentUser)
+    setCurrentLecture(completeLecture)
     setPage('results')
   }
 
@@ -182,7 +193,7 @@ export default function App() {
       setCurrentLecture(null)
       setPage('landing')
     } else {
-      deleteLecture(id)
+      deleteLecture(id, currentUser)
       if (currentLecture?.id === id) {
         setCurrentLecture(null)
         setPage('landing')
@@ -291,6 +302,7 @@ export default function App() {
           onOpenWorkspaceModal={handleOpenWorkspaceModal}
           onOpenInfo={(type) => setInfoModalType(type)}
           onDeleteLecture={handleDeleteLecture}
+          onUpdateLecture={(updated) => setCurrentLecture(updated)}
         />
       )}
 

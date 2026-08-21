@@ -30,22 +30,27 @@
 - Issues secure JWT/session token upon successful authentication.
 - Provides `/api/auth/signup`, `/api/auth/login`, `/api/auth/logout`, and `/api/auth/me` endpoints.
 
-### 5. Protected Student Workspace
+### 5. Protected Student Workspace & Persistence
 - Authenticated users are automatically redirected to the protected Workspace (`/workspace`).
 - Workspace provides full, unlimited lecture processing (bypasses trial limits).
+- Stores all processed lectures, transcripts, notes, and tutor conversation histories in PostgreSQL (`lectures` table).
+- Full interactive past lecture library and recent sessions grid.
 - Includes user profile status and logout button in the header.
 
-### 6. Speech Transcription & Notes Engine
+### 6. Speech Transcription, Notes Engine & Audio Playback
 - Supports MP3, WAV, and M4A audio files up to ~15MB and ~10 minutes.
 - Dual speech recognition routing: Groq Whisper API for clear English and Griot Nano 1 sidecar for African-accented English and multilingual speech.
+- Minimalist black-and-white synchronized audio player with playback speed toggles (1x, 1.25x, 1.5x, 2x), scrubber, and timestamp counter.
 - Generates structured Markdown notes, key concepts, terminology glossary, and self-test revision questions.
-- Includes interactive AI Academic Tutor for grounded transcript Q&A.
+- Includes interactive AI Academic Tutor for grounded transcript Q&A with persisted conversation history.
+- Multi-format exports: Official Branded PDF with LectureScribe Verified Stamp & Seal, Complete JSON (.json), Markdown (.md), and Plain Text (.txt).
 
 ## Non-functional requirements
 - **Security & Privacy**:
   - Passwords and session secrets must never be exposed to the frontend or committed to git.
   - Authentication tokens and trial cookies must be HTTP-only, secure in production, and use SameSite protection.
   - Server-side validation of file type, duration, and authentication tokens.
+  - Security headers enforced via `helmet` and API rate limiting via `express-rate-limit` on auth, upload, and tutor routes.
 - **Design & Responsiveness**:
   - Strictly follows `DESIGN.md`: black-and-white palette, pill buttons, bold display type with italic serif accent word, bordered cards.
   - Mobile responsive across all pages (phones, tablets, desktops).

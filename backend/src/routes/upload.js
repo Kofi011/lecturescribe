@@ -16,6 +16,7 @@ import { transcribeAudio } from '../services/transcribe.js'
 import { generateNotes }   from '../services/generateNotes.js'
 import { askAboutLecture } from '../services/askLecture.js'
 import { getTrialStatus, incrementTrial, enforceTrialLimit } from '../services/trial.js'
+import { createLecture } from '../db/index.js'
 
 const router = express.Router()
 
@@ -138,8 +139,7 @@ router.post('/upload', (req, res) => {
       const trialResult = incrementTrial(req, res)
       console.log(`[upload] lecture ready — "${result.title}" (transcribed by ${engine}) [trials remaining: ${trialResult.trialsRemaining}]`)
 
-      return res.json({
-        status: 'complete',
+      const lecturePayload = {
         id: `lec_${Date.now()}`,
         date: new Date().toISOString(),
         durationSec: durationSec ? Math.round(durationSec) : null,
@@ -147,13 +147,31 @@ router.post('/upload', (req, res) => {
         engine_used: engine,
         language,
         transcript,
+        user_id: req.user?.id || null,
+        ...result,
+      }
+
+      // Auto-save to database if user is authenticated
+      if (req.user?.id) {
+        try {
+          const savedDbRecord = await createLecture(lecturePayload)
+          if (savedDbRecord?.id) {
+            lecturePayload.id = savedDbRecord.id
+          }
+        } catch (dbErr) {
+          console.warn('[upload] failed to auto-save to db:', dbErr.message)
+        }
+      }
+
+      return res.json({
+        status: 'complete',
+        ...lecturePayload,
         trial: {
           isAuthenticated: !!req.user,
           trialsUsed: trialResult.trialsUsed,
           trialsRemaining: trialResult.trialsRemaining,
           maxTrials: 3,
         },
-        ...result,
       })
 
     } catch (err) {

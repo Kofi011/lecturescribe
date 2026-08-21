@@ -1,8 +1,9 @@
 /**
- * utils/lectureStorage.js — Local lecture persistence and preloaded interactive examples
+ * utils/lectureStorage.js — Dual Persistence: PostgreSQL Cloud Backend + Local Storage Fallback
  */
 
 const STORAGE_KEY = 'lecturescribe_saved_lectures_v1'
+const API_URL = import.meta.env.VITE_API_URL || ''
 
 export const SAMPLE_LECTURE = {
   id: 'sample_cs101_sorting',
@@ -208,7 +209,30 @@ export function getSavedLectures() {
   }
 }
 
-export function saveLecture(lecture) {
+/**
+ * Fetch server lectures for the authenticated user and sync into local state.
+ */
+export async function syncServerLectures() {
+  try {
+    const endpoint = API_URL ? `${API_URL}/api/lectures` : '/api/lectures'
+    const res = await fetch(endpoint, { credentials: 'include' })
+    if (res.ok) {
+      const data = await res.json()
+      if (Array.isArray(data?.lectures)) {
+        const localList = getSavedLectures().filter((l) => l.isSample)
+        const combined = [...data.lectures, ...localList]
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(combined))
+        window.dispatchEvent(new Event('lecturescribe_storage_update'))
+        return combined
+      }
+    }
+  } catch (err) {
+    console.warn('[lecture storage] server sync error:', err)
+  }
+  return getSavedLectures()
+}
+
+export function saveLecture(lecture, currentUser = null) {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     let list = []
@@ -222,6 +246,18 @@ export function saveLecture(lecture) {
     const updated = [lecture, ...existing]
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
     window.dispatchEvent(new Event('lecturescribe_storage_update'))
+
+    // If user is authenticated and this is not a sample, also sync to backend if needed
+    if (currentUser && !lecture.isSample) {
+      const endpoint = API_URL ? `${API_URL}/api/lectures` : '/api/lectures'
+      fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(lecture),
+        credentials: 'include',
+      }).catch((e) => console.warn('[lecture storage] server save error:', e))
+    }
+
     return updated
   } catch (e) {
     console.warn('Failed to save lecture to localStorage:', e)
@@ -229,7 +265,34 @@ export function saveLecture(lecture) {
   }
 }
 
-export function deleteLecture(lectureId) {
+export async function saveTutorHistory(lectureId, history, currentUser = null) {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (raw) {
+      const list = JSON.parse(raw)
+      const idx = list.findIndex((l) => l.id === lectureId)
+      if (idx !== -1) {
+        list[idx].tutor_history = history
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list))
+        window.dispatchEvent(new Event('lecturescribe_storage_update'))
+      }
+    }
+
+    if (currentUser && lectureId && !lectureId.startsWith('sample_')) {
+      const endpoint = API_URL ? `${API_URL}/api/lectures/${lectureId}/tutor` : `/api/lectures/${lectureId}/tutor`
+      await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ history }),
+        credentials: 'include',
+      })
+    }
+  } catch (err) {
+    console.warn('[tutor storage] save error:', err)
+  }
+}
+
+export function deleteLecture(lectureId, currentUser = null) {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     let list = []
@@ -242,6 +305,14 @@ export function deleteLecture(lectureId) {
     const updated = list.filter((l) => l.id !== lectureId)
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
     window.dispatchEvent(new Event('lecturescribe_storage_update'))
+
+    if (currentUser && lectureId && !lectureId.startsWith('sample_')) {
+      const endpoint = API_URL ? `${API_URL}/api/lectures/${lectureId}` : `/api/lectures/${lectureId}`
+      fetch(endpoint, { method: 'DELETE', credentials: 'include' }).catch((e) =>
+        console.warn('[lecture storage] server delete error:', e)
+      )
+    }
+
     return updated
   } catch (e) {
     console.warn('Failed to delete lecture:', e)
@@ -259,4 +330,3 @@ export function clearAllLectures() {
     return []
   }
 }
-

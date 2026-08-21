@@ -5,6 +5,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import MarkdownRenderer from './MarkdownRenderer'
+import { saveTutorHistory } from '../utils/lectureStorage'
 
 const API_URL = import.meta.env.VITE_API_URL || ''
 
@@ -12,16 +13,27 @@ export default function LectureTutorDrawer({
   isOpen,
   onClose,
   lecture,
+  currentUser,
+  onUpdateLecture,
 }) {
-  const [messages, setMessages] = useState([
-    {
-      role: 'assistant',
-      content: `Hello! I've analyzed **${lecture?.title || 'this lecture'}**.\n\nWhat would you like to explore or clarify? You can ask me to explain a concept, quiz your understanding, break down terminology, or summarize any part of the transcript.`,
-    },
-  ])
+  const defaultGreeting = {
+    role: 'assistant',
+    content: `Hello! I've analyzed **${lecture?.title || 'this lecture'}**.\n\nWhat would you like to explore or clarify? You can ask me to explain a concept, quiz your understanding, break down terminology, or summarize any part of the transcript.`,
+  }
+
+  const [messages, setMessages] = useState([defaultGreeting])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const scrollRef = useRef(null)
+
+  // Initialize from lecture's persisted tutor_history if present
+  useEffect(() => {
+    if (Array.isArray(lecture?.tutor_history) && lecture.tutor_history.length > 0) {
+      setMessages(lecture.tutor_history)
+    } else {
+      setMessages([defaultGreeting])
+    }
+  }, [lecture?.id])
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -39,6 +51,7 @@ export default function LectureTutorDrawer({
     setInput('')
     setLoading(true)
 
+    let finalHistory = updatedHistory
     try {
       const endpoint = API_URL ? `${API_URL}/api/chat` : '/api/chat'
       const res = await fetch(endpoint, {
@@ -56,34 +69,49 @@ export default function LectureTutorDrawer({
       }
 
       const data = await res.json()
-      setMessages((prev) => [
-        ...prev,
-        { role: 'assistant', content: data.answer || 'I could not generate an answer.' },
-      ])
+      const assistantMsg = { role: 'assistant', content: data.answer || 'I could not generate an answer.' }
+      finalHistory = [...updatedHistory, assistantMsg]
+      setMessages(finalHistory)
     } catch {
       // Intelligent fallback using local extracted lecture knowledge if server offline
       const answer = generateLocalTutorReply(query.trim(), lecture)
-      setMessages((prev) => [...prev, { role: 'assistant', content: answer }])
+      const assistantMsg = { role: 'assistant', content: answer }
+      finalHistory = [...updatedHistory, assistantMsg]
+      setMessages(finalHistory)
     } finally {
       setLoading(false)
+      // Persist tutor history
+      if (lecture?.id) {
+        saveTutorHistory(lecture.id, finalHistory, currentUser)
+        onUpdateLecture?.({ ...lecture, tutor_history: finalHistory })
+      }
+    }
+  }
+
+  const handleClearHistory = () => {
+    const fresh = [defaultGreeting]
+    setMessages(fresh)
+    if (lecture?.id) {
+      saveTutorHistory(lecture.id, fresh, currentUser)
+      onUpdateLecture?.({ ...lecture, tutor_history: fresh })
     }
   }
 
   function generateLocalTutorReply(q, lec) {
     const low = q.toLowerCase()
     if (low.includes('concept') || low.includes('explain')) {
-      const concepts = lec.key_concepts?.map((c) => `- **${c.concept}**: ${c.explanation}`).join('\n') || ''
+      const concepts = lec?.key_concepts?.map((c) => `- **${c.concept}**: ${c.explanation}`).join('\n') || ''
       return `### Key Concepts from this Lecture\n\n${concepts}`
     }
     if (low.includes('takeaway') || low.includes('summary') || low.includes('main')) {
-      const takeaways = lec.key_takeaways?.map((t) => `- ${t}`).join('\n') || lec.overview
+      const takeaways = lec?.key_takeaways?.map((t) => `- ${t}`).join('\n') || lec?.overview
       return `### Key Takeaways\n\n${takeaways}`
     }
     if (low.includes('term') || low.includes('definition')) {
-      const terms = lec.important_terms?.map((t) => `- **${t.term}**: ${t.definition}`).join('\n') || ''
+      const terms = lec?.important_terms?.map((t) => `- **${t.term}**: ${t.definition}`).join('\n') || ''
       return `### Important Terminology\n\n${terms}`
     }
-    return `### Summary of "${lec.title}"\n\n${lec.overview}\n\n**Key Takeaway:** ${lec.key_takeaways?.[0] || 'See full study notes in the Notes tab.'}`
+    return `### Summary of "${lec?.title}"\n\n${lec?.overview}\n\n**Key Takeaway:** ${lec?.key_takeaways?.[0] || 'See full study notes in the Notes tab.'}`
   }
 
   const suggestedQuestions = [
@@ -121,13 +149,24 @@ export default function LectureTutorDrawer({
             )}
           </div>
 
-          <button
-            onClick={onClose}
-            className="w-9 h-9 rounded-full bg-neutral-200/70 hover:bg-black hover:text-white text-black flex items-center justify-center transition-colors text-sm font-bold cursor-pointer"
-            aria-label="Close"
-          >
-            ✕
-          </button>
+          <div className="flex items-center gap-2">
+            {messages.length > 1 && (
+              <button
+                onClick={handleClearHistory}
+                className="text-xs text-neutral-400 hover:text-red-600 px-3 py-1.5 rounded-full transition-colors cursor-pointer"
+                title="Clear conversation history"
+              >
+                Clear
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="w-9 h-9 rounded-full bg-neutral-200/70 hover:bg-black hover:text-white text-black flex items-center justify-center transition-colors text-sm font-bold cursor-pointer"
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {/* Message Log with Structured Markdown Output */}

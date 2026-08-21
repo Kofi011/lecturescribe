@@ -7,7 +7,7 @@ import Nav from '../components/Nav'
 import Footer from '../components/Footer'
 import UploadCard from '../components/UploadCard'
 import AnimatedWaveform from '../components/AnimatedWaveform'
-import { getSavedLectures } from '../utils/lectureStorage'
+import { getSavedLectures, syncServerLectures } from '../utils/lectureStorage'
 
 export default function WorkspacePage({
   currentUser,
@@ -23,12 +23,17 @@ export default function WorkspacePage({
 
   useEffect(() => {
     setSavedLectures(getSavedLectures())
+    if (currentUser) {
+      syncServerLectures().then((res) => {
+        if (Array.isArray(res)) setSavedLectures(res)
+      })
+    }
     const handleStorageUpdate = () => {
       setSavedLectures(getSavedLectures())
     }
     window.addEventListener('lecturescribe_storage_update', handleStorageUpdate)
     return () => window.removeEventListener('lecturescribe_storage_update', handleStorageUpdate)
-  }, [])
+  }, [currentUser])
 
   // Guard: if not authenticated, prompt login
   if (!currentUser) {

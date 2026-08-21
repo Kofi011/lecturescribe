@@ -94,8 +94,13 @@ git push origin main
 - [x] Task 8.9: Frontend Protected Workspace (`/workspace` with full unlimited lecture pipeline and user logout) → commit + push
 - [x] Task 8.10: End-to-end testing of navigation, trial gating, and authentication flows → commit + push
 
+## Phase 8.5 — Lecture Persistence, Security, Audio Player & Branded PDF Export
+- [x] Task 8.5.1: Database lectures schema & CRUD persistence (`lectures` table in PostgreSQL & local fallback, `/api/lectures` endpoints, and Workspace/Library sync) → commit + push
+- [x] Task 8.5.2: Security headers & API rate limiting (`helmet`, `express-rate-limit` on `/api/auth/*`, `/api/upload`, and `/api/chat`) → commit + push
+- [x] Task 8.5.3: Minimalist audio player & lecture audio playback (`AudioPlayer.jsx` with speed toggle, scrubber, and playback toolbar) → commit + push
+- [x] Task 8.5.4: Branded PDF export with LectureScribe Stamp & Seal, JSON export, and Tutor Q&A persistence (`pdfExport.js`, `ResultsPage.jsx`, `LectureTutorDrawer.jsx`) → commit + push
 
-## Phase 9 — Deployment
+## Phase 9 — Deployment (Paused for Pre-Production Vetting)
 - [ ] Merge `dev` into `main` (deployment should run off `main`, not `dev`)
 - [ ] Deploy backend (Render/Railway with managed PostgreSQL), set production env vars → commit + push
 - [ ] Deploy frontend (Vercel), point to deployed backend URL → commit + push
