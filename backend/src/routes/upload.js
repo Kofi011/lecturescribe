@@ -202,4 +202,19 @@ router.post('/chat', async (req, res) => {
   }
 })
 
+// ─── POST /api/contact — User / Institutional Inquiries ───────────
+router.post('/contact', (req, res) => {
+  const { name, email, subject, message } = req.body || {}
+
+  if (!name || !email || !message) {
+    return res.status(400).json({ error: 'Name, email, and message are required.' })
+  }
+
+  console.log(`[contact inquiry] from "${name}" <${email}> [${subject || 'General'}]: ${message.substring(0, 80)}...`)
+  return res.json({
+    status: 'received',
+    message: 'Thank you for reaching out to LectureScribe. We have received your message.',
+  })
+})
+
 export default router

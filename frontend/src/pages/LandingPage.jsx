@@ -7,7 +7,7 @@ import Nav              from '../components/Nav'
 import HeroSection      from '../components/HeroSection'
 import HowItWorks       from '../components/HowItWorks'
 import DarkHeroCard     from '../components/DarkHeroCard'
-import UploadCard       from '../components/UploadCard'
+import ContactSection   from '../components/ContactSection'
 import Footer           from '../components/Footer'
 import AnimatedWaveform from '../components/AnimatedWaveform'
 
@@ -20,10 +20,10 @@ export default function LandingPage({
   onSelectExample,
   onOpenWorkspaceModal,
 }) {
-  const uploadRef     = useRef(null)
+  const contactRef    = useRef(null)
   const howItWorksRef = useRef(null)
 
-  const scrollToUpload     = () => uploadRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  const scrollToContact    = () => contactRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   const scrollToHowItWorks = () => howItWorksRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
   return (
@@ -69,10 +69,9 @@ export default function LandingPage({
           onSeeExample={onSelectExample}
         />
 
-        {/* 4. Studio Upload Card */}
-        <UploadCard
-          cardRef={uploadRef}
-          onSubmit={onUpload}
+        {/* 4. Contact & Inquiries Section */}
+        <ContactSection
+          sectionRef={contactRef}
         />
       </main>
 
