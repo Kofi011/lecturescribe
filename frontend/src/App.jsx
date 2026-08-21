@@ -1,18 +1,27 @@
 /**
  * App.jsx — LectureScribe Root Application Controller
- * Requirement 1: Animated flowing visual waveform motion
- * Requirement 2: Every clickable element produces a relevant result
- * Requirement 3: Internal transcription technology is not exposed
+ * Routes:
+ *   - 'landing'   — Public Landing Page (Hero, Features, Audio upload)
+ *   - 'trial'     — Free Trial Mode (3 free uploads with live counter & gating)
+ *   - 'auth'      — Authentication Page (Log in & Create Account toggle)
+ *   - 'workspace' — Protected Student Workspace (Unlimited processing & library)
+ *   - 'about'     — Static About & Mission Page
+ *   - 'processing'— Staged processing animation & status
+ *   - 'results'   — Complete study intelligence hub & AI tutor
  */
 
 import './App.css'
 import { useState, useEffect, useRef } from 'react'
 import LandingPage    from './pages/LandingPage'
+import TrialPage      from './pages/TrialPage'
+import AuthPage       from './pages/AuthPage'
+import WorkspacePage  from './pages/WorkspacePage'
+import AboutPage      from './pages/AboutPage'
 import ProcessingPage from './pages/ProcessingPage'
 import ResultsPage    from './pages/ResultsPage'
 import NavigationModal from './components/NavigationModal'
 import InfoModal       from './components/InfoModal'
-import { saveLecture, deleteLecture, SAMPLE_LECTURE } from './utils/lectureStorage'
+import { saveLecture, deleteLecture, clearAllLectures, SAMPLE_LECTURE } from './utils/lectureStorage'
 
 const API_URL = import.meta.env.VITE_API_URL || ''
 
@@ -21,13 +30,33 @@ export default function App() {
   const [stage,          setStage]          = useState('uploaded')
   const [error,          setError]          = useState(null)
   const [currentLecture, setCurrentLecture] = useState(null)
+  const [currentUser,    setCurrentUser]    = useState(null)
 
-  // Interactive Modals
-  const [menuOpen,        setMenuOpen]        = useState(false)
-  const [menuInitialTab,  setMenuInitialTab]  = useState('lectures')
-  const [infoModalType,   setInfoModalType]   = useState(null)
+  // Modals
+  const [workspaceModalOpen, setWorkspaceModalOpen] = useState(false)
+  const [workspaceInitialTab, setWorkspaceInitialTab] = useState('lectures')
+  const [infoModalType,      setInfoModalType]      = useState(null)
 
   const abortRef = useRef(null)
+
+  // ─── Check Auth Session on Load ───────────────────────────────────────────
+  useEffect(() => {
+    async function checkAuth() {
+      try {
+        const endpoint = API_URL ? `${API_URL}/api/auth/me` : '/api/auth/me'
+        const res = await fetch(endpoint, { credentials: 'include' })
+        if (res.ok) {
+          const data = await res.json()
+          if (data?.user) {
+            setCurrentUser(data.user)
+          }
+        }
+      } catch (err) {
+        console.warn('[auth check]', err)
+      }
+    }
+    checkAuth()
+  }, [])
 
   // ─── Upload Handler ────────────────────────────────────────────────────────
   const handleUpload = async (file) => {
@@ -36,8 +65,8 @@ export default function App() {
     setStage('uploaded')
     setPage('processing')
 
-    // Visual progression state
-    await new Promise((r) => setTimeout(r, 1200))
+    // Staged progression animation
+    await new Promise((r) => setTimeout(r, 1000))
     setStage('transcribing')
 
     const formData = new FormData()
@@ -52,10 +81,10 @@ export default function App() {
       const res = await fetch(endpoint, {
         method: 'POST',
         body: formData,
+        credentials: 'include',
         signal: controller.signal,
       })
 
-      // Parse JSON response or fallback to text error
       const contentType = res.headers.get('content-type') || ''
       if (contentType.includes('application/json')) {
         data = await res.json()
@@ -65,7 +94,14 @@ export default function App() {
       }
 
       if (!res.ok) {
-        setError(data?.error || `Processing failed with status ${res.status}. Please try again.`)
+        // If 3-trial limit reached, provide clear error message and link to auth
+        if (res.status === 403 && data?.code === 'TRIAL_LIMIT_REACHED') {
+          setError(
+            'You have used all 3 free trial uploads. Please create a free account or log in to continue unlimited processing.'
+          )
+        } else {
+          setError(data?.error || `Processing failed with status ${res.status}. Please try again.`)
+        }
         setStage('transcribing')
         setPage('processing')
         return
@@ -75,7 +111,7 @@ export default function App() {
       console.error('[upload error]', err)
       setError(
         err.message?.includes('Failed to fetch') || err.message?.includes('NetworkError')
-          ? 'Connection to LectureScribe server failed. Please ensure the backend is running and try again.'
+          ? 'Connection to LectureScribe server failed. Please ensure the backend is running.'
           : `Upload error: ${err.message}`
       )
       setStage('transcribing')
@@ -88,12 +124,38 @@ export default function App() {
     await new Promise((r) => setTimeout(r, 900))
     setStage('complete')
     await new Promise((r) => setTimeout(r, 600))
-    await new Promise((r) => setTimeout(r, 600))
 
     // Persist to local client storage
     saveLecture(data)
     setCurrentLecture(data)
     setPage('results')
+  }
+
+  // ─── Auth Handlers ────────────────────────────────────────────────────────
+  const handleAuthSuccess = (user) => {
+    setCurrentUser(user)
+    setPage('workspace')
+  }
+
+  const handleLogout = async () => {
+    try {
+      const endpoint = API_URL ? `${API_URL}/api/auth/logout` : '/api/auth/logout'
+      await fetch(endpoint, { method: 'POST', credentials: 'include' })
+    } catch (err) {
+      console.warn('[logout error]', err)
+    }
+    setCurrentUser(null)
+    setPage('landing')
+  }
+
+  // ─── Navigation Handlers ──────────────────────────────────────────────────
+  const handleNavigate = (targetPage) => {
+    setError(null)
+    if (targetPage === 'workspace' && !currentUser) {
+      setPage('auth')
+      return
+    }
+    setPage(targetPage)
   }
 
   // ─── Load Interactive Example ──────────────────────────────────────────────
@@ -103,15 +165,14 @@ export default function App() {
     setPage('results')
   }
 
-  // ─── Navigation / Menu triggers ────────────────────────────────────────────
-  const handleOpenMenu = (tab = 'lectures') => {
-    setMenuInitialTab(tab)
-    setMenuOpen(true)
+  const handleOpenWorkspaceModal = (tab = 'lectures') => {
+    setWorkspaceInitialTab(tab)
+    setWorkspaceModalOpen(true)
   }
 
-  const handleSelectLectureFromMenu = (lec) => {
+  const handleSelectLectureFromModal = (lec) => {
     setCurrentLecture(lec)
-    setMenuOpen(false)
+    setWorkspaceModalOpen(false)
     setPage('results')
   }
 
@@ -131,10 +192,9 @@ export default function App() {
 
   const handleRetry = () => {
     abortRef.current?.abort()
-    setPage('landing')
-    setStage('uploaded')
     setError(null)
     setCurrentLecture(null)
+    setPage(currentUser ? 'workspace' : 'landing')
   }
 
   useEffect(() => {
@@ -143,46 +203,107 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* ─── PAGES ──────────────────────────────────────────────────────────── */}
+      {/* ─── 1. LANDING PAGE ────────────────────────────────────────────────── */}
       {page === 'landing' && (
         <LandingPage
           onUpload={handleUpload}
-          onOpenMenu={handleOpenMenu}
+          onNavigate={handleNavigate}
+          currentUser={currentUser}
+          onLogout={handleLogout}
           onOpenInfo={(type) => setInfoModalType(type)}
           onSelectExample={handleSelectExample}
+          onOpenWorkspaceModal={handleOpenWorkspaceModal}
         />
       )}
 
+      {/* ─── 2. FREE TRIAL PAGE (3 UPLOADS) ─────────────────────────────────── */}
+      {page === 'trial' && (
+        <TrialPage
+          onUpload={handleUpload}
+          uploadError={error}
+          onNavigate={handleNavigate}
+          currentUser={currentUser}
+          onLogout={handleLogout}
+          onOpenInfo={(type) => setInfoModalType(type)}
+          onOpenWorkspaceModal={handleOpenWorkspaceModal}
+        />
+      )}
+
+      {/* ─── 3. AUTH PAGE (LOGIN / SIGNUP) ──────────────────────────────────── */}
+      {page === 'auth' && (
+        <AuthPage
+          onNavigate={handleNavigate}
+          onAuthSuccess={handleAuthSuccess}
+          onOpenInfo={(type) => setInfoModalType(type)}
+          onOpenWorkspaceModal={handleOpenWorkspaceModal}
+        />
+      )}
+
+      {/* ─── 4. PROTECTED STUDENT WORKSPACE ─────────────────────────────────── */}
+      {page === 'workspace' && (
+        <WorkspacePage
+          currentUser={currentUser}
+          onNavigate={handleNavigate}
+          onUpload={handleUpload}
+          uploadError={error}
+          onSelectLecture={(lec) => {
+            setCurrentLecture(lec)
+            setPage('results')
+          }}
+          onLogout={handleLogout}
+          onOpenInfo={(type) => setInfoModalType(type)}
+          onOpenWorkspaceModal={handleOpenWorkspaceModal}
+        />
+      )}
+
+      {/* ─── 5. STATIC ABOUT PAGE ───────────────────────────────────────────── */}
+      {page === 'about' && (
+        <AboutPage
+          onNavigate={handleNavigate}
+          currentUser={currentUser}
+          onLogout={handleLogout}
+          onOpenInfo={(type) => setInfoModalType(type)}
+          onOpenWorkspaceModal={handleOpenWorkspaceModal}
+        />
+      )}
+
+      {/* ─── 6. PROCESSING STATE ────────────────────────────────────────────── */}
       {page === 'processing' && (
         <ProcessingPage
           stage={error ? 'error' : stage}
           error={error}
           onRetry={handleRetry}
-          onOpenMenu={handleOpenMenu}
-          onOpenInfo={(type) => setInfoModalType(type)}
+          onNavigate={handleNavigate}
+          currentUser={currentUser}
+          onLogout={handleLogout}
+          onOpenWorkspaceModal={handleOpenWorkspaceModal}
         />
       )}
 
+      {/* ─── 7. RESULTS VIEW ────────────────────────────────────────────────── */}
       {page === 'results' && currentLecture && (
         <ResultsPage
           lecture={currentLecture}
           onReset={handleRetry}
-          onOpenMenu={handleOpenMenu}
+          onNavigate={handleNavigate}
+          currentUser={currentUser}
+          onLogout={handleLogout}
+          onOpenWorkspaceModal={handleOpenWorkspaceModal}
           onOpenInfo={(type) => setInfoModalType(type)}
           onDeleteLecture={handleDeleteLecture}
         />
       )}
 
-      {/* ─── INTERACTIVE WORKSPACE MENU MODAL (Requirement 2) ────────────────── */}
+      {/* ─── WORKSPACE LIBRARY MODAL ────────────────────────────────────────── */}
       <NavigationModal
-        isOpen={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        initialView={menuInitialTab}
-        onSelectLecture={handleSelectLectureFromMenu}
+        isOpen={workspaceModalOpen}
+        onClose={() => setWorkspaceModalOpen(false)}
+        initialView={workspaceInitialTab}
+        onSelectLecture={handleSelectLectureFromModal}
         onDeleteLecture={handleDeleteLecture}
       />
 
-      {/* ─── INTERACTIVE POLICY & FORMAT INFO MODAL (Requirement 2) ─────────── */}
+      {/* ─── INFO MODAL ─────────────────────────────────────────────────────── */}
       <InfoModal
         type={infoModalType}
         isOpen={!!infoModalType}

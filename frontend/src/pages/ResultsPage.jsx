@@ -12,7 +12,10 @@ import LectureTutorDrawer from '../components/LectureTutorDrawer'
 export default function ResultsPage({
   lecture,
   onReset,
-  onOpenMenu,
+  onNavigate,
+  currentUser,
+  onLogout,
+  onOpenWorkspaceModal,
   onOpenInfo,
   onDeleteLecture,
 }) {
@@ -92,7 +95,13 @@ export default function ResultsPage({
     <div className="min-h-screen flex flex-col bg-white selection:bg-black selection:text-white">
       {/* Sticky Header */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-neutral-100">
-        <Nav onOpenMenu={onOpenMenu} onOpenInfo={onOpenInfo} onGoHome={onReset} />
+        <Nav
+          currentPage="results"
+          onNavigate={onNavigate}
+          currentUser={currentUser}
+          onLogout={onLogout}
+          onOpenWorkspaceModal={onOpenWorkspaceModal}
+        />
       </header>
 
       <main className="flex-1 px-6 py-10 md:py-16 max-w-5xl mx-auto w-full">

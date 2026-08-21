@@ -1,9 +1,5 @@
 /**
  * LandingPage.jsx — Full-page experience with continuous flowing spline waveforms
- * Requirements:
- *   1. Faster animation pace
- *   2. Spline lines visible throughout entire page (from top to bottom)
- *   3. Motion clearly visible behind transparent marquee & nav
  */
 
 import { useRef } from 'react'
@@ -17,9 +13,12 @@ import AnimatedWaveform from '../components/AnimatedWaveform'
 
 export default function LandingPage({
   onUpload,
-  onOpenMenu,
+  onNavigate,
+  currentUser,
+  onLogout,
   onOpenInfo,
   onSelectExample,
+  onOpenWorkspaceModal,
 }) {
   const uploadRef     = useRef(null)
   const howItWorksRef = useRef(null)
@@ -36,27 +35,29 @@ export default function LandingPage({
       {/* Clean Top Navigation Bar */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm">
         <Nav
-          onOpenMenu={onOpenMenu}
-          onGoHome={scrollToUpload}
+          currentPage="landing"
+          onNavigate={onNavigate}
+          currentUser={currentUser}
+          onLogout={onLogout}
+          onOpenWorkspaceModal={onOpenWorkspaceModal}
         />
       </header>
 
       <main className="flex-1 relative z-10">
         {/* 1. Hero Section (with contained marquee above headline) */}
         <HeroSection
-          onUploadClick={scrollToUpload}
+          onUploadClick={() => onNavigate('trial')}
           onExampleClick={onSelectExample}
           onOpenInfo={onOpenInfo}
-          onOpenMenu={onOpenMenu}
+          onOpenMenu={() => onOpenWorkspaceModal('lectures')}
         />
-
 
         {/* 2. Feature Section: "Three things, done properly." */}
         <HowItWorks
           sectionRef={howItWorksRef}
           onExploreFeature={(actionKey) => {
             if (actionKey === 'topics') {
-              onOpenMenu('topics')
+              onOpenWorkspaceModal('topics')
             } else {
               onOpenInfo(actionKey)
             }
@@ -65,7 +66,7 @@ export default function LandingPage({
 
         {/* 3. Dark Hero Card: "Studying with an AI scribe?" */}
         <DarkHeroCard
-          onGetStarted={scrollToUpload}
+          onGetStarted={() => onNavigate('trial')}
           onSeeExample={onSelectExample}
         />
 
