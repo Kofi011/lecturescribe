@@ -85,9 +85,9 @@ git push origin main
 ## Phase 8 — Navigation, Trial Mode, Authentication & Workspace
 - [x] Task 8.1: Update documentation specifications (PROJECT.md, REQUIREMENTS.md, ARCHITECTURE.md, DESIGN.md, TASKS.md) → commit + push
 - [x] Task 8.2: Backend database setup with PostgreSQL (users table migration & connection pool) → commit + push
-- [ ] Task 8.3: Backend authentication service (bcrypt password hashing, JWT/cookie auth, `/api/auth/signup`, `/api/auth/login`, `/api/auth/logout`, `/api/auth/me`) → commit + push
-
+- [x] Task 8.3: Backend authentication service (bcrypt password hashing, JWT/cookie auth, `/api/auth/signup`, `/api/auth/login`, `/api/auth/logout`, `/api/auth/me`) → commit + push
 - [ ] Task 8.4: Backend trial tracking & gating (signed session cookie `lecture_trial_session`, 3-upload limit for anonymous users, bypass for authenticated users) → commit + push
+
 - [ ] Task 8.5: Frontend Menu dropdown navigation (HOME, TRY LECTURESCRIBE, LOGIN, ABOUT per DESIGN.md) → commit + push
 - [ ] Task 8.6: Frontend static About page (`/about` with hero and 3-card how-it-works architecture) → commit + push
 - [ ] Task 8.7: Frontend Auth page (`/login` with "Log in" and "Create account" toggle, form validation, and auth state) → commit + push

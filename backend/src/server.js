@@ -2,9 +2,10 @@
  * server.js — LectureScribe Express server
  *
  * Endpoints:
- *   GET  /api/health  — liveness check
- *   POST /api/upload  — audio upload, validation, transcription
- *   POST /api/chat    — interactive Q&A tutor
+ *   GET  /api/health      — liveness check
+ *   POST /api/auth/*      — signup, login, logout, me
+ *   POST /api/upload      — audio upload, validation, transcription
+ *   POST /api/chat        — interactive Q&A tutor
  */
 
 import 'dotenv/config'
@@ -12,6 +13,8 @@ import express from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import uploadRouter from './routes/upload.js'
+import authRouter from './routes/auth.js'
+import { authenticateOptional } from './services/auth.js'
 import { initDb } from './db/index.js'
 
 const app = express()
@@ -29,6 +32,7 @@ app.use(cors({
 
 app.use(express.json())
 app.use(cookieParser(SESSION_SECRET))
+app.use(authenticateOptional)
 
 // ─── Health check ──────────────────────────────────────────────────
 app.get('/api/health', (_req, res) => {
@@ -36,6 +40,7 @@ app.get('/api/health', (_req, res) => {
 })
 
 // ─── Feature routes ───────────────────────────────────────────────
+app.use('/api/auth', authRouter)
 app.use('/api', uploadRouter)
 
 // ─── Global error handler ─────────────────────────────────────────
