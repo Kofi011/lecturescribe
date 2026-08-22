@@ -177,6 +177,10 @@ export default function App() {
   }
 
   const handleOpenWorkspaceModal = (tab = 'lectures') => {
+    if (!currentUser) {
+      setPage('auth')
+      return
+    }
     setWorkspaceInitialTab(tab)
     setWorkspaceModalOpen(true)
   }

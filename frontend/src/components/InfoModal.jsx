@@ -43,9 +43,10 @@ Prohibited Use:
       badge: 'SUPPORT & FEEDBACK',
       body: `Have a question, feedback, or feature request? We would love to hear from you.
 
-Direct: Contact form on the home page
-Support: Academic Partnerships & Student Inquiries
-Response time: Within 24 hours`,
+Fill the contact form on the home page to get in touch with the team. We will get back to you as soon as possible. 
+
+Support: [lecturescribe@edu.tech]
+`,
     },
     format_mp3: {
       title: 'MP3 Audio Compatibility',

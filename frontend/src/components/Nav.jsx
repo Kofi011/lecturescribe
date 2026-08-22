@@ -158,8 +158,8 @@ export default function Nav({
                 <span>ABOUT</span>
               </button>
 
-              {/* Optional Quick Library access */}
-              {onOpenWorkspaceModal && (
+              {/* Quick Library access — only for signed-in users */}
+              {currentUser && onOpenWorkspaceModal && (
                 <button
                   onClick={() => {
                     setMenuOpen(false)
