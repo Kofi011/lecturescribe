@@ -17,6 +17,7 @@ export default function TrialPage({
   currentUser,
   onLogout,
   onOpenInfo,
+  onOpenSettings,
   onOpenWorkspaceModal,
 }) {
   const [trialStatus, setTrialStatus] = useState({
@@ -56,6 +57,7 @@ export default function TrialPage({
           onNavigate={onNavigate}
           currentUser={currentUser}
           onLogout={onLogout}
+          onOpenSettings={onOpenSettings}
           onOpenWorkspaceModal={onOpenWorkspaceModal}
         />
         <main className="flex-1 flex items-center justify-center p-6 text-center">
@@ -91,6 +93,7 @@ export default function TrialPage({
           onNavigate={onNavigate}
           currentUser={currentUser}
           onLogout={onLogout}
+          onOpenSettings={onOpenSettings}
           onOpenWorkspaceModal={onOpenWorkspaceModal}
         />
       </header>

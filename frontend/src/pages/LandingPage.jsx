@@ -17,6 +17,7 @@ export default function LandingPage({
   currentUser,
   onLogout,
   onOpenInfo,
+  onOpenSettings,
   onSelectExample,
   onOpenWorkspaceModal,
 }) {
@@ -38,6 +39,7 @@ export default function LandingPage({
           onNavigate={onNavigate}
           currentUser={currentUser}
           onLogout={onLogout}
+          onOpenSettings={onOpenSettings}
           onOpenWorkspaceModal={onOpenWorkspaceModal}
         />
       </header>

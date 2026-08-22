@@ -21,7 +21,8 @@ import ProcessingPage from './pages/ProcessingPage'
 import ResultsPage    from './pages/ResultsPage'
 import NavigationModal from './components/NavigationModal'
 import InfoModal       from './components/InfoModal'
-import { saveLecture, deleteLecture, clearAllLectures, SAMPLE_LECTURE } from './utils/lectureStorage'
+import UserSettingsModal from './components/UserSettingsModal'
+import { saveLecture, deleteLecture, clearAllLectures, SAMPLE_LECTURE, getSavedLectures } from './utils/lectureStorage'
 
 const API_URL = import.meta.env.VITE_API_URL || ''
 
@@ -36,6 +37,7 @@ export default function App() {
   const [workspaceModalOpen, setWorkspaceModalOpen] = useState(false)
   const [workspaceInitialTab, setWorkspaceInitialTab] = useState('lectures')
   const [infoModalType,      setInfoModalType]      = useState(null)
+  const [settingsModalOpen,  setSettingsModalOpen]  = useState(false)
 
   const abortRef = useRef(null)
 
@@ -226,6 +228,7 @@ export default function App() {
           currentUser={currentUser}
           onLogout={handleLogout}
           onOpenInfo={(type) => setInfoModalType(type)}
+          onOpenSettings={() => setSettingsModalOpen(true)}
           onSelectExample={handleSelectExample}
           onOpenWorkspaceModal={handleOpenWorkspaceModal}
         />
@@ -240,6 +243,7 @@ export default function App() {
           currentUser={currentUser}
           onLogout={handleLogout}
           onOpenInfo={(type) => setInfoModalType(type)}
+          onOpenSettings={() => setSettingsModalOpen(true)}
           onOpenWorkspaceModal={handleOpenWorkspaceModal}
         />
       )}
@@ -266,6 +270,7 @@ export default function App() {
             setPage('results')
           }}
           onLogout={handleLogout}
+          onOpenSettings={() => setSettingsModalOpen(true)}
           onOpenInfo={(type) => setInfoModalType(type)}
           onOpenWorkspaceModal={handleOpenWorkspaceModal}
         />
@@ -278,6 +283,7 @@ export default function App() {
           currentUser={currentUser}
           onLogout={handleLogout}
           onOpenInfo={(type) => setInfoModalType(type)}
+          onOpenSettings={() => setSettingsModalOpen(true)}
           onOpenWorkspaceModal={handleOpenWorkspaceModal}
         />
       )}
@@ -291,6 +297,7 @@ export default function App() {
           onNavigate={handleNavigate}
           currentUser={currentUser}
           onLogout={handleLogout}
+          onOpenSettings={() => setSettingsModalOpen(true)}
           onOpenWorkspaceModal={handleOpenWorkspaceModal}
         />
       )}
@@ -303,6 +310,7 @@ export default function App() {
           onNavigate={handleNavigate}
           currentUser={currentUser}
           onLogout={handleLogout}
+          onOpenSettings={() => setSettingsModalOpen(true)}
           onOpenWorkspaceModal={handleOpenWorkspaceModal}
           onOpenInfo={(type) => setInfoModalType(type)}
           onDeleteLecture={handleDeleteLecture}
@@ -317,6 +325,15 @@ export default function App() {
         initialView={workspaceInitialTab}
         onSelectLecture={handleSelectLectureFromModal}
         onDeleteLecture={handleDeleteLecture}
+      />
+
+      {/* ─── USER SETTINGS MODAL ────────────────────────────────────────────── */}
+      <UserSettingsModal
+        isOpen={settingsModalOpen}
+        onClose={() => setSettingsModalOpen(false)}
+        currentUser={currentUser}
+        onLogout={handleLogout}
+        savedLecturesCount={getSavedLectures().length}
       />
 
       {/* ─── INFO MODAL ─────────────────────────────────────────────────────── */}

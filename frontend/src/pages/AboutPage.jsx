@@ -11,6 +11,7 @@ export default function AboutPage({
   currentUser,
   onLogout,
   onOpenInfo,
+  onOpenSettings,
   onOpenWorkspaceModal,
 }) {
   return (
@@ -25,6 +26,7 @@ export default function AboutPage({
           onNavigate={onNavigate}
           currentUser={currentUser}
           onLogout={onLogout}
+          onOpenSettings={onOpenSettings}
           onOpenWorkspaceModal={onOpenWorkspaceModal}
         />
       </header>

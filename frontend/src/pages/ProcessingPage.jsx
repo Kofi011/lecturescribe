@@ -52,6 +52,7 @@ export default function ProcessingPage({
   onNavigate,
   currentUser,
   onLogout,
+  onOpenSettings,
   onOpenWorkspaceModal,
 }) {
   const currentIdx = STAGE_ORDER.indexOf(stage)
@@ -77,6 +78,7 @@ export default function ProcessingPage({
           onNavigate={onNavigate}
           currentUser={currentUser}
           onLogout={onLogout}
+          onOpenSettings={onOpenSettings}
           onOpenWorkspaceModal={onOpenWorkspaceModal}
         />
       </header>

@@ -16,6 +16,7 @@ export default function ResultsPage({
   onNavigate,
   currentUser,
   onLogout,
+  onOpenSettings,
   onOpenWorkspaceModal,
   onOpenInfo,
   onDeleteLecture,
@@ -117,6 +118,7 @@ export default function ResultsPage({
           onNavigate={onNavigate}
           currentUser={currentUser}
           onLogout={onLogout}
+          onOpenSettings={onOpenSettings}
           onOpenWorkspaceModal={onOpenWorkspaceModal}
         />
       </header>
