@@ -99,6 +99,7 @@ git push origin main
 - [x] Task 8.5.2: Security headers & API rate limiting (`helmet`, `express-rate-limit` on `/api/auth/*`, `/api/upload`, and `/api/chat`) → commit + push
 - [x] Task 8.5.3: Minimalist audio player & lecture audio playback (`AudioPlayer.jsx` with speed toggle, scrubber, and playback toolbar) → commit + push
 - [x] Task 8.5.4: Branded PDF export with LectureScribe Stamp & Seal, JSON export, and Tutor Q&A persistence (`pdfExport.js`, `ResultsPage.jsx`, `LectureTutorDrawer.jsx`) → commit + push
+- [x] Task 8.5.5: Mid-page CTA card refinement on Landing page (`DarkHeroCard.jsx` with single solid "Try LectureScribe free" pill CTA and plain gray supporting subtext) → commit + push
 
 ## Phase 9 — Deployment (Paused for Pre-Production Vetting)
 - [ ] Merge `dev` into `main` (deployment should run off `main`, not `dev`)

@@ -43,7 +43,8 @@ word for emphasis. Feels premium and simple, not "startup gradient."
 - Headline: "Turn your lecture into *notes*."
 - Action buttons: "Upload a lecture" (solid black) and "See an example" (pill outline with badge).
 - Feature cards: 3-column card grid ("Three things, done properly.").
-- Dark hero card: "Studying with an *AI scribe*?"
+- Mid-page CTA card ("Studying with an *AI scribe*?"): Dark rounded container (`bg-[#0c0c0c]`, rounded `[32px]`) with a single solid pill button ("Try LectureScribe free") linking to the trial upload flow, followed by plain gray supporting text ("No sign-up needed for your first lecture"). No duplicate secondary outline button.
+- Contact section: Clean white bordered card with form fields for inquiries.
 
 ### 2. Trial Page (`/trial`)
 - Reuses the core upload → status → results UI.
