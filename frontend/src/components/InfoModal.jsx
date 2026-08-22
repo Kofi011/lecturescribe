@@ -7,6 +7,20 @@ export default function InfoModal({ type, isOpen, onClose }) {
   if (!isOpen || !type) return null
 
   const content = {
+    how_it_works: {
+      title: 'How LectureScribe Works',
+      badge: 'THREE-STEP WORKFLOW',
+      body: `LectureScribe transforms spoken academic lectures into study-ready knowledge in three simple steps:
+
+1. Upload Lecture Audio
+Upload any lecture recording in MP3, WAV, or M4A format (from your phone, laptop, or classroom recording).
+
+2. Neural Acoustic Transcription
+Our adaptive speech intelligence engine transcribes the recording with high acoustic fidelity, handling diverse classroom acoustics, fast speakers, and global accents.
+
+3. Semantic Study Synthesis
+Transcripts are synthesized into structured hierarchical notes, core arguments, high-yield takeaways, flashcard-ready terminology, self-test revision questions, and an interactive AI study tutor grounded strictly in your lecture content.`,
+    },
     terms: {
       title: 'Terms of Service',
       badge: 'LEGAL & USAGE',

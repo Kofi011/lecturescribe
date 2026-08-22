@@ -12,12 +12,12 @@ export default function Footer({ onOpenInfo }) {
 
         {/* Right Interactive Links */}
         <nav className="flex items-center gap-6 md:gap-8 flex-wrap justify-center" aria-label="Footer Navigation">
-          <a href="#how-it-works" className="hover:text-black transition-colors">
+          <button
+            onClick={() => onOpenInfo('how_it_works')}
+            className="hover:text-black transition-colors cursor-pointer"
+          >
             How it works
-          </a>
-          <a href="#upload-section" className="hover:text-black transition-colors">
-            Upload
-          </a>
+          </button>
           <button
             onClick={() => onOpenInfo('terms')}
             className="hover:text-black transition-colors cursor-pointer"
