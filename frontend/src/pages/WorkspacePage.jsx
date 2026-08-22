@@ -150,7 +150,7 @@ export default function WorkspacePage({
                   <div className="flex items-center justify-between text-[11px] text-neutral-400 mb-2">
                     <span>{lec.date ? new Date(lec.date).toLocaleDateString() : 'Recent'}</span>
                     <span className="font-semibold text-neutral-700 bg-neutral-100 px-2 py-0.5 rounded-full text-[10px]">
-                      {lec.engine_used || 'groq-whisper'}
+                      Neural Synthesis
                     </span>
                   </div>
                   <h3 className="font-bold text-sm text-black group-hover:underline line-clamp-2 mb-2">

@@ -165,8 +165,8 @@ export default function TrialPage({
           </div>
           <div className="p-4 border border-neutral-200/80 rounded-[20px] bg-neutral-50/50 text-center">
             <div className="font-bold text-xs text-neutral-400 mb-1">STEP 2</div>
-            <div className="text-xs font-bold text-black">Dual-Engine ASR</div>
-            <div className="text-[11px] text-neutral-500 mt-1">Whisper + Griot Nano 1</div>
+            <div className="text-xs font-bold text-black">Neural Acoustic Engine</div>
+            <div className="text-[11px] text-neutral-500 mt-1">High-Fidelity Transcription</div>
           </div>
           <div className="p-4 border border-neutral-200/80 rounded-[20px] bg-neutral-50/50 text-center">
             <div className="font-bold text-xs text-neutral-400 mb-1">STEP 3</div>

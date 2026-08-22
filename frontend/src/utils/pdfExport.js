@@ -24,7 +24,7 @@ export function exportLectureToPdf(lecture) {
   const title = lecture?.title || 'Lecture Study Notes'
   const dateStr = lecture?.date ? new Date(lecture.date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : new Date().toLocaleDateString()
   const durationText = lecture?.durationSec ? `${Math.round(lecture.durationSec / 60)} min` : ''
-  const engineText = lecture?.engine_used === 'griot-nano-1' ? 'Griot Nano 1' : 'Groq Whisper'
+  const engineText = 'LectureScribe Neural Acoustic Engine'
 
   // Helper to add new page and maintain headers/footers
   function checkPageBreak(spaceNeeded = 15) {

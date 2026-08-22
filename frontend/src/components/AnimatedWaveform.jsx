@@ -60,7 +60,7 @@ export default function AnimatedWaveform({ side }) {
         { h: 215, s: 10, l: 45, a: 0.13 }, // Medium slate gray
         { h: 210, s: 8,  l: 58, a: 0.10 }, // Soft ash
         { h: 220, s: 6,  l: 25, a: 0.18 }, // Charcoal accent
-        { h: 215, s: 12, l: 68, a: 0.08 }, // Whisper light gray
+        { h: 215, s: 12, l: 68, a: 0.08 }, // Subtle light gray
       ],
       nodes: 8,
       phaseOffset: 0,

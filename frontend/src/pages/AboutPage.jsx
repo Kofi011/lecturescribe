@@ -78,10 +78,10 @@ export default function AboutPage({
                   01
                 </div>
                 <h3 className="font-bold text-lg text-black mb-2">
-                  Dual-Engine ASR
+                  Adaptive Speech Intelligence
                 </h3>
                 <p className="text-neutral-600 text-sm leading-relaxed font-normal">
-                  Intelligently routes audio between <strong>Groq Whisper</strong> (high-speed English) and the <strong>Griot Nano 1</strong> neural model, preserving accuracy across African accents and international dialects.
+                  Intelligently processes audio through an advanced <strong>Acoustic Neural Pipeline</strong>, preserving maximum transcription fidelity across global accents, varied classroom acoustics, and fast lecture speech.
                 </p>
               </div>
               <div className="mt-6 pt-4 border-t border-neutral-100 text-xs font-semibold text-neutral-400">

@@ -43,8 +43,8 @@ Prohibited Use:
       badge: 'SUPPORT & FEEDBACK',
       body: `Have a question, feedback, or feature request? We would love to hear from you.
 
-Email: support@lecturescribe.edu
-Location: Kofi Labs · Built for university students worldwide
+Direct: Contact form on the home page
+Support: Academic Partnerships & Student Inquiries
 Response time: Within 24 hours`,
     },
     format_mp3: {
