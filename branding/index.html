@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LectureScribe — Brand Identity & Logo Concepts</title>
+  
+  <!-- Fonts: Instrument Serif + Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-page: #fbfbfb;
+      --bg-card: #ffffff;
+      --border: rgba(0, 0, 0, 0.08);
+      --text-main: #000000;
+      --text-muted: #737373;
+      --dark-card: #0c0c0c;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+      padding: 40px 20px 80px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      margin-bottom: 56px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .pill-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #000000;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 999px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: 42px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+    }
+
+    h1 span {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* Grid */
+    .concepts-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 48px;
+    }
+
+    .concept-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 32px;
+      padding: 36px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.02);
+    }
+
+    .concept-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .concept-tag {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .concept-title {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-top: 4px;
+    }
+
+    .concept-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin-top: 6px;
+    }
+
+    /* Canvas Panels: Light & Dark */
+    .showcase-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+
+    @media (max-width: 768px) {
+      .showcase-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      border-radius: 20px;
+      padding: 40px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 160px;
+      position: relative;
+      transition: transform 0.2s ease;
+    }
+
+    .panel-light {
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      color: #000000;
+    }
+
+    .panel-dark {
+      background: var(--dark-card);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+
+    .panel-label {
+      position: absolute;
+      top: 12px;
+      left: 16px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      opacity: 0.5;
+      text-transform: uppercase;
+    }
+
+    .logo-container {
+      width: 100%;
+      max-width: 380px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-container svg {
+      width: 100%;
+      height: auto;
+      max-height: 54px;
+    }
+
+    /* Mini Scale Bar (Nav + Favicon scale) */
+    .scale-inspection {
+      background: #f7f7f7;
+      border-radius: 20px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .scale-group {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .scale-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .scale-caption {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .favicon-preview {
+      width: 32px;
+      height: 32px;
+      background: #000000;
+      color: #ffffff;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-style: italic;
+    }
+
+    .favicon-preview-svg {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: #000000;
+      color: #ffffff;
+      padding: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .favicon-preview-svg svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #000000;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .download-btn:hover {
+      border-color: #000000;
+      background: #000000;
+      color: #ffffff;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 60px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="pill-badge">BRAND IDENTITY EXPLORATION</div>
+      <h1>LectureScribe <span>Concepts</span></h1>
+      <p class="subtitle">
+        Three distinct brand marks designed strictly per <strong>DESIGN.md</strong>: high-contrast, black-and-white, literary, and confident.
+      </p>
+    </header>
+
+    <div class="concepts-grid">
+
+      <!-- ═══════════════════════════════════════════════════════════════════ -->
+      <!-- CONCEPT 1: PURE EDITORIAL WORDMARK -->
+      <!-- ═══════════════════════════════════════════════════════════════════ -->
+      <section class="concept-card">
+        <div class="concept-header">
+          <div>
+            <span class="concept-tag">Concept 01 · Typographic</span>
+            <h2 class="concept-title">The Pure Editorial Wordmark</h2>
+            <p class="concept-desc">
+              Inspired directly by classical academic literature and the <em>SasuSync</em> script baseline. Pure bespoke typography with graceful italic serif terminals and a minimal registered mark.
+            </p>
+          </div>
+          <a href="concept1_wordmark.svg" download class="download-btn">
+            Download SVG ↓
+          </a>
+        </div>
+
+        <!-- Light & Dark Showcase -->
+        <div class="showcase-row">
+          <div class="panel panel-light">
+            <span class="panel-label">Light Surface (#ffffff)</span>
+            <div class="logo-container" style="color: #000000;">
+              <svg viewBox="0 0 420 80" fill="none">
+                <text x="10" y="56" font-family="'Instrument Serif', Georgia, serif" font-style="italic" font-size="52" fill="currentColor" letter-spacing="-0.02em">LectureScribe</text>
+                <text x="308" y="30" font-family="'Inter', sans-serif" font-weight="700" font-size="11" fill="currentColor">®</text>
+              </svg>
+            </div>
+          </div>
+
+          <div class="panel panel-dark">
+            <span class="panel-label">Dark Surface (#0c0c0c)</span>
+            <div class="logo-container" style="color: #ffffff;">
+              <svg viewBox="0 0 420 80" fill="none">
+                <text x="10" y="56" font-family="'Instrument Serif', Georgia, serif" font-style="italic" font-size="52" fill="currentColor" letter-spacing="-0.02em">LectureScribe</text>
+                <text x="308" y="30" font-family="'Inter', sans-serif" font-weight="700" font-size="11" fill="currentColor">®</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scale & Favicon Inspection -->
+        <div class="scale-inspection">
+          <div class="scale-group">
+            <div class="scale-item">
+              <span class="scale-caption">Nav Scale (36px):</span>
+              <span style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 26px; color: #000;">LectureScribe<sup>®</sup></span>
+            </div>
+            <div class="scale-item">
+              <span class="scale-caption">Favicon:</span>
+              <div class="favicon-preview">L</div>
+            </div>
+          </div>
+          <span class="scale-caption">Philosophy: Confident, unadorned, classic academic authority.</span>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════════ -->
+      <!-- CONCEPT 2: THE ACOUSTIC QUILL -->
+      <!-- ═══════════════════════════════════════════════════════════════════ -->
+      <section class="concept-card">
+        <div class="concept-header">
+          <div>
+            <span class="concept-tag">Concept 02 · Icon + Wordmark</span>
+            <h2 class="concept-title">The Acoustic Quill</h2>
+            <p class="concept-desc">
+              Geometric soundwave frequencies converging dynamically into a writing nib. Captures the transformation of spoken lecture audio into permanent written scholarship.
+            </p>
+          </div>
+          <a href="concept2_acoustic_quill.svg" download class="download-btn">
+            Download SVG ↓
+          </a>
+        </div>
+
+        <!-- Light & Dark Showcase -->
+        <div class="showcase-row">
+          <div class="panel panel-light">
+            <span class="panel-label">Light Surface (#ffffff)</span>
+            <div class="logo-container" style="color: #000000;">
+              <svg viewBox="0 0 480 80" fill="none">
+                <g transform="translate(10, 14)">
+                  <line x1="6" y1="20" x2="6" y2="32" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" />
+                  <line x1="14" y1="14" x2="14" y2="38" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" />
+                  <path d="M26 4 L38 24 L38 42 L26 50 L14 42 L14 24 Z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" />
+                  <line x1="26" y1="10" x2="26" y2="34" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+                  <circle cx="26" cy="34" r="2.2" fill="currentColor" />
+                  <line x1="38" y1="14" x2="38" y2="38" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" />
+                  <line x1="46" y1="20" x2="46" y2="32" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" />
+                </g>
+                <text x="80" y="54" font-family="'Instrument Serif', Georgia, serif" font-style="italic" font-size="48" fill="currentColor" letter-spacing="-0.02em">LectureScribe</text>
+                <circle cx="362" cy="24" r="3" fill="currentColor" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="panel panel-dark">
+            <span class="panel-label">Dark Surface (#0c0c0c)</span>
+            <div class="logo-container" style="color: #ffffff;">
+              <svg viewBox="0 0 480 80" fill="none">
+                <g transform="translate(10, 14)">
+                  <line x1="6" y1="20" x2="6" y2="32" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" />
+                  <line x1="14" y1="14" x2="14" y2="38" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" />
+                  <path d="M26 4 L38 24 L38 42 L26 50 L14 42 L14 24 Z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" />
+                  <line x1="26" y1="10" x2="26" y2="34" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+                  <circle cx="26" cy="34" r="2.2" fill="currentColor" />
+                  <line x1="38" y1="14" x2="38" y2="38" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" />
+                  <line x1="46" y1="20" x2="46" y2="32" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" />
+                </g>
+                <text x="80" y="54" font-family="'Instrument Serif', Georgia, serif" font-style="italic" font-size="48" fill="currentColor" letter-spacing="-0.02em">LectureScribe</text>
+                <circle cx="362" cy="24" r="3" fill="currentColor" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scale & Favicon Inspection -->
+        <div class="scale-inspection">
+          <div class="scale-group">
+            <div class="scale-item">
+              <span class="scale-caption">Nav Scale (36px):</span>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <svg width="22" height="22" viewBox="0 0 52 52" fill="none" stroke="#000" stroke-width="3">
+                  <path d="M26 4 L38 24 L38 42 L26 50 L14 42 L14 24 Z" />
+                  <line x1="26" y1="10" x2="26" y2="34" stroke-linecap="round" />
+                </svg>
+                <span style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 24px; color: #000;">LectureScribe</span>
+              </div>
+            </div>
+            <div class="scale-item">
+              <span class="scale-caption">Favicon / App Icon:</span>
+              <div class="favicon-preview-svg">
+                <svg viewBox="0 0 52 52" fill="none" stroke="#ffffff" stroke-width="3.2">
+                  <line x1="6" y1="20" x2="6" y2="32" stroke-linecap="round" />
+                  <path d="M26 6 L38 24 L38 42 L26 50 L14 42 L14 24 Z" stroke-linejoin="round" />
+                  <line x1="26" y1="12" x2="26" y2="34" stroke-linecap="round" />
+                  <line x1="46" y1="20" x2="46" y2="32" stroke-linecap="round" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <span class="scale-caption">Philosophy: Direct visual metaphor for audio-to-text intelligence.</span>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════════ -->
+      <!-- CONCEPT 3: THE HARMONIC MONOGRAM -->
+      <!-- ═══════════════════════════════════════════════════════════════════ -->
+      <section class="concept-card">
+        <div class="concept-header">
+          <div>
+            <span class="concept-tag">Concept 03 · Monogram / Lettermark</span>
+            <h2 class="concept-title">The Harmonic Monogram ("LS")</h2>
+            <p class="concept-desc">
+              Interlocking acoustic curves forming an abstract "LS" lettermark within a modern squircle frame. Highly scalable for browser tabs, mobile app launchers, and stamped PDF seals.
+            </p>
+          </div>
+          <a href="concept3_monogram_ls.svg" download class="download-btn">
+            Download SVG ↓
+          </a>
+        </div>
+
+        <!-- Light & Dark Showcase -->
+        <div class="showcase-row">
+          <div class="panel panel-light">
+            <span class="panel-label">Light Surface (#ffffff)</span>
+            <div class="logo-container" style="color: #000000;">
+              <svg viewBox="0 0 490 80" fill="none">
+                <g transform="translate(10, 12)">
+                  <rect x="0" y="0" width="56" height="56" rx="16" fill="none" stroke="currentColor" stroke-width="2.5" />
+                  <path d="M18 14 L18 38 C18 41 20 43 23 43 L32 43" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M38 18 C35 15 28 15 28 22 C28 29 39 29 39 36 C39 42 32 42 27 40" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+                </g>
+                <text x="82" y="54" font-family="'Instrument Serif', Georgia, serif" font-style="italic" font-size="48" fill="currentColor" letter-spacing="-0.02em">LectureScribe</text>
+                <rect x="364" y="22" width="6" height="6" rx="3" fill="currentColor" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="panel panel-dark">
+            <span class="panel-label">Dark Surface (#0c0c0c)</span>
+            <div class="logo-container" style="color: #ffffff;">
+              <svg viewBox="0 0 490 80" fill="none">
+                <g transform="translate(10, 12)">
+                  <rect x="0" y="0" width="56" height="56" rx="16" fill="none" stroke="currentColor" stroke-width="2.5" />
+                  <path d="M18 14 L18 38 C18 41 20 43 23 43 L32 43" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M38 18 C35 15 28 15 28 22 C28 29 39 29 39 36 C39 42 32 42 27 40" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+                </g>
+                <text x="82" y="54" font-family="'Instrument Serif', Georgia, serif" font-style="italic" font-size="48" fill="currentColor" letter-spacing="-0.02em">LectureScribe</text>
+                <rect x="364" y="22" width="6" height="6" rx="3" fill="currentColor" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scale & Favicon Inspection -->
+        <div class="scale-inspection">
+          <div class="scale-group">
+            <div class="scale-item">
+              <span class="scale-caption">Nav Scale (36px):</span>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <svg width="24" height="24" viewBox="0 0 56 56" fill="none" stroke="#000" stroke-width="3.5">
+                  <rect x="2" y="2" width="52" height="52" rx="14" />
+                  <path d="M18 14 L18 38 C18 41 20 43 23 43 L32 43" stroke-linecap="round" />
+                  <path d="M38 18 C35 15 28 15 28 22 C28 29 39 29 39 36 C39 42 32 42 27 40" stroke-linecap="round" />
+                </svg>
+                <span style="font-family: 'Instrument Serif', serif; font-style: italic; font-size: 24px; color: #000;">LectureScribe</span>
+              </div>
+            </div>
+            <div class="scale-item">
+              <span class="scale-caption">Favicon / App Icon:</span>
+              <div class="favicon-preview-svg">
+                <svg viewBox="0 0 56 56" fill="none" stroke="#ffffff" stroke-width="3.5">
+                  <rect x="2" y="2" width="52" height="52" rx="14" />
+                  <path d="M18 14 L18 38 C18 41 20 43 23 43 L32 43" stroke-linecap="round" />
+                  <path d="M38 18 C35 15 28 15 28 22 C28 29 39 29 39 36 C39 42 32 42 27 40" stroke-linecap="round" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <span class="scale-caption">Philosophy: Modern technology mark suitable for standalone app icon.</span>
+        </div>
+      </section>
+
+    </div>
+
+    <footer>
+      LectureScribe Identity Review · Open <code>branding/index.html</code> in any browser to inspect vector fidelity.
+    </footer>
+  </div>
+
+</body>
+</html>

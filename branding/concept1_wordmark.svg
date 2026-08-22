@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 80" width="100%" height="100%" fill="none">
+  <!-- Concept 1: The Pure Editorial Wordmark (Black & White Minimalist) -->
+  <style>
+    .wordmark-text {
+      font-family: 'Instrument Serif', 'Times New Roman', Georgia, serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: 52px;
+      fill: currentColor;
+      letter-spacing: -0.02em;
+    }
+    .reg-mark {
+      font-family: 'Inter', -apple-system, sans-serif;
+      font-style: normal;
+      font-weight: 700;
+      font-size: 11px;
+      fill: currentColor;
+    }
+  </style>
+
+  <g transform="translate(10, 56)">
+    <!-- Primary Italic Serif Wordmark -->
+    <text x="0" y="0" class="wordmark-text">LectureScribe</text>
+    <!-- Registered Brand Mark -->
+    <text x="298" y="-26" class="reg-mark">®</text>
+  </g>
+</svg>
