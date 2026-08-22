@@ -23,6 +23,7 @@ import NavigationModal from './components/NavigationModal'
 import InfoModal       from './components/InfoModal'
 import UserSettingsModal from './components/UserSettingsModal'
 import { saveLecture, deleteLecture, clearAllLectures, SAMPLE_LECTURE, getSavedLectures } from './utils/lectureStorage'
+import { useInactivityLogout } from './utils/useInactivityLogout'
 
 const API_URL = import.meta.env.VITE_API_URL || ''
 
@@ -32,6 +33,7 @@ export default function App() {
   const [error,          setError]          = useState(null)
   const [currentLecture, setCurrentLecture] = useState(null)
   const [currentUser,    setCurrentUser]    = useState(null)
+  const [inactivityNotice, setInactivityNotice] = useState(null)
 
   // Modals
   const [workspaceModalOpen, setWorkspaceModalOpen] = useState(false)
@@ -147,10 +149,11 @@ export default function App() {
   // ─── Auth Handlers ────────────────────────────────────────────────────────
   const handleAuthSuccess = (user) => {
     setCurrentUser(user)
+    setInactivityNotice(null)
     setPage('workspace')
   }
 
-  const handleLogout = async () => {
+  const handleLogout = async (isAuto = false) => {
     try {
       const endpoint = API_URL ? `${API_URL}/api/auth/logout` : '/api/auth/logout'
       await fetch(endpoint, { method: 'POST', credentials: 'include' })
@@ -158,12 +161,22 @@ export default function App() {
       console.warn('[logout error]', err)
     }
     setCurrentUser(null)
-    setPage('landing')
+    if (isAuto === true) {
+      setInactivityNotice('You were automatically signed out due to 15 minutes of inactivity for your security.')
+      setPage('auth')
+    } else {
+      setInactivityNotice(null)
+      setPage('landing')
+    }
   }
+
+  // Automatic logout hook for inactive sessions (15 minutes default)
+  useInactivityLogout(currentUser, handleLogout, 15)
 
   // ─── Navigation Handlers ──────────────────────────────────────────────────
   const handleNavigate = (targetPage) => {
     setError(null)
+    setInactivityNotice(null)
     if (targetPage === 'workspace' && !currentUser) {
       setPage('auth')
       return
@@ -342,6 +355,21 @@ export default function App() {
         isOpen={!!infoModalType}
         onClose={() => setInfoModalType(null)}
       />
+
+      {/* ─── INACTIVITY AUTO-LOGOUT NOTIFICATION TOAST ───────────────────────── */}
+      {inactivityNotice && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-black text-white px-6 py-3.5 rounded-full text-xs font-semibold shadow-2xl flex items-center gap-3 animate-fade-in border border-white/20">
+          <span className="w-2 h-2 rounded-full bg-amber-400 inline-block animate-pulse"></span>
+          <span>{inactivityNotice}</span>
+          <button
+            onClick={() => setInactivityNotice(null)}
+            className="text-neutral-400 hover:text-white font-bold ml-2 cursor-pointer text-xs"
+            aria-label="Dismiss notice"
+          >
+            ✕
+          </button>
+        </div>
+      )}
     </div>
   )
 }

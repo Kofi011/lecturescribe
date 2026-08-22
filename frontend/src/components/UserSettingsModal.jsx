@@ -183,6 +183,14 @@ export default function UserSettingsModal({ isOpen, onClose, currentUser, onLogo
                 </div>
                 <span className="text-xs font-bold text-emerald-600">Active ✓</span>
               </div>
+
+              <div className="flex items-center justify-between p-3.5 border border-neutral-200 rounded-[18px]">
+                <div>
+                  <span className="font-bold text-black block text-xs">Inactivity Auto-Logout Protection</span>
+                  <span className="text-[11px] text-neutral-500">Automatically secures and signs out idle sessions</span>
+                </div>
+                <span className="text-xs font-bold text-neutral-800">15 min</span>
+              </div>
             </div>
           )}
         </div>
