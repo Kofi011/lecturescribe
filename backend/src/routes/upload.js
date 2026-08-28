@@ -16,7 +16,7 @@ import { transcribeAudio } from '../services/transcribe.js'
 import { generateNotes }   from '../services/generateNotes.js'
 import { askAboutLecture } from '../services/askLecture.js'
 import { getTrialStatus, incrementTrial, enforceTrialLimit } from '../services/trial.js'
-import { createLecture } from '../db/index.js'
+import { createLecture, logAnalyticsEvent } from '../db/index.js'
 
 const router = express.Router()
 
@@ -139,6 +139,17 @@ router.post('/upload', (req, res) => {
       const trialResult = incrementTrial(req, res)
       console.log(`[upload] lecture ready — "${result.title}" (transcribed by ${engine}) [trials remaining: ${trialResult.trialsRemaining}]`)
 
+      // Log analytics event
+      await logAnalyticsEvent({
+        event_name: 'upload_completed',
+        route: '/api/upload',
+        anon_session_token: req.cookies?.lecture_trial_session || null,
+        metadata: {
+          engine,
+          is_trial: !req.user,
+        },
+      })
+
       const lecturePayload = {
         id: `lec_${Date.now()}`,
         date: new Date().toISOString(),
@@ -177,6 +188,14 @@ router.post('/upload', (req, res) => {
     } catch (err) {
       removeTempFile(filePath)
       console.error('[upload] error:', err.message)
+      await logAnalyticsEvent({
+        event_name: 'upload_failed',
+        route: '/api/upload',
+        anon_session_token: req.cookies?.lecture_trial_session || null,
+        metadata: {
+          is_trial: !req.user,
+        },
+      })
       return res.status(500).json({ error: err.message })
     }
   })

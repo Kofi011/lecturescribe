@@ -18,8 +18,10 @@ import cookieParser from 'cookie-parser'
 import uploadRouter from './routes/upload.js'
 import authRouter from './routes/auth.js'
 import lecturesRouter from './routes/lectures.js'
+import analyticsRouter from './routes/analytics.js'
 import { authenticateOptional } from './services/auth.js'
-import { initDb } from './db/index.js'
+import { initDb, isDbHealthy } from './db/index.js'
+import { checkGriotHealth } from './services/transcribe.js'
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -83,8 +85,20 @@ const chatLimiter = rateLimit({
 })
 
 // ─── Health check ──────────────────────────────────────────────────
-app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', message: 'LectureScribe backend running' })
+app.get('/api/health', async (_req, res) => {
+  const dbHealthy = await isDbHealthy()
+  const griotStatus = await checkGriotHealth()
+
+  res.json({
+    status: 'ok',
+    message: 'LectureScribe backend running',
+    timestamp: new Date().toISOString(),
+    services: {
+      api: 'healthy',
+      db: dbHealthy ? 'healthy' : 'disconnected',
+      griot_sidecar: griotStatus,
+    },
+  })
 })
 
 // ─── Feature routes ───────────────────────────────────────────────
@@ -97,6 +111,7 @@ app.use('/api/chat', chatLimiter)
 app.use('/api', uploadRouter)
 
 app.use('/api/lectures', lecturesRouter)
+app.use('/api/analytics', analyticsRouter)
 
 // ─── Global error handler ─────────────────────────────────────────
 app.use((err, _req, res, _next) => {

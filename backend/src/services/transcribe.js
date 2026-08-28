@@ -59,35 +59,42 @@ export async function transcribeWithGriot(filePath, mimeType = 'audio/wav') {
   } catch (err) {
     if (err?.cause?.code === 'ECONNREFUSED' || err.message?.includes('fetch failed')) {
       throw new Error(
-        `Specialized speech sidecar (Griot Nano 1) is currently unreachable at ${sidecarUrl}. ` +
-        'Please ensure the Griot sidecar service is running on port 8000.'
+        'Griot Nano 1 Speech Sidecar is unreachable. ' +
+        'Please make sure the Python service is running on ' + sidecarUrl
       )
     }
-    throw new Error(`Griot speech service connection error: ${err.message}`)
+    throw new Error(`Griot Nano 1 request error: ${err.message}`)
   }
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}))
-    throw new Error(
-      errorData.detail ||
-      `Griot speech service failed with HTTP ${response.status}: ${response.statusText}`
-    )
+    const errText = await response.text().catch(() => '')
+    throw new Error(`Griot Nano 1 error (${response.status}): ${errText || 'Transcription failed'}`)
   }
 
   const data = await response.json()
   const transcript = (data.transcript || '').trim()
 
-  if (!transcript) {
-    throw new Error(
-      'Griot Nano 1 detected no audible speech in this recording. ' +
-      'Please ensure the audio has audible spoken lecture content.'
-    )
-  }
-
   return {
     transcript,
     language: data.language || 'en',
     engine: 'griot-nano-1',
+  }
+}
+
+/**
+ * Checks the operational health status of the Griot Nano 1 sidecar.
+ * @returns {Promise<'healthy'|'offline'>}
+ */
+export async function checkGriotHealth() {
+  const sidecarUrl = process.env.GRIOT_SIDECAR_URL || 'http://localhost:8000'
+  try {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 1500)
+    const res = await fetch(`${sidecarUrl}/health`, { signal: controller.signal })
+    clearTimeout(timeout)
+    return res.ok ? 'healthy' : 'offline'
+  } catch {
+    return 'offline'
   }
 }
 
