@@ -70,6 +70,15 @@ word for emphasis. Feels premium and simple, not "startup gradient."
 - Header displays user email badge and a "Log out" button.
 - Unlimited lecture upload zone, past lecture session history, and full study toolkit.
 
+### 6. Admin Dashboard page (`/admin`)
+- Same nav/footer conventions as the rest of the app, plus a distinct
+  "Admin" label so it's never confused with the user-facing Workspace
+- Three-panel layout: System health (top), Live usage stats (cards, 
+  same bordered-card style as elsewhere), Anonymous activity stream 
+  (scrolling list, monospace or plain text rows, newest on top)
+- Live indicator (e.g. a small pulsing dot) showing data is polling/
+  streaming, not static
+
 ## What NOT to borrow
 - No SMS/telecom-specific content (networks, credits, pricing bundles)
 - No color accents beyond black/white/gray

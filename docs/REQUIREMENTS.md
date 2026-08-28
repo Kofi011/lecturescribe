@@ -45,6 +45,13 @@
 - Includes interactive AI Academic Tutor for grounded transcript Q&A with persisted conversation history.
 - Multi-format exports: Official Branded PDF with LectureScribe Verified Stamp & Seal, Complete JSON (.json), Markdown (.md), and Plain Text (.txt).
 
+### 7. Admin Dashboard & Operational Monitoring
+- An admin-only dashboard shows live system health and aggregate usage
+  data, refreshed in real time (polling or push)
+- The dashboard never displays individual user content, identity, or
+  per-session behavioral trails — only aggregate counts and an
+  anonymized event stream
+
 ## Non-functional requirements
 - **Security & Privacy**:
   - Passwords and session secrets must never be exposed to the frontend or committed to git.

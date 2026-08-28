@@ -120,8 +120,25 @@ CREATE INDEX IF NOT EXISTS idx_lectures_created_at ON lectures(created_at DESC);
 /about      ── About Page (Static problem statement, mission & 3-card architecture)
 ```
 
+## Monitoring & Analytics
+
+**Admin role & dashboard**
+- Add a `role` column to `users` (`VARCHAR`, default `'user'`), set to
+  `'admin'` manually via a DB console — no self-serve admin signup
+- `GET /api/health` — already exists, dashboard polls it
+- `GET /api/analytics/live` — returns today's aggregate counts (uploads,
+  success/failure, engine split, signups, logins, trial uploads) —
+  admin-auth required
+- `GET /api/analytics/stream` — returns the last ~50 analytics_events
+  rows with ONLY `event_name`, `route`, `created_at` selected — explicitly
+  excludes `anon_session_token` and `metadata` from the response, even
+  though they exist in the table — admin-auth required
+- Admin auth middleware: verifies JWT + checks `role === 'admin'`,
+  returns 403 otherwise — separate check from regular login auth
+
 ## Security Rules
 - Passwords must be hashed using bcrypt (rounds >= 10).
 - JWT secret (`JWT_SECRET`) and cookie signing secret (`SESSION_SECRET`) stored in backend `.env` only.
 - Authentication cookies set with `httpOnly: true`, `sameSite: 'lax'`, and `secure: true` in production.
 - API keys (Groq, HuggingFace) remain strictly backend-only.
+
