@@ -6,6 +6,7 @@ import pg from 'pg'
 import fs from 'fs'
 import path from 'path'
 import { randomUUID } from 'crypto'
+import bcrypt from 'bcryptjs'
 
 const { Pool } = pg
 
@@ -185,6 +186,64 @@ export async function initDb() {
   getLocalUsers()
   getLocalLectures()
   getLocalEvents()
+
+  // Ensure default main admin account exists
+  await seedDefaultAdmin('admin@edu.tech', 'admin123')
+}
+
+/**
+ * Seed or verify the default main admin account.
+ * @param {string} email
+ * @param {string} password
+ */
+export async function seedDefaultAdmin(email = 'admin@edu.tech', password = 'admin123') {
+  const normalizedEmail = email.toLowerCase().trim()
+  const salt = await bcrypt.genSalt(10)
+  const password_hash = await bcrypt.hash(password, salt)
+
+  if (usePostgres && pool) {
+    try {
+      const existing = await pool.query('SELECT id, email, role FROM users WHERE LOWER(email) = $1 LIMIT 1', [normalizedEmail])
+      if (existing.rows[0]) {
+        await pool.query('UPDATE users SET role = $1, password_hash = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3', [
+          'admin',
+          password_hash,
+          existing.rows[0].id,
+        ])
+        console.log(`[db] Main admin console account ensured: ${normalizedEmail} (role: admin) ✓`)
+      } else {
+        await pool.query(
+          'INSERT INTO users (email, password_hash, role) VALUES ($1, $2, $3)',
+          [normalizedEmail, password_hash, 'admin']
+        )
+        console.log(`[db] Main admin console account seeded: ${normalizedEmail} (role: admin) ✓`)
+      }
+      return
+    } catch (err) {
+      console.warn('[db] PostgreSQL seed admin error:', err.message)
+    }
+  }
+
+  const users = getLocalUsers()
+  const idx = users.findIndex((u) => u.email.toLowerCase() === normalizedEmail)
+  if (idx !== -1) {
+    users[idx].role = 'admin'
+    users[idx].password_hash = password_hash
+    users[idx].updated_at = new Date().toISOString()
+    saveLocalUsers(users)
+    console.log(`[db] Main local admin console account ensured: ${normalizedEmail} (role: admin) ✓`)
+  } else {
+    users.push({
+      id: randomUUID(),
+      email: normalizedEmail,
+      password_hash,
+      role: 'admin',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    saveLocalUsers(users)
+    console.log(`[db] Main local admin console account seeded: ${normalizedEmail} (role: admin) ✓`)
+  }
 }
 
 /**
