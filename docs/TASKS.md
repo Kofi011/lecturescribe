@@ -106,10 +106,10 @@ git push origin main
 - [x] Build admin-auth middleware (JWT + role check, 403 otherwise) → commit + push
 - [x] Build `GET /api/analytics/live` (today's aggregate counts) → commit + push
 - [x] Build `GET /api/analytics/stream` (last 50 events, event_name + route + created_at only — no token, no metadata) → commit + push
-- [ ] Build `/admin` frontend route, gated by role check → commit + push
-- [ ] Build System health panel, polling `/api/health` → commit + push
-- [ ] Build Live usage panel, polling `/api/analytics/live` → commit + push
-- [ ] Build Anonymous activity stream, polling or SSE from `/api/analytics/stream` → commit + push
+- [x] Build `/admin` frontend route, gated by role check → commit + push
+- [x] Build System health panel, polling `/api/health` → commit + push
+- [x] Build Live usage panel, polling `/api/analytics/live` → commit + push
+- [x] Build Anonymous activity stream, polling or SSE from `/api/analytics/stream` → commit + push
 - [ ] Test: confirm a non-admin user gets 403 on all admin endpoints and can't load `/admin` → commit + push
 - [ ] Test: confirm the dashboard never renders a token, email, transcript, or any per-visitor trail, even in devtools network responses → commit + push
 - [ ] Test: confirm numbers shown are real and change as real events occur (trigger a test upload, watch the counter update) → commit + push

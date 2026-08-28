@@ -44,47 +44,67 @@ export default function Nav({
   const initial = username ? username.charAt(0).toUpperCase() : 'S'
 
   return (
-    <nav className="max-w-7xl mx-auto flex items-center justify-between px-6 py-6 md:px-12 bg-white/95 backdrop-blur-sm relative z-50">
-      {/* Wordmark Logo */}
+    <nav className="max-w-7xl mx-auto flex items-center justify-between gap-2 px-4 py-3.5 sm:px-6 sm:py-5 md:px-12 bg-white/95 backdrop-blur-sm relative z-50">
+      {/* Brand Mark: Continuous Scribe Loop + Scaled Wordmark */}
       <button
         onClick={() => handleItemClick('landing')}
-        className="flex items-center gap-1 group select-none text-left cursor-pointer"
+        className="flex items-center gap-1.5 sm:gap-2 group select-none text-left cursor-pointer transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] origin-left shrink-0"
         title="Return to Home"
       >
-        <span className="font-serif text-3xl md:text-4xl italic text-black font-normal tracking-tight">
+        {/* Continuous Scribe Loop Icon */}
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 52 52"
+          fill="none"
+          className="text-black transition-transform duration-200 group-hover:scale-110 shrink-0 sm:w-[22px] sm:h-[22px]"
+          aria-hidden="true"
+        >
+          <path
+            d="M12 40 C6 30 6 18 16 12 C28 5 36 22 24 34 C16 42 22 50 34 46 C44 42 46 28 38 18"
+            stroke="currentColor"
+            strokeWidth="3.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <circle cx="12" cy="40" r="3" fill="currentColor" />
+          <circle cx="38" cy="18" r="2.5" fill="currentColor" />
+        </svg>
+
+        <span className="font-serif text-xl sm:text-2xl md:text-[28px] italic text-black font-normal tracking-tight transition-transform duration-200 group-hover:scale-105 origin-left inline-block">
           LectureScribe
         </span>
-        <sup className="text-xs font-sans font-bold text-black -top-2">®</sup>
+        <sup className="text-[9px] sm:text-[10px] font-sans font-bold text-black -top-1 sm:-top-1.5 transition-transform duration-200 group-hover:scale-105 origin-left">®</sup>
       </button>
 
       {/* Menu Pill & Profile Dropdown */}
-      <div className="relative flex items-center gap-3" ref={menuRef}>
+      <div className="relative flex items-center gap-2 sm:gap-3 shrink-0" ref={menuRef}>
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="btn-primary px-5 py-2.5 text-sm flex items-center gap-2 select-none"
+          className="btn-primary px-3.5 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 select-none"
           aria-expanded={menuOpen}
           aria-label="Navigation Menu"
         >
           {currentUser ? (
-            <div className="flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-white text-black text-[10px] font-bold flex items-center justify-center">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-white text-black text-[9px] sm:text-[10px] font-bold flex items-center justify-center shrink-0">
                 {initial}
               </span>
-              <span className="max-w-[90px] truncate">{username}</span>
+              <span className="max-w-[70px] sm:max-w-[100px] md:max-w-[120px] truncate text-xs sm:text-sm">{username}</span>
             </div>
           ) : (
             <span>Menu</span>
           )}
           <svg
-            width="12"
-            height="12"
+            width="10"
+            height="10"
             viewBox="0 0 12 12"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className={`transition-transform duration-200 ${menuOpen ? 'rotate-180' : ''}`}
+            className={`transition-transform duration-200 shrink-0 ${menuOpen ? 'rotate-180' : ''}`}
             aria-hidden="true"
           >
             <polyline points="2,4 6,8 10,4" />
@@ -93,7 +113,7 @@ export default function Nav({
 
         {/* Dropdown Menu per DESIGN.md */}
         {menuOpen && (
-          <div className="absolute right-0 top-full mt-2.5 w-64 bg-white border border-neutral-200/90 rounded-[24px] shadow-2xl p-2.5 z-50 animate-scale-up">
+          <div className="absolute right-0 top-full mt-2 w-60 sm:w-64 max-w-[calc(100vw-24px)] bg-white border border-neutral-200/90 rounded-[24px] shadow-2xl p-2.5 z-50 animate-scale-up">
             {/* Header info if user logged in */}
             {currentUser && (
               <div className="px-4 py-3 mb-1.5 border-b border-neutral-100 text-xs">
@@ -181,6 +201,24 @@ export default function Nav({
               >
                 <span>ABOUT</span>
               </button>
+
+              {/* 5. ADMIN DASHBOARD (Only visible to admin role) */}
+              {currentUser?.role === 'admin' && (
+                <button
+                  onClick={() => handleItemClick('admin')}
+                  className={[
+                    'w-full text-left px-4 py-2.5 text-xs font-bold rounded-full transition-all flex items-center justify-between cursor-pointer border border-neutral-900/10',
+                    currentPage === 'admin'
+                      ? 'bg-black text-white'
+                      : 'text-black bg-neutral-100 hover:bg-neutral-200',
+                  ].join(' ')}
+                >
+                  <span className="flex items-center gap-1.5">
+                    <span>⚡ ADMIN CONSOLE</span>
+                  </span>
+                  <span className="text-[9px] bg-black text-white px-1.5 py-0.5 rounded font-mono font-semibold">ADMIN</span>
+                </button>
+              )}
 
               {/* Quick Library access — only for signed-in users */}
               {currentUser && onOpenWorkspaceModal && (

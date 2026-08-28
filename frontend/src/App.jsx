@@ -12,15 +12,16 @@
 
 import './App.css'
 import { useState, useEffect, useRef } from 'react'
-import LandingPage    from './pages/LandingPage'
-import TrialPage      from './pages/TrialPage'
-import AuthPage       from './pages/AuthPage'
-import WorkspacePage  from './pages/WorkspacePage'
-import AboutPage      from './pages/AboutPage'
+import LandingPage from './pages/LandingPage'
+import TrialPage from './pages/TrialPage'
+import AuthPage from './pages/AuthPage'
+import WorkspacePage from './pages/WorkspacePage'
+import AboutPage from './pages/AboutPage'
+import AdminDashboardPage from './pages/AdminDashboardPage'
 import ProcessingPage from './pages/ProcessingPage'
-import ResultsPage    from './pages/ResultsPage'
+import ResultsPage from './pages/ResultsPage'
 import NavigationModal from './components/NavigationModal'
-import InfoModal       from './components/InfoModal'
+import InfoModal from './components/InfoModal'
 import UserSettingsModal from './components/UserSettingsModal'
 import { saveLecture, deleteLecture, clearAllLectures, SAMPLE_LECTURE, getSavedLectures } from './utils/lectureStorage'
 import { useInactivityLogout } from './utils/useInactivityLogout'
@@ -28,20 +29,41 @@ import { useInactivityLogout } from './utils/useInactivityLogout'
 const API_URL = import.meta.env.VITE_API_URL || ''
 
 export default function App() {
-  const [page,           setPage]           = useState('landing')
-  const [stage,          setStage]          = useState('uploaded')
-  const [error,          setError]          = useState(null)
+  const getInitialPage = () => {
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname.toLowerCase()
+      if (path === '/admin') return 'admin'
+      if (path === '/trial') return 'trial'
+      if (path === '/login' || path === '/auth') return 'auth'
+      if (path === '/about') return 'about'
+      if (path === '/workspace') return 'workspace'
+    }
+    return 'landing'
+  }
+
+  const [page, setPage] = useState(getInitialPage)
+  const [stage, setStage] = useState('uploaded')
+  const [error, setError] = useState(null)
   const [currentLecture, setCurrentLecture] = useState(null)
-  const [currentUser,    setCurrentUser]    = useState(null)
+  const [currentUser, setCurrentUser] = useState(null)
   const [inactivityNotice, setInactivityNotice] = useState(null)
 
   // Modals
   const [workspaceModalOpen, setWorkspaceModalOpen] = useState(false)
   const [workspaceInitialTab, setWorkspaceInitialTab] = useState('lectures')
-  const [infoModalType,      setInfoModalType]      = useState(null)
-  const [settingsModalOpen,  setSettingsModalOpen]  = useState(false)
+  const [infoModalType, setInfoModalType] = useState(null)
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false)
 
   const abortRef = useRef(null)
+
+  // Sync browser popstate
+  useEffect(() => {
+    const handlePopState = () => {
+      setPage(getInitialPage())
+    }
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
 
   // ─── Check Auth Session on Load ───────────────────────────────────────────
   useEffect(() => {
@@ -133,7 +155,7 @@ export default function App() {
     let audioUrl = null
     try {
       audioUrl = URL.createObjectURL(file)
-    } catch {}
+    } catch { }
 
     const completeLecture = {
       ...data,
@@ -179,9 +201,24 @@ export default function App() {
     setInactivityNotice(null)
     if (targetPage === 'workspace' && !currentUser) {
       setPage('auth')
+      if (typeof window !== 'undefined') window.history.pushState(null, '', '/login')
       return
     }
     setPage(targetPage)
+    if (typeof window !== 'undefined') {
+      const pathMap = {
+        landing: '/',
+        trial: '/trial',
+        auth: '/login',
+        workspace: '/workspace',
+        about: '/about',
+        admin: '/admin',
+      }
+      const targetPath = pathMap[targetPage] || '/'
+      if (window.location.pathname !== targetPath) {
+        window.history.pushState(null, '', targetPath)
+      }
+    }
   }
 
   // ─── Load Interactive Example ──────────────────────────────────────────────
@@ -328,6 +365,18 @@ export default function App() {
           onOpenInfo={(type) => setInfoModalType(type)}
           onDeleteLecture={handleDeleteLecture}
           onUpdateLecture={(updated) => setCurrentLecture(updated)}
+        />
+      )}
+
+      {/* ─── 8. ADMIN DASHBOARD ─────────────────────────────────────────────── */}
+      {page === 'admin' && (
+        <AdminDashboardPage
+          currentUser={currentUser}
+          onNavigate={handleNavigate}
+          onLogout={handleLogout}
+          onOpenSettings={() => setSettingsModalOpen(true)}
+          onOpenWorkspaceModal={handleOpenWorkspaceModal}
+          onOpenInfo={(type) => setInfoModalType(type)}
         />
       )}
 
