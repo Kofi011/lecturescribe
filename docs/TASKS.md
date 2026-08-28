@@ -110,9 +110,9 @@ git push origin main
 - [x] Build System health panel, polling `/api/health` → commit + push
 - [x] Build Live usage panel, polling `/api/analytics/live` → commit + push
 - [x] Build Anonymous activity stream, polling or SSE from `/api/analytics/stream` → commit + push
-- [ ] Test: confirm a non-admin user gets 403 on all admin endpoints and can't load `/admin` → commit + push
-- [ ] Test: confirm the dashboard never renders a token, email, transcript, or any per-visitor trail, even in devtools network responses → commit + push
-- [ ] Test: confirm numbers shown are real and change as real events occur (trigger a test upload, watch the counter update) → commit + push
+- [x] Test: confirm a non-admin user gets 403 on all admin endpoints and can't load `/admin` → commit + push
+- [x] Test: confirm the dashboard never renders a token, email, transcript, or any per-visitor trail, even in devtools network responses → commit + push
+- [x] Test: confirm numbers shown are real and change as real events occur (trigger a test upload, watch the counter update) → commit + push
 
 ## Phase 9 — Deployment (Paused for Pre-Production Vetting)
 - [ ] Merge `dev` into `main` (deployment should run off `main`, not `dev`)
