@@ -3,7 +3,7 @@
  */
 
 import express from 'express'
-import { findUserByEmail, findUserById, createUser } from '../db/index.js'
+import { findUserByEmail, findUserById, createUser, logAnalyticsEvent } from '../db/index.js'
 import {
   hashPassword,
   comparePassword,
@@ -36,7 +36,14 @@ router.post('/signup', async (req, res) => {
     }
 
     const password_hash = await hashPassword(password)
-    const user = await createUser({ email, password_hash })
+    const user = await createUser({ email, password_hash, role: 'user' })
+
+    // Log analytics event
+    await logAnalyticsEvent({
+      event_name: 'user_signup',
+      route: '/api/auth/signup',
+      anon_session_token: req.cookies?.lecture_trial_session || null,
+    })
 
     const token = generateToken(user)
     setAuthCookie(res, token)
@@ -47,6 +54,7 @@ router.post('/signup', async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
+        role: user.role || 'user',
         created_at: user.created_at,
       },
       token,
@@ -76,6 +84,13 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password.' })
     }
 
+    // Log analytics event
+    await logAnalyticsEvent({
+      event_name: 'user_login',
+      route: '/api/auth/login',
+      anon_session_token: req.cookies?.lecture_trial_session || null,
+    })
+
     const token = generateToken(user)
     setAuthCookie(res, token)
 
@@ -85,6 +100,7 @@ router.post('/login', async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
+        role: user.role || 'user',
         created_at: user.created_at,
       },
       token,
@@ -115,6 +131,7 @@ router.get('/me', requireAuth, async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
+        role: user.role || 'user',
         created_at: user.created_at,
       },
     })

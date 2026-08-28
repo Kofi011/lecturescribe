@@ -103,7 +103,7 @@ git push origin main
 
 ## Phase — Admin Dashboard
 - [x] Add `role` column to `users` table, manually set an admin account → commit + push
-- [ ] Build admin-auth middleware (JWT + role check, 403 otherwise) → commit + push
+- [x] Build admin-auth middleware (JWT + role check, 403 otherwise) → commit + push
 - [ ] Build `GET /api/analytics/live` (today's aggregate counts) → commit + push
 - [ ] Build `GET /api/analytics/stream` (last 50 events, event_name + route + created_at only — no token, no metadata) → commit + push
 - [ ] Build `/admin` frontend route, gated by role check → commit + push

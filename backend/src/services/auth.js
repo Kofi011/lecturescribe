@@ -34,6 +34,7 @@ export async function comparePassword(password, hash) {
  * @param {Object} user
  * @param {string} user.id
  * @param {string} user.email
+ * @param {string} [user.role='user']
  * @returns {string}
  */
 export function generateToken(user) {
@@ -41,6 +42,7 @@ export function generateToken(user) {
     {
       id: user.id,
       email: user.email,
+      role: user.role || 'user',
     },
     JWT_SECRET,
     { expiresIn: '7d' }
@@ -107,7 +109,7 @@ export function authenticateOptional(req, _res, next) {
 }
 
 /**
- * Express middleware requiring authentication.
+ * Express middleware requiring general authentication.
  */
 export function requireAuth(req, res, next) {
   const token =
@@ -126,3 +128,34 @@ export function requireAuth(req, res, next) {
   req.user = decoded
   next()
 }
+
+/**
+ * Express middleware requiring administrator role ('admin').
+ * Rejects non-admin or unauthenticated requests with 401 or 403.
+ */
+export function requireAdmin(req, res, next) {
+  const token =
+    req.cookies?.[AUTH_COOKIE_NAME] ||
+    req.headers.authorization?.replace(/^Bearer\s+/i, '')
+
+  if (!token) {
+    return res.status(401).json({ error: 'Authentication required. Please log in as admin.' })
+  }
+
+  const decoded = verifyToken(token)
+  if (!decoded) {
+    return res.status(401).json({ error: 'Session expired or invalid. Please log in again.' })
+  }
+
+  req.user = decoded
+
+  if (decoded.role !== 'admin') {
+    return res.status(403).json({
+      error: 'Forbidden: Administrator privileges required.',
+      code: 'FORBIDDEN_NOT_ADMIN',
+    })
+  }
+
+  next()
+}
+
