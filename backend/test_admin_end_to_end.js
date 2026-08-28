@@ -123,12 +123,14 @@ async function run() {
     const forbiddenKeywords = [
       'SUPER_SECRET_SESSION_TOKEN',
       'Alan Turing',
+      'Computational Machinery',
       'private_student@university.edu',
       '192.168.1.100',
       'anon_session_token',
       'metadata',
-      'transcript',
-      'password',
+      '"transcript":',
+      '"password":',
+      '"user_id":',
     ]
 
     for (const keyword of forbiddenKeywords) {

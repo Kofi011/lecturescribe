@@ -80,6 +80,9 @@ router.get('/trial-status', (req, res) => {
 
 // ─── POST /api/upload ─────────────────────────────────────────────
 router.post('/upload', (req, res) => {
+  // Set extended 5-minute timeout for large audio transcription & note synthesis
+  req.setTimeout(300000)
+
   // 1. Enforce trial limit before processing file upload
   const trialStatus = getTrialStatus(req)
   if (!trialStatus.canUpload) {
@@ -110,6 +113,13 @@ router.post('/upload', (req, res) => {
     }
 
     const filePath = req.file.path
+
+    // Clean up temp upload file if client cancels or disconnects mid-processing
+    req.on('close', () => {
+      if (!res.writableEnded) {
+        removeTempFile(filePath)
+      }
+    })
 
     try {
       // 2. Duration check

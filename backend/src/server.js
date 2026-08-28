@@ -116,15 +116,29 @@ app.use('/api/analytics', analyticsRouter)
 // ─── Global error handler ─────────────────────────────────────────
 app.use((err, _req, res, _next) => {
   console.error('[server error]', err)
+  if (res.headersSent) return
   res.status(err.status || 500).json({
     error: err.message || 'An unexpected server error occurred.',
   })
 })
 
+// ─── Process Error Safeguards ─────────────────────────────────────
+process.on('unhandledRejection', (reason) => {
+  console.error('[server unhandledRejection]', reason)
+})
+process.on('uncaughtException', (err) => {
+  console.error('[server uncaughtException]', err)
+})
+
 // ─── Initialize Database & Start ──────────────────────────────────
 await initDb()
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`[lecturescribe] backend listening on http://localhost:${PORT}`)
   console.log(`[lecturescribe] GROQ_API_KEY: ${process.env.GROQ_API_KEY ? 'loaded ✓' : 'NOT SET — add to .env'}`)
 })
+
+// 5 minutes timeout for long-running audio transcription & AI summarization
+server.timeout = 300000
+server.keepAliveTimeout = 65000
+server.headersTimeout = 66000
