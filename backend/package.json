@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch src/server.js",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "sidecar": "python -m uvicorn main:app --app-dir ../griot_sidecar --host 127.0.0.1 --port 8000"
   },
   "dependencies": {
     "@ffmpeg/ffmpeg": "^0.12.15",

@@ -21,7 +21,7 @@ import lecturesRouter from './routes/lectures.js'
 import analyticsRouter from './routes/analytics.js'
 import { authenticateOptional } from './services/auth.js'
 import { initDb, isDbHealthy } from './db/index.js'
-import { checkGriotHealth } from './services/transcribe.js'
+import { checkGriotHealth, ensureGriotSidecarRunning } from './services/transcribe.js'
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -132,6 +132,9 @@ process.on('uncaughtException', (err) => {
 
 // ─── Initialize Database & Start ──────────────────────────────────
 await initDb()
+
+// Auto-start Griot Nano 1 sidecar if local Python sidecar is detected
+ensureGriotSidecarRunning()
 
 const server = app.listen(PORT, () => {
   console.log(`[lecturescribe] backend listening on http://localhost:${PORT}`)

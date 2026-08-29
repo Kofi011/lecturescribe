@@ -12,8 +12,54 @@
 import Groq from 'groq-sdk'
 import fs from 'fs'
 import path from 'path'
+import { spawn } from 'child_process'
 
 let _groqClient = null
+let _sidecarProcess = null
+
+/**
+ * Ensures the Griot Nano 1 Python FastAPI sidecar is running.
+ */
+export function ensureGriotSidecarRunning() {
+  if (process.env.GRIOT_AUTOSTART === 'false') return
+
+  // Resolve directory of griot_sidecar (supports running from backend or project root)
+  const candidateDirs = [
+    path.resolve('griot_sidecar'),
+    path.resolve('../griot_sidecar'),
+    path.resolve('../../griot_sidecar'),
+  ]
+  const sidecarDir = candidateDirs.find((dir) => fs.existsSync(path.join(dir, 'main.py')))
+  if (!sidecarDir) return
+
+  checkGriotHealth().then((status) => {
+    if (status === 'healthy') {
+      console.log('[griot] Griot Nano 1 sidecar is active on port 8000 ✓')
+      return
+    }
+
+    console.log(`[griot] Launching Griot Nano 1 sidecar microservice from ${sidecarDir} on port 8000…`)
+    _sidecarProcess = spawn('python', ['-m', 'uvicorn', 'main:app', '--host', '127.0.0.1', '--port', '8000'], {
+      cwd: sidecarDir,
+      stdio: 'ignore',
+      shell: true,
+      windowsHide: true,
+    })
+
+    _sidecarProcess.on('error', (err) => {
+      console.warn('[griot] Sidecar spawn error:', err.message)
+    })
+  }).catch(() => {})
+}
+
+// Clean up child process on exit
+process.on('exit', () => {
+  if (_sidecarProcess) {
+    try {
+      _sidecarProcess.kill()
+    } catch {}
+  }
+})
 
 function getGroqClient() {
   if (!process.env.GROQ_API_KEY) {
