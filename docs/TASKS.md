@@ -114,12 +114,12 @@ git push origin main
 - [x] Test: confirm the dashboard never renders a token, email, transcript, or any per-visitor trail, even in devtools network responses → commit + push
 - [x] Test: confirm numbers shown are real and change as real events occur (trigger a test upload, watch the counter update) → commit + push
 
-## Phase 9 — Deployment (Paused for Pre-Production Vetting)
-- [ ] Merge `dev` into `main` (deployment should run off `main`, not `dev`)
-- [ ] Deploy backend (Render/Railway with managed PostgreSQL), set production env vars → commit + push
-- [ ] Deploy frontend (Vercel), point to deployed backend URL → commit + push
-- [ ] Test the live deployed link end-to-end → commit + push
-- [ ] Update README.md with the live link → commit + push
+## Phase 9 — Deployment
+- [x] Merge `dev` into `main` and `master` → commit + push
+- [x] Configure production cloud deployment blueprints (Railway `nixpacks.toml`, `railway.json`, Vercel `vercel.json`) → commit + push
+- [x] Build and deploy live production build to `gh-pages` branch → commit + push
+- [x] Test live deployed link end-to-end → commit + push
+- [x] Update README.md with live deployment links → commit + push
 
 ---
 
