@@ -3,7 +3,7 @@
  */
 
 const STORAGE_KEY = 'lecturescribe_saved_lectures_v1'
-const API_URL = import.meta.env.VITE_API_URL || ''
+import { API_URL } from '../config'
 
 export const SAMPLE_LECTURE = {
   id: 'sample_cs101_sorting',

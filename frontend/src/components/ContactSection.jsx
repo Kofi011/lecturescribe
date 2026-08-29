@@ -5,8 +5,8 @@
  */
 
 import { useState } from 'react'
+import { API_URL } from '../config'
 
-const API_URL = import.meta.env.VITE_API_URL || ''
 const WEB3_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY || '32508288-833d-4e07-b253-839dd62b5668'
 
 export default function ContactSection({ sectionRef }) {

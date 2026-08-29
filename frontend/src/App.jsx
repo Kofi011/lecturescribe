@@ -27,7 +27,7 @@ import { saveLecture, deleteLecture, clearAllLectures, SAMPLE_LECTURE, getSavedL
 import { useInactivityLogout } from './utils/useInactivityLogout'
 import { trackClientEvent } from './utils/analytics'
 
-const API_URL = import.meta.env.VITE_API_URL || ''
+import { API_URL } from './config'
 
 export default function App() {
   const getInitialPage = () => {

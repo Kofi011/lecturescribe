@@ -11,8 +11,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import Nav from '../components/Nav'
 import Footer from '../components/Footer'
-
-const API_URL = import.meta.env.VITE_API_URL || ''
+import { API_URL } from '../config'
 
 export default function AdminDashboardPage({
   currentUser,

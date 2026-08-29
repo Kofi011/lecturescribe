@@ -6,8 +6,7 @@ import { useState } from 'react'
 import Nav from '../components/Nav'
 import Footer from '../components/Footer'
 import AnimatedWaveform from '../components/AnimatedWaveform'
-
-const API_URL = import.meta.env.VITE_API_URL || ''
+import { API_URL } from '../config'
 
 export default function AuthPage({
   initialMode = 'login',
