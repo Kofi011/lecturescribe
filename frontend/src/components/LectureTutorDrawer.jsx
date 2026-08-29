@@ -98,19 +98,78 @@ export default function LectureTutorDrawer({
 
   function generateLocalTutorReply(q, lec) {
     const low = q.toLowerCase()
-    if (low.includes('concept') || low.includes('explain')) {
-      const concepts = lec?.key_concepts?.map((c) => `- **${c.concept}**: ${c.explanation}`).join('\n') || ''
-      return `### Key Concepts from this Lecture\n\n${concepts}`
+
+    const concepts =
+      lec?.key_concepts?.map((c) => `#### **${c.concept}**\n- **Mechanism / Detail**: ${c.explanation}`).join('\n\n') ||
+      lec?.important_terms?.map((t) => `#### **${t.term}**\n- **Definition**: ${t.definition}`).join('\n\n') ||
+      'No key concepts extracted yet.'
+
+    const takeaways =
+      lec?.key_takeaways?.map((t, idx) => `${idx + 1}. **${t}**`).join('\n') ||
+      lec?.overview ||
+      'Detailed overview available in notes.'
+
+    const terms =
+      lec?.important_terms?.map((t) => `| **${t.term}** | ${t.definition} |`).join('\n') ||
+      '| Term | Definition |\n| --- | --- |\n| Core Topic | Primary subject matter |'
+
+    const quiz =
+      lec?.review_questions?.map((r, i) => `${i + 1}. **Q**: ${r.question}\n   - **Answer**: ${r.answer}`).join('\n\n') ||
+      ''
+
+    if (low.includes('concept') || low.includes('explain') || low.includes('how')) {
+      return `### 1. Conceptual Deep-Dive: "${lec?.title || 'Lecture'}"
+Grounding our exploration in this lecture, here is the detailed breakdown of the foundational concepts:
+
+${concepts}
+
+### 2. Key Academic Takeaways
+${takeaways}
+
+### 3. Study Checklist
+- Review how these concepts interact within practical applications.
+- Test your active recall against the key terms table in the notes section.`
     }
-    if (low.includes('takeaway') || low.includes('summary') || low.includes('main')) {
-      const takeaways = lec?.key_takeaways?.map((t) => `- ${t}`).join('\n') || lec?.overview
-      return `### Key Takeaways\n\n${takeaways}`
+
+    if (low.includes('takeaway') || low.includes('summary') || low.includes('overview') || low.includes('main')) {
+      return `### 1. Executive Lecture Summary
+${lec?.overview || 'This lecture explores core principles, methodologies, and technical nuances.'}
+
+### 2. Core Takeaways & Insights
+${takeaways}
+
+### 3. Key Concepts Matrix
+${concepts}
+
+### 4. Practice & Self-Assessment
+${quiz ? quiz : 'Review the Practice Quiz tab to test your mastery of these principles.'}`
     }
-    if (low.includes('term') || low.includes('definition')) {
-      const terms = lec?.important_terms?.map((t) => `- **${t.term}**: ${t.definition}`).join('\n') || ''
-      return `### Important Terminology\n\n${terms}`
+
+    if (low.includes('term') || low.includes('definition') || low.includes('vocab')) {
+      return `### 1. Master Terminology Glossary
+Below is the structured reference table for all essential technical terminology from this lecture:
+
+| Term / Notation | Precise Academic Definition |
+| :--- | :--- |
+${terms}
+
+### 2. Contextual Application
+These terms define the theoretical framework of **${lec?.title || 'this subject'}**. Make sure to understand how each term connects to the overall lecture takeaways.`
     }
-    return `### Summary of "${lec?.title}"\n\n${lec?.overview}\n\n**Key Takeaway:** ${lec?.key_takeaways?.[0] || 'See full study notes in the Notes tab.'}`
+
+    return `### 1. Academic Analysis for "${lec?.title || 'Lecture'}"
+**Topic Overview**: ${lec?.overview || 'Comprehensive analysis of lecture concepts and foundations.'}
+
+### 2. Fundamental Principles
+${concepts}
+
+### 3. Summary Takeaways
+${takeaways}
+
+### 4. Key Terminology Reference
+| Term | Definition |
+| :--- | :--- |
+${terms}`
   }
 
   const suggestedQuestions = [
