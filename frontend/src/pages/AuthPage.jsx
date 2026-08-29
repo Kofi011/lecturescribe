@@ -131,26 +131,11 @@ export default function AuthPage({
             </button>
           </div>
 
-          {/* Error Message Display with Offline Demo Option */}
+          {/* Error Message Display */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50/80 border border-red-200/80 rounded-[18px] text-xs text-red-700 font-medium flex flex-col gap-2.5 animate-fade-in">
-              <div className="flex items-start gap-2.5">
-                <span className="text-red-500 font-bold shrink-0">⚠️</span>
-                <span>{error}</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  onAuthSuccess?.({
-                    id: 'offline_demo_user',
-                    email: email.trim() || 'admin@edu.tech',
-                    role: (email.trim().toLowerCase() === 'admin@edu.tech' || !email.trim()) ? 'admin' : 'user',
-                  })
-                }}
-                className="mt-1 w-full py-2.5 bg-neutral-900 hover:bg-black text-white text-[11px] font-bold rounded-xl transition-all cursor-pointer shadow-xs text-center"
-              >
-                Continue in Standalone / Demo Mode →
-              </button>
+            <div className="mb-6 p-4 bg-red-50/80 border border-red-200/80 rounded-[18px] text-xs text-red-700 font-medium flex items-start gap-2.5 animate-fade-in">
+              <span className="text-red-500 font-bold shrink-0">⚠️</span>
+              <span>{error}</span>
             </div>
           )}
 
