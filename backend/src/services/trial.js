@@ -71,11 +71,12 @@ export function incrementTrial(req, res) {
     updatedAt: new Date().toISOString(),
   }
 
+  const isProd = process.env.NODE_ENV === 'production'
   res.cookie(TRIAL_COOKIE_NAME, payload, {
     signed: true,
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
     maxAge: COOKIE_MAX_AGE_MS,
     path: '/',
   })

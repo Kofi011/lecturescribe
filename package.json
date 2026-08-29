@@ -1,0 +1,13 @@
+{
+  "name": "lecturescribe",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LectureScribe — Turn your lectures into structured notes with dual-engine AI",
+  "scripts": {
+    "start": "node backend/src/server.js",
+    "build": "cd frontend && npm install && npm run build",
+    "backend": "cd backend && npm run dev",
+    "frontend": "cd frontend && npm run dev",
+    "sidecar": "cd backend && npm run sidecar"
+  }
+}

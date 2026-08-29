@@ -27,6 +27,9 @@ const app = express()
 const PORT = process.env.PORT || 5000
 const SESSION_SECRET = process.env.SESSION_SECRET || 'lecturescribe_session_secret_default_key'
 
+// Trust reverse proxy (Railway, Render, etc.) for secure cookies & rate limiting
+app.set('trust proxy', 1)
+
 // ─── Security Headers ─────────────────────────────────────────────
 app.use(
   helmet({

@@ -68,24 +68,26 @@ export function verifyToken(token) {
  * @param {string} token
  */
 export function setAuthCookie(res, token) {
+  const isProd = process.env.NODE_ENV === 'production'
   res.cookie(AUTH_COOKIE_NAME, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
     maxAge: COOKIE_MAX_AGE_MS,
     path: '/',
   })
 }
 
 /**
- * Clear authentication cookie on logout.
+ * Clear authentication cookie on response.
  * @param {import('express').Response} res
  */
 export function clearAuthCookie(res) {
+  const isProd = process.env.NODE_ENV === 'production'
   res.clearCookie(AUTH_COOKIE_NAME, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
     path: '/',
   })
 }
