@@ -22,16 +22,14 @@ export default function HeroSection({
 
       {/* Central Content Area */}
       <div className="relative max-w-3xl mx-auto z-10 px-4 sm:px-6">
-        {/* Main Headline */}
-        <h1 className="text-5xl sm:text-6xl md:text-7xl font-black text-black tracking-tight leading-[1.05] mb-6">
-          Turn your lecture into{' '}
-          <span className="font-serif italic font-normal text-[1.12em] tracking-tight inline-block pr-1">
-            notes.
-          </span>
+        {/* Main Headline — Proportioned elegantly matching reference */}
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[54px] font-extrabold text-black tracking-[-0.03em] leading-[1.12] sm:leading-[1.08] mb-4 sm:mb-5">
+          Turn your lectures <br className="hidden sm:inline" />
+          into <span className="font-serif italic font-normal text-[1.05em] tracking-tight inline-block pr-0.5">notes.</span>
         </h1>
 
         {/* Subtext */}
-        <p className="text-neutral-500 text-base sm:text-lg md:text-xl font-normal mb-10 max-w-xl mx-auto leading-relaxed">
+        <p className="text-neutral-500 text-sm sm:text-base md:text-[17px] font-normal mb-8 sm:mb-10 max-w-lg mx-auto leading-relaxed">
           Upload any lecture recording and get a full transcript, structured study
           notes, key concepts, and revision questions in seconds.
         </p>
