@@ -84,7 +84,9 @@ function parseInlineFormatting(text) {
 export default function MarkdownRenderer({ content, className = '' }) {
   if (!content) return null
 
-  const lines = content.split('\n')
+  // Strip internal reasoning tags (<think>...</think>) if present
+  const cleanContent = content.replace(/<think>[\s\S]*?<\/think>/gi, '').trim()
+  const lines = cleanContent.split('\n')
   const elements = []
   let i = 0
 

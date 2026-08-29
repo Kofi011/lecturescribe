@@ -25,19 +25,20 @@ function getClient() {
 export async function askAboutLecture(transcript, question, history = []) {
   const client = getClient()
 
-  const systemPrompt = `You are LectureScribe's elite Academic AI Professor & Master Tutor.
-Your goal is to provide comprehensive, thorough, and highly educational answers to the student's questions grounded in the provided lecture transcript and academic context.
+  const systemPrompt = `You are LectureScribe's Academic AI Professor & Master Tutor.
+Your goal is to provide a comprehensive, engaging, and exceptionally clear explanation directly answering the student's question, grounded on the provided lecture transcript.
 
-CRITICAL INSTRUCTIONS:
-1. Provide IN-DEPTH, DETAILED, AND RIGOROUS explanations. Avoid brief, superficial, or 1-2 sentence answers unless explicitly asked for brevity.
-2. Structure your answer using clear, beautiful Markdown:
-   - ### 1. Executive Summary & Core Principle
-   - ### 2. Detailed Technical Breakdown & Mechanisms (use step-by-step logic, bold key concepts)
-   - ### 3. Comparative Tables & Structured Matrices (where comparing concepts, trade-offs, or architectures)
-   - ### 4. Concrete Examples, Analogies, or Code/Math Walkthroughs (to anchor understanding)
-   - ### 5. Key Takeaways & Exam Review Checklist
-3. Ground your explanations directly in the lecture transcript, and synthesize related fundamental knowledge where necessary to provide complete understanding.
-4. Highlight technical terms in **bold** and provide precise definitions.
+STRICT OUTPUT RULES:
+- Output ONLY the final academic response. NEVER output <think> tags, internal reasoning scratchpads, drafting notes, or meta commentary.
+- Write in a natural, authoritative, and welcoming pedagogical tone.
+
+FORMATTING GUIDELINES:
+- Begin directly with a clear, engaging overview of the concept or answer.
+- Organize the explanation with descriptive Markdown headings (e.g. ### Core Intuition, ### Step-by-Step Breakdown, ### Practical Example, ### Summary Matrix).
+- Use **bold** for key technical terms.
+- Use Markdown tables (| Concept | Description |) where comparing ideas or summarizing takeaways.
+- Use bullet points (- item) or numbered lists for sequential processes.
+- Ensure the answer is thorough and in-depth, offering clear analogies and concrete examples where helpful.
 
 LECTURE TRANSCRIPT:
 ${transcript}`
@@ -51,9 +52,8 @@ ${transcript}`
   const models = [
     'llama-3.3-70b-versatile',
     'llama-3.1-70b-versatile',
-    'qwen/qwen3.6-27b',
-    'openai/gpt-oss-120b',
     'mixtral-8x7b-32768',
+    'qwen/qwen3.6-27b',
   ]
   let reply = ''
   let lastErr = null
@@ -67,7 +67,11 @@ ${transcript}`
         max_tokens: 3500,
       })
       reply = completion.choices[0]?.message?.content ?? ''
-      if (reply) break
+      if (reply) {
+        // Strip any residual think tags or CoT scratchpad
+        reply = reply.replace(/<think>[\s\S]*?<\/think>/gi, '').trim()
+        if (reply) break
+      }
     } catch (err) {
       lastErr = err
       console.warn(`[askLecture] model ${model} failed:`, err.message)
@@ -78,5 +82,5 @@ ${transcript}`
     throw new Error(`Failed to generate answer: ${lastErr.message}`)
   }
 
-  return reply.trim()
+  return reply.replace(/<think>[\s\S]*?<\/think>/gi, '').trim()
 }
