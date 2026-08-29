@@ -4,7 +4,8 @@
   "private": true,
   "description": "LectureScribe — Turn your lectures into structured notes with dual-engine AI",
   "scripts": {
-    "start": "node backend/src/server.js",
+    "postinstall": "npm --prefix backend install",
+    "start": "cd backend && npm start",
     "build": "cd frontend && npm install && npm run build",
     "backend": "cd backend && npm run dev",
     "frontend": "cd frontend && npm run dev",
