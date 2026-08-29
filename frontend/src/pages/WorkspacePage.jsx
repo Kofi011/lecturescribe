@@ -18,6 +18,7 @@ export default function WorkspacePage({
   uploadError,
   onSelectLecture,
   onLogout,
+  onOpenSettings,
   onOpenInfo,
   onOpenWorkspaceModal,
 }) {
@@ -46,16 +47,16 @@ export default function WorkspacePage({
     return (
       <div className="min-h-screen relative flex flex-col bg-white selection:bg-black selection:text-white">
         <Nav currentPage="workspace" onNavigate={onNavigate} onOpenWorkspaceModal={onOpenWorkspaceModal} />
-        <main className="flex-1 flex items-center justify-center p-6 text-center">
-          <div className="card-white max-w-md p-8">
+        <main className="flex-1 flex items-center justify-center px-4 py-8 sm:p-6 text-center">
+          <div className="card-white w-full max-w-md p-6 sm:p-8 rounded-[24px] sm:rounded-[32px] mx-auto shadow-sm">
             <span className="pill-badge text-[10px] mb-3">AUTHENTICATION REQUIRED</span>
-            <h2 className="text-2xl font-bold mb-2">Sign in to access Workspace</h2>
-            <p className="text-sm text-neutral-600 mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold mb-2">Sign in to access Workspace</h2>
+            <p className="text-xs sm:text-sm text-neutral-600 mb-6 leading-relaxed">
               The student workspace is protected. Please log in or create an account.
             </p>
             <button
               onClick={() => onNavigate('auth')}
-              className="btn-primary w-full text-sm py-3.5"
+              className="btn-primary w-full text-sm py-3 sm:py-3.5"
             >
               Sign In / Create Account →
             </button>
@@ -66,17 +67,18 @@ export default function WorkspacePage({
     )
   }
 
-  const username = currentUser.email.split('@')[0]
-  const initial = username.charAt(0).toUpperCase()
+  const username = currentUser?.email ? currentUser.email.split('@')[0] : 'Scholar'
+  const initial = username ? username.charAt(0).toUpperCase() : 'S'
 
-  // Calculate metrics
-  const totalLectures = savedLectures.length
-  const totalConcepts = savedLectures.reduce((acc, l) => acc + (l.keyConcepts?.length || l.importantTerms?.length || 4), 0)
-  const totalMinutes = savedLectures.reduce((acc, l) => acc + Math.round((l.durationSec || 2400) / 60), 0)
+  // Metric Computations
+  const totalLectures = savedLectures?.length || 0
+  const totalMinutes = savedLectures.reduce((acc, lec) => acc + (lec.durationSec ? Math.ceil(lec.durationSec / 60) : (lec.duration ? Math.ceil(lec.duration / 60) : 45)), 0)
+  const totalStudyMinutes = totalMinutes
+  const totalConcepts = savedLectures.reduce((acc, lec) => acc + (lec.keyConcepts?.length || lec.quiz?.length || 0) + (lec.importantTerms?.length || lec.glossary?.length || 0), 0)
 
   // Filter lectures based on search query
-  const filteredLectures = savedLectures.filter((lec) => {
-    if (!searchQuery.trim()) return true
+  const filteredLectures = (savedLectures || []).filter((lec) => {
+    if (!searchQuery) return true
     const query = searchQuery.toLowerCase()
     return (
       lec.title?.toLowerCase().includes(query) ||
@@ -96,13 +98,14 @@ export default function WorkspacePage({
           onNavigate={onNavigate}
           currentUser={currentUser}
           onLogout={onLogout}
+          onOpenSettings={onOpenSettings || (() => setIsSettingsOpen(true))}
           onOpenWorkspaceModal={onOpenWorkspaceModal}
         />
       </header>
 
-      <main className="flex-1 relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-10 md:py-14 space-y-10 w-full">
+      <main className="flex-1 relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10 md:py-14 space-y-8 sm:space-y-10 w-full">
         {/* 1. Scholar Workspace Banner with User Profile Dropdown */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 p-8 bg-neutral-50/80 border border-neutral-200/90 rounded-[32px] shadow-sm">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 p-5 sm:p-8 bg-neutral-50/80 border border-neutral-200/90 rounded-[24px] sm:rounded-[32px] shadow-sm">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <span className="pill-badge text-[10px] bg-black text-white">SCHOLAR HUB</span>

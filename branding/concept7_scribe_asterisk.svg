@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 80" width="100%" height="100%" fill="none">
+  <!-- Concept 7: The Scribe Asterisk / Nexus Star (Acoustic Footnote Pulse + High-Contrast Wordmark) -->
+  <style>
+    .star-text {
+      font-family: 'Instrument Serif', 'Times New Roman', Georgia, serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: 48px;
+      fill: currentColor;
+      letter-spacing: -0.02em;
+    }
+  </style>
+
+  <!-- 1. The Scribe Asterisk / Acoustic Footnote Star -->
+  <g transform="translate(18, 14)">
+    <!-- 6-Point Radial Sound Pulse Star with Hollow Acoustic Core -->
+    <!-- Vertical Spikes -->
+    <path d="M26 4 L29 18 L26 22 L23 18 Z" fill="currentColor" />
+    <path d="M26 48 L29 34 L26 30 L23 34 Z" fill="currentColor" />
+    
+    <!-- Top-Right / Bottom-Left Diagonal Spikes -->
+    <path d="M45 15 L32 23 L29 20 L35 11 Z" fill="currentColor" />
+    <path d="M7 37 L20 29 L23 32 L17 41 Z" fill="currentColor" />
+    
+    <!-- Top-Left / Bottom-Right Diagonal Spikes -->
+    <path d="M7 15 L20 23 L17 11 L23 20 Z" fill="currentColor" />
+    <path d="M45 37 L32 29 L35 41 L29 32 Z" fill="currentColor" />
+
+    <!-- Center Ring Aperture -->
+    <circle cx="26" cy="26" r="3.5" stroke="currentColor" stroke-width="2.5" fill="none" />
+  </g>
+
+  <!-- 2. Wordmark Lockup -->
+  <g transform="translate(86, 54)">
+    <text x="0" y="0" class="star-text">LectureScribe</text>
+    <circle cx="282" cy="-30" r="3.2" fill="currentColor" />
+  </g>
+</svg>

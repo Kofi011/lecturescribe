@@ -30,17 +30,17 @@ export default function ResultsPage({
   const [exportDropdownOpen, setExportDropdownOpen] = useState(false)
   const [isExportingPdf, setIsExportingPdf] = useState(false)
 
-  const title              = lecture?.title || 'Lecture Summary'
-  const overview           = lecture?.overview || ''
-  const key_concepts       = lecture?.key_concepts || []
-  const main_arguments     = lecture?.main_arguments || []
-  const important_terms    = lecture?.important_terms || []
-  const study_notes        = lecture?.study_notes || []
-  const key_takeaways      = lecture?.key_takeaways || []
+  const title = lecture?.title || 'Lecture Summary'
+  const overview = lecture?.overview || ''
+  const key_concepts = lecture?.key_concepts || []
+  const main_arguments = lecture?.main_arguments || []
+  const important_terms = lecture?.important_terms || []
+  const study_notes = lecture?.study_notes || []
+  const key_takeaways = lecture?.key_takeaways || []
   const revision_questions = lecture?.revision_questions || []
-  const transcript         = lecture?.transcript || ''
-  const notes_markdown     = lecture?.notes_markdown || ''
-  const audioUrl           = lecture?.audioUrl || null
+  const transcript = lecture?.transcript || ''
+  const notes_markdown = lecture?.notes_markdown || ''
+  const audioUrl = lecture?.audioUrl || null
 
   // ─── Actions ─────────────────────────────────────────────────────────────
 
@@ -86,8 +86,8 @@ export default function ResultsPage({
     }
 
     const blob = new Blob([content], { type: mime })
-    const url  = URL.createObjectURL(blob)
-    const a    = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
     const safeName = title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
@@ -181,10 +181,10 @@ export default function ResultsPage({
           role="tablist"
         >
           {[
-            { id: 'overview',   label: 'Overview & Concepts', count: key_concepts.length },
-            { id: 'notes',      label: 'Study Notes', count: study_notes.length },
-            { id: 'terms',      label: 'Important Terms', count: important_terms.length },
-            { id: 'quiz',       label: 'Revision Questions', count: revision_questions.length },
+            { id: 'overview', label: 'Overview & Concepts', count: key_concepts.length },
+            { id: 'notes', label: 'Study Notes', count: study_notes.length },
+            { id: 'terms', label: 'Important Terms', count: important_terms.length },
+            { id: 'quiz', label: 'Revision Questions', count: revision_questions.length },
             { id: 'transcript', label: 'Raw Transcript' },
           ].map((tab) => (
             <button

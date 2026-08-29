@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 80" width="100%" height="100%" fill="none">
+  <!-- Concept 9: The Acoustic Monolith / Sound Bookmark + Wordmark -->
+  <style>
+    .monolith-text {
+      font-family: 'Instrument Serif', 'Times New Roman', Georgia, serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: 48px;
+      fill: currentColor;
+      letter-spacing: -0.02em;
+    }
+  </style>
+
+  <!-- 1. The Acoustic Monolith Mark -->
+  <g transform="translate(18, 12)">
+    <!-- Main Bookmark Body with Chevron Tail -->
+    <path d="M8 4 L44 4 L44 46 L26 36 L8 46 Z" fill="currentColor" />
+    
+    <!-- Negative Space Soundwave Slits cut into the top of the monolith -->
+    <!-- Slit 1 -->
+    <rect x="15" y="8" width="3" height="14" rx="1.5" fill="white" style="fill: var(--monolith-cut, #ffffff);" />
+    <!-- Slit 2 (Taller center pulse) -->
+    <rect x="24.5" y="8" width="3" height="20" rx="1.5" fill="white" style="fill: var(--monolith-cut, #ffffff);" />
+    <!-- Slit 3 -->
+    <rect x="34" y="8" width="3" height="14" rx="1.5" fill="white" style="fill: var(--monolith-cut, #ffffff);" />
+  </g>
+
+  <!-- 2. Wordmark Lockup -->
+  <g transform="translate(86, 54)">
+    <text x="0" y="0" class="monolith-text">LectureScribe</text>
+    <rect x="282" y="-30" width="12" height="3" rx="1.5" fill="currentColor" />
+  </g>
+</svg>

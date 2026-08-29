@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 490 80" width="100%" height="100%" fill="none">
+  <!-- Concept 6: The Academic Cadence (Architectural Frequency Column + Wordmark) -->
+  <style>
+    .cadence-text {
+      font-family: 'Instrument Serif', 'Times New Roman', Georgia, serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: 48px;
+      fill: currentColor;
+      letter-spacing: -0.02em;
+    }
+  </style>
+
+  <!-- 1. The Academic Cadence Mark (Harmonic columns rising to an intellectual apex) -->
+  <g transform="translate(16, 16)">
+    <!-- Column 1 -->
+    <rect x="0" y="24" width="4.5" height="24" rx="2.25" fill="currentColor" />
+    <!-- Column 2 -->
+    <rect x="10" y="14" width="4.5" height="34" rx="2.25" fill="currentColor" />
+    <!-- Column 3 (Apex Column with Diamond Crown) -->
+    <rect x="20" y="8" width="4.5" height="40" rx="2.25" fill="currentColor" />
+    <polygon points="22.25,0 26,4 22.25,8 18.5,4" fill="currentColor" />
+    <!-- Column 4 -->
+    <rect x="30" y="14" width="4.5" height="34" rx="2.25" fill="currentColor" />
+    <!-- Column 5 -->
+    <rect x="40" y="24" width="4.5" height="24" rx="2.25" fill="currentColor" />
+  </g>
+
+  <!-- 2. Wordmark Lockup -->
+  <g transform="translate(82, 54)">
+    <text x="0" y="0" class="cadence-text">LectureScribe</text>
+    <polygon points="284,-30 288,-26 284,-22 280,-26" fill="currentColor" />
+  </g>
+</svg>

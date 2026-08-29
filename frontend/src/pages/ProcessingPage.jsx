@@ -6,10 +6,10 @@ import Nav from '../components/Nav'
 import AnimatedWaveform from '../components/AnimatedWaveform'
 
 const STAGES = [
-  { key: 'uploaded',     label: 'Audio uploaded' },
+  { key: 'uploaded', label: 'Audio uploaded' },
   { key: 'transcribing', label: 'Transcribing lecture…' },
-  { key: 'summarizing',  label: 'Generating notes…' },
-  { key: 'complete',     label: 'Complete' },
+  { key: 'summarizing', label: 'Generating notes…' },
+  { key: 'complete', label: 'Complete' },
 ]
 
 const STAGE_ORDER = STAGES.map((s) => s.key)
@@ -56,15 +56,15 @@ export default function ProcessingPage({
   onOpenWorkspaceModal,
 }) {
   const currentIdx = STAGE_ORDER.indexOf(stage)
-  const isError    = stage === 'error'
+  const isError = stage === 'error'
 
   function getStatus(stageKey, idx) {
     if (isError) {
-      if (idx < currentIdx)  return 'done'
+      if (idx < currentIdx) return 'done'
       if (idx === currentIdx) return 'error'
       return 'pending'
     }
-    if (idx < currentIdx)   return 'done'
+    if (idx < currentIdx) return 'done'
     if (idx === currentIdx) return stage === 'complete' ? 'done' : 'active'
     return 'pending'
   }

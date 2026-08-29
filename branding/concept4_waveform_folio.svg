@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 80" width="100%" height="100%" fill="none">
+  <!-- Concept 4: The Waveform Folio (Open Academic Codex & Sound Resonance) -->
+  <style>
+    .folio-text {
+      font-family: 'Instrument Serif', 'Times New Roman', Georgia, serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: 48px;
+      fill: currentColor;
+      letter-spacing: -0.02em;
+    }
+  </style>
+
+  <!-- 1. The Waveform Folio Icon Mark (Open book whose pages form acoustic waves) -->
+  <g transform="translate(12, 14)">
+    <!-- Central Spine / Stylus -->
+    <line x1="28" y1="6" x2="28" y2="46" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+    <circle cx="28" cy="6" r="2" fill="currentColor" />
+
+    <!-- Left Folio Page / Acoustic Waves -->
+    <path d="M26 14 C18 10 10 14 4 11" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+    <path d="M26 24 C18 19 10 25 4 20" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+    <path d="M26 34 C18 29 10 35 4 30" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+    <path d="M26 44 C18 39 10 44 4 40" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" />
+
+    <!-- Right Folio Page / Acoustic Waves -->
+    <path d="M30 14 C38 10 46 14 52 11" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+    <path d="M30 24 C38 19 46 25 52 20" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+    <path d="M30 34 C38 29 46 35 52 30" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+    <path d="M30 44 C38 39 46 44 52 40" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" />
+  </g>
+
+  <!-- 2. Wordmark Lockup -->
+  <g transform="translate(86, 54)">
+    <text x="0" y="0" class="folio-text">LectureScribe</text>
+    <circle cx="282" cy="-30" r="3" fill="currentColor" />
+  </g>
+</svg>

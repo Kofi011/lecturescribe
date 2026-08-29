@@ -3,12 +3,12 @@
  */
 
 import { useRef } from 'react'
-import Nav              from '../components/Nav'
-import HeroSection      from '../components/HeroSection'
-import HowItWorks       from '../components/HowItWorks'
-import DarkHeroCard     from '../components/DarkHeroCard'
-import ContactSection   from '../components/ContactSection'
-import Footer           from '../components/Footer'
+import Nav from '../components/Nav'
+import HeroSection from '../components/HeroSection'
+import HowItWorks from '../components/HowItWorks'
+import DarkHeroCard from '../components/DarkHeroCard'
+import ContactSection from '../components/ContactSection'
+import Footer from '../components/Footer'
 import AnimatedWaveform from '../components/AnimatedWaveform'
 
 export default function LandingPage({
@@ -21,10 +21,10 @@ export default function LandingPage({
   onSelectExample,
   onOpenWorkspaceModal,
 }) {
-  const contactRef    = useRef(null)
+  const contactRef = useRef(null)
   const howItWorksRef = useRef(null)
 
-  const scrollToContact    = () => contactRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  const scrollToContact = () => contactRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   const scrollToHowItWorks = () => howItWorksRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
   return (

@@ -1,5 +1,6 @@
 /**
  * UploadCard.jsx — Audio file upload card styled with SasuSync visual language
+ * Responsive for all mobile screen sizes down to 320px
  */
 
 import { useState, useRef, useCallback } from 'react'
@@ -105,118 +106,104 @@ export default function UploadCard({ cardRef, onSubmit }) {
   }
 
   return (
-    <section ref={cardRef} id="upload-section" className="px-6 py-20 bg-neutral-50/50 border-t border-neutral-100">
-      <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-10">
-          <span className="pill-badge mb-4">
-            STUDIO UPLOAD
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-black text-black tracking-tight mt-2">
-            Ready to transcribe?
-          </h2>
-          <p className="text-neutral-500 text-sm md:text-base mt-2 font-normal">
-            Select an audio file from your device to begin.
-          </p>
+    <div ref={cardRef} id="upload-section" className="w-full">
+      {/* Upload Card */}
+      <div className="bg-white border border-neutral-200/90 rounded-[24px] sm:rounded-[28px] p-5 sm:p-8 md:p-10 shadow-[0_4px_24px_rgba(0,0,0,0.03)]">
+        {/* Drop area */}
+        <div
+          role="button"
+          tabIndex={0}
+          aria-label="Upload audio file"
+          onClick={() => !file && !checking && fileInputRef.current?.click()}
+          onKeyDown={(e) => e.key === 'Enter' && fileInputRef.current?.click()}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className={[
+            'border-2 border-dashed rounded-[18px] sm:rounded-[22px] p-6 sm:p-10 md:p-12 text-center transition-all duration-200 select-none',
+            isDragging
+              ? 'border-black bg-neutral-50 scale-[1.01]'
+              : file
+              ? 'border-black bg-neutral-50/40 cursor-default'
+              : 'border-neutral-200 hover:border-black hover:bg-neutral-50/50 cursor-pointer',
+          ].join(' ')}
+        >
+          {/* Upload Icon */}
+          <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-neutral-100 flex items-center justify-center mx-auto mb-3 sm:mb-5 text-black shrink-0">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:w-6 sm:h-6">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+          </div>
+
+          {checking ? (
+            <p className="text-neutral-600 font-medium text-xs sm:text-sm">Analyzing audio duration…</p>
+          ) : file ? (
+            <div className="flex flex-col items-center">
+              <span className="font-bold text-black text-sm sm:text-base md:text-lg break-all">{file.name}</span>
+              <span className="text-neutral-500 text-[11px] sm:text-xs font-semibold mt-1 px-3 py-1 bg-neutral-100 rounded-full">
+                {formatSize(file.size)}
+              </span>
+            </div>
+          ) : (
+            <>
+              <p className="font-bold text-black text-sm sm:text-base md:text-lg mb-1 tracking-tight">
+                Click to select audio or drag &amp; drop
+              </p>
+              <p className="text-neutral-400 text-[11px] sm:text-xs md:text-sm font-normal">
+                MP3, WAV, or M4A · Max {MAX_DURATION_MIN} min · Max {MAX_SIZE_MB} MB
+              </p>
+            </>
+          )}
         </div>
 
-        {/* Upload Card */}
-        <div className="bg-white border border-neutral-200/90 rounded-[28px] p-8 md:p-12 shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
-          {/* Drop area */}
-          <div
-            role="button"
-            tabIndex={0}
-            aria-label="Upload audio file"
-            onClick={() => !file && !checking && fileInputRef.current?.click()}
-            onKeyDown={(e) => e.key === 'Enter' && fileInputRef.current?.click()}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
+        {/* Hidden File Input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".mp3,.wav,.m4a,audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/x-m4a,audio/m4a"
+          className="hidden"
+          aria-hidden="true"
+          onChange={handleChange}
+        />
+
+        {/* Error Message */}
+        {error && (
+          <div role="alert" className="mt-4 px-4 py-3 border border-red-500/20 bg-red-50/50 rounded-[16px] text-xs sm:text-sm text-red-900 flex items-start gap-2.5">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 mt-0.5 text-red-600">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <span className="font-medium leading-relaxed">{error}</span>
+          </div>
+        )}
+
+        {/* Actions */}
+        <div className="mt-6 sm:mt-8 flex gap-3 flex-col sm:flex-row">
+          <button
+            id="upload-submit-btn"
+            onClick={handleSubmit}
+            disabled={!file || checking}
             className={[
-              'border-2 border-dashed rounded-[22px] p-10 md:p-14 text-center transition-all duration-200 select-none',
-              isDragging
-                ? 'border-black bg-neutral-50 scale-[1.01]'
-                : file
-                ? 'border-black bg-neutral-50/40 cursor-default'
-                : 'border-neutral-200 hover:border-black hover:bg-neutral-50/50 cursor-pointer',
+              'btn-primary flex-1 py-3.5 sm:py-4 text-sm sm:text-base tracking-tight',
+              (!file || checking) ? 'opacity-40 cursor-not-allowed hover:bg-black' : '',
             ].join(' ')}
           >
-            {/* Upload Icon */}
-            <div className="w-14 h-14 rounded-full bg-neutral-100 flex items-center justify-center mx-auto mb-5 text-black">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="17 8 12 3 7 8" />
-                <line x1="12" y1="3" x2="12" y2="15" />
-              </svg>
-            </div>
-
-            {checking ? (
-              <p className="text-neutral-600 font-medium text-sm">Analyzing audio duration…</p>
-            ) : file ? (
-              <div className="flex flex-col items-center">
-                <span className="font-bold text-black text-base md:text-lg break-all">{file.name}</span>
-                <span className="text-neutral-500 text-xs font-semibold mt-1 px-3 py-1 bg-neutral-100 rounded-full">
-                  {formatSize(file.size)}
-                </span>
-              </div>
-            ) : (
-              <>
-                <p className="font-bold text-black text-base md:text-lg mb-1 tracking-tight">
-                  Click to select audio or drag and drop
-                </p>
-                <p className="text-neutral-400 text-xs md:text-sm font-normal">
-                  MP3, WAV, or M4A · Max {MAX_DURATION_MIN} minutes · Max {MAX_SIZE_MB} MB
-                </p>
-              </>
-            )}
-          </div>
-
-          {/* Hidden File Input */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".mp3,.wav,.m4a,audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/x-m4a,audio/m4a"
-            className="hidden"
-            aria-hidden="true"
-            onChange={handleChange}
-          />
-
-          {/* Error Message */}
-          {error && (
-            <div role="alert" className="mt-5 px-5 py-3.5 border border-red-500/20 bg-red-50/50 rounded-[18px] text-sm text-red-900 flex items-start gap-3">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 mt-0.5 text-red-600">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-              <span className="font-medium leading-relaxed">{error}</span>
-            </div>
-          )}
-
-          {/* Actions */}
-          <div className="mt-8 flex gap-3 flex-wrap">
+            Upload &amp; Transcribe
+          </button>
+          {(file || error) && !checking && (
             <button
-              id="upload-submit-btn"
-              onClick={handleSubmit}
-              disabled={!file || checking}
-              className={[
-                'btn-primary flex-1 py-4 text-base tracking-tight',
-                (!file || checking) ? 'opacity-40 cursor-not-allowed hover:bg-black' : '',
-              ].join(' ')}
+              id="upload-clear-btn"
+              onClick={handleClear}
+              className="btn-secondary w-full sm:w-auto px-6 py-3.5 sm:py-4 text-sm sm:text-base"
             >
-              Upload &amp; Transcribe
+              Clear
             </button>
-            {(file || error) && !checking && (
-              <button
-                id="upload-clear-btn"
-                onClick={handleClear}
-                className="btn-secondary px-7 py-4 text-base"
-              >
-                Clear
-              </button>
-            )}
-          </div>
+          )}
         </div>
       </div>
-    </section>
+    </div>
   )
 }
