@@ -125,22 +125,24 @@ export default function AdminDashboardPage({
   if (!currentUser || !isAdmin) {
     return (
       <div className="min-h-screen bg-white text-black flex flex-col justify-between font-sans selection:bg-black selection:text-white">
-        <Nav
-          currentPage="admin"
-          onNavigate={onNavigate}
-          currentUser={currentUser}
-          onLogout={onLogout}
-          onOpenSettings={onOpenSettings}
-          onOpenWorkspaceModal={onOpenWorkspaceModal}
-        />
+        <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm w-full border-b border-neutral-100">
+          <Nav
+            currentPage="admin"
+            onNavigate={onNavigate}
+            currentUser={currentUser}
+            onLogout={onLogout}
+            onOpenSettings={onOpenSettings}
+            onOpenWorkspaceModal={onOpenWorkspaceModal}
+          />
+        </header>
 
-        <main className="max-w-2xl mx-auto px-6 py-20 text-center">
-          <div className="border border-neutral-200 rounded-[32px] p-8 sm:p-12 shadow-sm bg-neutral-50/50">
-            <div className="w-14 h-14 mx-auto mb-6 rounded-full bg-black text-white flex items-center justify-center font-bold text-xl">
+        <main className="max-w-2xl mx-auto px-4 sm:px-6 py-12 sm:py-20 text-center">
+          <div className="border border-neutral-200 rounded-[28px] sm:rounded-[32px] p-6 sm:p-12 shadow-sm bg-neutral-50/50">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-5 sm:mb-6 rounded-full bg-black text-white flex items-center justify-center font-bold text-lg sm:text-xl">
               🔒
             </div>
 
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-200 text-neutral-800 text-[11px] font-bold uppercase tracking-wider mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-200 text-neutral-800 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider mb-4">
               Restricted Route
             </div>
 
@@ -148,12 +150,12 @@ export default function AdminDashboardPage({
               Administrator Access <span className="font-serif italic font-normal">Required</span>
             </h1>
 
-            <p className="text-neutral-600 text-sm sm:text-base leading-relaxed mb-8 max-w-md mx-auto">
+            <p className="text-neutral-600 text-xs sm:text-sm leading-relaxed mb-6 sm:mb-8 max-w-md mx-auto">
               The Admin Dashboard is strictly restricted to accounts with <code className="bg-neutral-200 px-1.5 py-0.5 rounded text-xs text-black font-semibold">role = &apos;admin&apos;</code>.
               Your account currently does not have administrator privileges.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3">
               {currentUser ? (
                 <button
                   onClick={() => onNavigate('workspace')}
@@ -191,14 +193,17 @@ export default function AdminDashboardPage({
 
   return (
     <div className="min-h-screen bg-white text-black flex flex-col justify-between font-sans selection:bg-black selection:text-white">
-      <Nav
-        currentPage="admin"
-        onNavigate={onNavigate}
-        currentUser={currentUser}
-        onLogout={onLogout}
-        onOpenSettings={onOpenSettings}
-        onOpenWorkspaceModal={onOpenWorkspaceModal}
-      />
+      {/* Clean Top Navigation Bar with identical full-width spacing as Landing */}
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm w-full border-b border-neutral-100">
+        <Nav
+          currentPage="admin"
+          onNavigate={onNavigate}
+          currentUser={currentUser}
+          onLogout={onLogout}
+          onOpenSettings={onOpenSettings}
+          onOpenWorkspaceModal={onOpenWorkspaceModal}
+        />
+      </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 py-6 sm:py-10 flex-1 w-full space-y-8">
         {/* ─── DASHBOARD TOP HEADER WITH ADMIN BADGE & PULSING LIVE INDICATOR ── */}
@@ -339,7 +344,7 @@ export default function AdminDashboardPage({
             <span className="text-[11px] text-neutral-400">GET /api/analytics/live</span>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 sm:gap-4">
             {/* 2.1 Uploads Processed Today */}
             <div className="border border-neutral-200 rounded-[24px] p-4 sm:p-5 bg-white shadow-sm hover:border-neutral-300 transition-colors">
               <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider block mb-2">
@@ -404,7 +409,7 @@ export default function AdminDashboardPage({
             </div>
 
             {/* 2.5 Trial Uploads Used */}
-            <div className="col-span-2 md:col-span-1 border border-neutral-200 rounded-[24px] p-4 sm:p-5 bg-white shadow-sm hover:border-neutral-300 transition-colors">
+            <div className="sm:col-span-2 lg:col-span-1 border border-neutral-200 rounded-[24px] p-4 sm:p-5 bg-white shadow-sm hover:border-neutral-300 transition-colors">
               <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider block mb-2">
                 Trial Uploads
               </span>
@@ -435,59 +440,63 @@ export default function AdminDashboardPage({
           </div>
 
           <div className="border border-neutral-200 rounded-[28px] bg-white shadow-sm overflow-hidden">
-            {/* Table Header */}
-            <div className="grid grid-cols-12 px-5 py-3 bg-neutral-50/80 border-b border-neutral-200/80 text-[11px] font-bold text-neutral-500 uppercase tracking-wider">
-              <div className="col-span-5 sm:col-span-4">Event Type</div>
-              <div className="col-span-4 sm:col-span-5">Route Target</div>
-              <div className="col-span-3 text-right">Timestamp</div>
-            </div>
-
-            {/* Event List */}
-            <div className="max-h-[380px] overflow-y-auto divide-y divide-neutral-100 font-mono text-xs">
-              {streamEvents.length > 0 ? (
-                streamEvents.map((ev, index) => {
-                  let badgeStyle = 'bg-neutral-100 text-neutral-800'
-                  if (ev.event_name?.includes('signup')) badgeStyle = 'bg-emerald-100 text-emerald-800 font-semibold'
-                  if (ev.event_name?.includes('login')) badgeStyle = 'bg-blue-100 text-blue-800'
-                  if (ev.event_name?.includes('upload_completed')) badgeStyle = 'bg-black text-white font-semibold'
-                  if (ev.event_name?.includes('upload_failed')) badgeStyle = 'bg-red-100 text-red-800 font-semibold'
-                  if (ev.event_name?.includes('griot')) badgeStyle = 'bg-amber-100 text-amber-900'
-
-                  return (
-                    <div
-                      key={`${ev.created_at}-${index}`}
-                      className="grid grid-cols-12 px-5 py-3 items-center hover:bg-neutral-50/60 transition-colors"
-                    >
-                      {/* Event Name */}
-                      <div className="col-span-5 sm:col-span-4 flex items-center gap-2 truncate pr-2">
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-sans tracking-wide truncate ${badgeStyle}`}>
-                          {ev.event_name}
-                        </span>
-                      </div>
-
-                      {/* Route */}
-                      <div className="col-span-4 sm:col-span-5 text-neutral-600 truncate pr-2 font-mono text-[11px]">
-                        {ev.route || '/'}
-                      </div>
-
-                      {/* Time */}
-                      <div className="col-span-3 text-right text-neutral-400 font-sans text-[11px] truncate">
-                        {formatTimeAgo(ev.created_at)}
-                      </div>
-                    </div>
-                  )
-                })
-              ) : (
-                <div className="py-12 text-center text-neutral-400 text-xs font-sans">
-                  {loading ? 'Connecting to activity stream…' : 'No recent operational events recorded today yet.'}
+            <div className="overflow-x-auto">
+              <div className="min-w-[460px] sm:min-w-full">
+                {/* Table Header */}
+                <div className="grid grid-cols-12 px-4 sm:px-5 py-3 bg-neutral-50/80 border-b border-neutral-200/80 text-[11px] font-bold text-neutral-500 uppercase tracking-wider">
+                  <div className="col-span-5 sm:col-span-4">Event Type</div>
+                  <div className="col-span-4 sm:col-span-5">Route Target</div>
+                  <div className="col-span-3 text-right">Timestamp</div>
                 </div>
-              )}
+
+                {/* Event List */}
+                <div className="max-h-[380px] overflow-y-auto divide-y divide-neutral-100 font-mono text-xs">
+                  {streamEvents.length > 0 ? (
+                    streamEvents.map((ev, index) => {
+                      let badgeStyle = 'bg-neutral-100 text-neutral-800'
+                      if (ev.event_name?.includes('signup')) badgeStyle = 'bg-emerald-100 text-emerald-800 font-semibold'
+                      if (ev.event_name?.includes('login')) badgeStyle = 'bg-blue-100 text-blue-800'
+                      if (ev.event_name?.includes('upload_completed')) badgeStyle = 'bg-black text-white font-semibold'
+                      if (ev.event_name?.includes('upload_failed')) badgeStyle = 'bg-red-100 text-red-800 font-semibold'
+                      if (ev.event_name?.includes('griot')) badgeStyle = 'bg-amber-100 text-amber-900'
+
+                      return (
+                        <div
+                          key={`${ev.created_at}-${index}`}
+                          className="grid grid-cols-12 px-4 sm:px-5 py-3 items-center hover:bg-neutral-50/60 transition-colors"
+                        >
+                          {/* Event Name */}
+                          <div className="col-span-5 sm:col-span-4 flex items-center gap-2 truncate pr-2">
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-sans tracking-wide truncate ${badgeStyle}`}>
+                              {ev.event_name}
+                            </span>
+                          </div>
+
+                          {/* Route */}
+                          <div className="col-span-4 sm:col-span-5 text-neutral-600 truncate pr-2 font-mono text-[11px]">
+                            {ev.route || '/'}
+                          </div>
+
+                          {/* Time */}
+                          <div className="col-span-3 text-right text-neutral-400 font-sans text-[11px] truncate">
+                            {formatTimeAgo(ev.created_at)}
+                          </div>
+                        </div>
+                      )
+                    })
+                  ) : (
+                    <div className="py-12 text-center text-neutral-400 text-xs font-sans">
+                      {loading ? 'Connecting to activity stream…' : 'No recent operational events recorded today yet.'}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Stream Footer Notice */}
-            <div className="px-5 py-2.5 bg-neutral-50 border-t border-neutral-200/80 text-[11px] text-neutral-500 font-sans flex items-center justify-between">
+            <div className="px-4 sm:px-5 py-3 bg-neutral-50 border-t border-neutral-200/80 text-[11px] text-neutral-500 font-sans flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1.5">
               <span>Displaying raw anonymous stream — strictly excluded: anon tokens, IDs, emails, IP addresses & transcripts.</span>
-              <span className="font-semibold text-black">Privacy Verified ✓</span>
+              <span className="font-semibold text-black shrink-0">Privacy Verified ✓</span>
             </div>
           </div>
         </section>

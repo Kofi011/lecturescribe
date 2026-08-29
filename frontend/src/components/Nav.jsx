@@ -44,7 +44,7 @@ export default function Nav({
   const initial = username ? username.charAt(0).toUpperCase() : 'S'
 
   return (
-    <nav className="max-w-7xl mx-auto flex items-center justify-between gap-2 px-4 py-3.5 sm:px-6 sm:py-5 md:px-12 bg-white/95 backdrop-blur-sm relative z-50">
+    <nav className="w-full max-w-7xl mx-auto flex items-center justify-between gap-3 px-4 py-3.5 sm:px-6 sm:py-5 md:px-12 bg-white/95 backdrop-blur-sm relative z-50">
       {/* Brand Mark: Continuous Scribe Loop + Scaled Wordmark */}
       <button
         onClick={() => handleItemClick('landing')}
