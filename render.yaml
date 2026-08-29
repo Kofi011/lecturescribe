@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: lecturescribe-backend
+    runtime: node
+    plan: free
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: GROQ_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: lecturescribe-db
+          property: connectionString
+
+databases:
+  - name: lecturescribe-db
+    plan: free
