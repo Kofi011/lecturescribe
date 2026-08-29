@@ -10,5 +10,8 @@
     "backend": "cd backend && npm run dev",
     "frontend": "cd frontend && npm run dev",
     "sidecar": "cd backend && npm run sidecar"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
   }
 }
