@@ -42,7 +42,6 @@ export function ensureGriotSidecarRunning() {
     _sidecarProcess = spawn('python', ['-m', 'uvicorn', 'main:app', '--host', '127.0.0.1', '--port', '8000'], {
       cwd: sidecarDir,
       stdio: 'ignore',
-      shell: true,
       windowsHide: true,
     })
 
