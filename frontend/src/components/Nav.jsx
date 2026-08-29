@@ -202,8 +202,8 @@ export default function Nav({
                 <span>ABOUT</span>
               </button>
 
-              {/* 5. ADMIN DASHBOARD (Only visible to admin role) */}
-              {currentUser?.role === 'admin' && (
+              {/* 5. ADMIN DASHBOARD (Visible to admin role or admin@edu.tech) */}
+              {(currentUser?.role === 'admin' || currentUser?.email?.toLowerCase() === 'admin@edu.tech') && (
                 <button
                   onClick={() => handleItemClick('admin')}
                   className={[

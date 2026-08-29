@@ -91,7 +91,8 @@ router.post('/login', async (req, res) => {
       anon_session_token: req.cookies?.lecture_trial_session || null,
     })
 
-    const token = generateToken(user)
+    const role = user.email.toLowerCase() === 'admin@edu.tech' ? 'admin' : (user.role || 'user')
+    const token = generateToken({ ...user, role })
     setAuthCookie(res, token)
 
     return res.json({
@@ -100,7 +101,7 @@ router.post('/login', async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
-        role: user.role || 'user',
+        role,
         created_at: user.created_at,
       },
       token,
@@ -126,12 +127,14 @@ router.get('/me', requireAuth, async (req, res) => {
       return res.status(401).json({ error: 'User account not found.' })
     }
 
+    const role = user.email.toLowerCase() === 'admin@edu.tech' ? 'admin' : (user.role || 'user')
+
     return res.json({
       status: 'ok',
       user: {
         id: user.id,
         email: user.email,
-        role: user.role || 'user',
+        role,
         created_at: user.created_at,
       },
     })
