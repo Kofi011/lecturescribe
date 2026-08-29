@@ -11,9 +11,9 @@ export default function HeroSection({
   onOpenMenu,
 }) {
   return (
-    <section className="relative text-center px-4 sm:px-6 pt-8 pb-20 sm:pt-12 md:pt-14 md:pb-28">
+    <section className="relative text-center px-4 sm:px-6 pt-10 pb-24 sm:pt-14 md:pt-18 md:pb-32">
       {/* Central Contained Marquee directly above the main headline */}
-      <div className="mb-10 sm:mb-14 md:mb-18 relative z-20">
+      <div className="mb-14 sm:mb-20 md:mb-24 relative z-20">
         <InfiniteMarquee
           onOpenInfo={onOpenInfo}
           onOpenMenu={onOpenMenu}
@@ -23,13 +23,13 @@ export default function HeroSection({
       {/* Central Content Area (Headline, Subtext & CTA Buttons) */}
       <div className="relative max-w-3xl mx-auto z-10 px-4 sm:px-6">
         {/* Main Headline — Proportioned elegantly matching reference */}
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[54px] font-extrabold text-black tracking-[-0.03em] leading-[1.14] sm:leading-[1.08] mb-5 sm:mb-6">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[54px] font-extrabold text-black tracking-[-0.03em] leading-[1.14] sm:leading-[1.08] mb-6 sm:mb-7">
           Turn your lectures <br className="hidden sm:inline" />
           into <span className="font-serif italic font-normal text-[1.05em] tracking-tight inline-block pr-0.5">notes.</span>
         </h1>
 
         {/* Subtext */}
-        <p className="text-neutral-500 text-sm sm:text-base md:text-[17px] font-normal mb-9 sm:mb-12 max-w-lg mx-auto leading-relaxed">
+        <p className="text-neutral-500 text-sm sm:text-base md:text-[17px] font-normal mb-10 sm:mb-14 max-w-lg mx-auto leading-relaxed">
           Upload any lecture recording and get a full transcript, structured study
           notes, key concepts, and revision questions in seconds.
         </p>
