@@ -25,6 +25,7 @@ import InfoModal from './components/InfoModal'
 import UserSettingsModal from './components/UserSettingsModal'
 import { saveLecture, deleteLecture, clearAllLectures, SAMPLE_LECTURE, getSavedLectures } from './utils/lectureStorage'
 import { useInactivityLogout } from './utils/useInactivityLogout'
+import { trackClientEvent } from './utils/analytics'
 
 const API_URL = import.meta.env.VITE_API_URL || ''
 
@@ -202,6 +203,7 @@ export default function App() {
     if (targetPage === 'workspace' && !currentUser) {
       setPage('auth')
       if (typeof window !== 'undefined') window.history.pushState(null, '', '/login')
+      trackClientEvent('page_view_auth_redirect', '/login')
       return
     }
     setPage(targetPage)
@@ -218,11 +220,13 @@ export default function App() {
       if (window.location.pathname !== targetPath) {
         window.history.pushState(null, '', targetPath)
       }
+      trackClientEvent(`page_view_${targetPage}`, targetPath)
     }
   }
 
   // ─── Load Interactive Example ──────────────────────────────────────────────
   const handleSelectExample = () => {
+    trackClientEvent('sample_lecture_loaded', '/results')
     saveLecture(SAMPLE_LECTURE)
     setCurrentLecture(SAMPLE_LECTURE)
     setPage('results')

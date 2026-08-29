@@ -10,6 +10,7 @@ import {
   createLecture,
   updateLecture,
   deleteLecture,
+  logAnalyticsEvent,
 } from '../db/index.js'
 
 const router = Router()
@@ -20,6 +21,7 @@ const router = Router()
 router.get('/', requireAuth, async (req, res, next) => {
   try {
     const lectures = await getLecturesByUserId(req.user.id)
+    await logAnalyticsEvent({ event_name: 'lectures_library_viewed', route: '/api/lectures' })
     res.json({ lectures })
   } catch (err) {
     next(err)
@@ -35,6 +37,7 @@ router.get('/:id', requireAuth, async (req, res, next) => {
     if (!lecture) {
       return res.status(404).json({ error: 'Lecture not found' })
     }
+    await logAnalyticsEvent({ event_name: 'lecture_retrieved', route: `/api/lectures/${req.params.id}` })
     res.json({ lecture })
   } catch (err) {
     next(err)
@@ -56,6 +59,7 @@ router.post('/', requireAuth, async (req, res, next) => {
       user_id: req.user.id,
     })
 
+    await logAnalyticsEvent({ event_name: 'lecture_saved', route: '/api/lectures' })
     res.status(201).json({ lecture: saved })
   } catch (err) {
     next(err)
@@ -71,6 +75,7 @@ router.put('/:id', requireAuth, async (req, res, next) => {
     if (!updated) {
       return res.status(404).json({ error: 'Lecture not found or unauthorized' })
     }
+    await logAnalyticsEvent({ event_name: 'lecture_updated', route: `/api/lectures/${req.params.id}` })
     res.json({ lecture: updated })
   } catch (err) {
     next(err)
@@ -86,6 +91,7 @@ router.delete('/:id', requireAuth, async (req, res, next) => {
     if (!deleted) {
       return res.status(404).json({ error: 'Lecture not found or already deleted' })
     }
+    await logAnalyticsEvent({ event_name: 'lecture_deleted', route: `/api/lectures/${req.params.id}` })
     res.json({ message: 'Lecture deleted successfully' })
   } catch (err) {
     next(err)

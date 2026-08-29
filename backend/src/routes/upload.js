@@ -70,8 +70,13 @@ function removeTempFile(filePath) {
 }
 
 // ─── GET /api/trial-status ─────────────────────────────────────────
-router.get('/trial-status', (req, res) => {
+router.get('/trial-status', async (req, res) => {
   const status = getTrialStatus(req)
+  await logAnalyticsEvent({
+    event_name: 'trial_status_checked',
+    route: '/api/trial-status',
+    anon_session_token: req.cookies?.lecture_trial_session || null,
+  })
   return res.json({
     status: 'ok',
     ...status,
@@ -79,13 +84,19 @@ router.get('/trial-status', (req, res) => {
 })
 
 // ─── POST /api/upload ─────────────────────────────────────────────
-router.post('/upload', (req, res) => {
+router.post('/upload', async (req, res) => {
   // Set extended 5-minute timeout for large audio transcription & note synthesis
   req.setTimeout(300000)
 
   // 1. Enforce trial limit before processing file upload
   const trialStatus = getTrialStatus(req)
   if (!trialStatus.canUpload) {
+    await logAnalyticsEvent({
+      event_name: 'upload_failed',
+      route: '/api/upload',
+      anon_session_token: req.cookies?.lecture_trial_session || null,
+      metadata: { reason: 'TRIAL_LIMIT_REACHED', is_trial: true },
+    })
     return res.status(403).json({
       error: 'You have completed your 3 free trial uploads. Please log in or create an account to continue unlimited processing.',
       code: 'TRIAL_LIMIT_REACHED',
@@ -95,8 +106,22 @@ router.post('/upload', (req, res) => {
     })
   }
 
+  // Log upload initiated immediately
+  await logAnalyticsEvent({
+    event_name: 'upload_started',
+    route: '/api/upload',
+    anon_session_token: req.cookies?.lecture_trial_session || null,
+    metadata: { is_trial: !req.user },
+  })
+
   upload.single('audio')(req, res, async (multerErr) => {
     if (multerErr) {
+      await logAnalyticsEvent({
+        event_name: 'upload_failed',
+        route: '/api/upload',
+        anon_session_token: req.cookies?.lecture_trial_session || null,
+        metadata: { reason: multerErr.code || 'MULTER_ERROR', is_trial: !req.user },
+      })
       if (multerErr.code === 'LIMIT_FILE_SIZE') {
         return res.status(400).json({
           error: `Audio file is too large. Maximum supported size is ${MAX_SIZE_MB} MB.`,
@@ -109,6 +134,12 @@ router.post('/upload', (req, res) => {
     }
 
     if (!req.file) {
+      await logAnalyticsEvent({
+        event_name: 'upload_failed',
+        route: '/api/upload',
+        anon_session_token: req.cookies?.lecture_trial_session || null,
+        metadata: { reason: 'NO_FILE_ATTACHED', is_trial: !req.user },
+      })
       return res.status(400).json({ error: 'No audio file was attached.' })
     }
 
@@ -129,6 +160,12 @@ router.post('/upload', (req, res) => {
 
       if (durationSec && durationSec > MAX_DURATION_SECONDS) {
         removeTempFile(filePath)
+        await logAnalyticsEvent({
+          event_name: 'upload_failed',
+          route: '/api/upload',
+          anon_session_token: req.cookies?.lecture_trial_session || null,
+          metadata: { reason: 'DURATION_EXCEEDED', is_trial: !req.user },
+        })
         const mins = Math.round(durationSec / 60)
         return res.status(400).json({
           error: `Lecture audio is too long (${mins} min). Maximum duration is 10 minutes.`,
@@ -221,6 +258,12 @@ router.post('/chat', async (req, res) => {
   if (!question || !question.trim()) {
     return res.status(400).json({ error: 'Question cannot be empty.' })
   }
+
+  await logAnalyticsEvent({
+    event_name: 'academic_tutor_query',
+    route: '/api/chat',
+    anon_session_token: req.cookies?.lecture_trial_session || null,
+  })
 
   try {
     const answer = await askAboutLecture(transcript, question.trim(), history || [])

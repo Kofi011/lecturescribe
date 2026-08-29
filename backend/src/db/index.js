@@ -644,19 +644,26 @@ export async function logAnalyticsEvent({
 }
 
 /**
- * Get aggregated live metrics for today (UTC start of day).
+ * Get aggregated live metrics for today (using local calendar day / rolling 24h window).
  * @returns {Promise<Object>}
  */
 export async function getLiveAnalyticsToday() {
-  const startOfDayUtc = new Date()
-  startOfDayUtc.setUTCHours(0, 0, 0, 0)
-  const startIso = startOfDayUtc.toISOString()
+  const now = Date.now()
+  const startOfLocalDay = new Date()
+  startOfLocalDay.setHours(0, 0, 0, 0)
+  const startOfUtcDay = new Date()
+  startOfUtcDay.setUTCHours(0, 0, 0, 0)
+
+  // Use the earliest cutoff between local day, UTC day, and 24 hours ago so recent evening activity is never lost
+  const cutoffMs = Math.min(startOfLocalDay.getTime(), startOfUtcDay.getTime(), now - 24 * 60 * 60 * 1000)
+  const cutoffDate = new Date(cutoffMs)
+  const startIso = cutoffDate.toISOString()
 
   if (usePostgres && pool) {
     try {
       const res = await pool.query(
         `SELECT
-          COUNT(*) FILTER (WHERE event_name IN ('upload_completed', 'upload_failed', 'upload_processed')) as uploads_today,
+          COUNT(*) FILTER (WHERE event_name IN ('upload_completed', 'upload_failed', 'upload_processed', 'upload_started')) as uploads_today,
           COUNT(*) FILTER (WHERE event_name IN ('upload_completed', 'upload_processed')) as success_today,
           COUNT(*) FILTER (WHERE event_name = 'upload_failed') as failure_today,
           COUNT(*) FILTER (WHERE metadata->>'engine' ILIKE '%whisper%' OR event_name = 'transcription_whisper') as engine_whisper,
@@ -689,7 +696,7 @@ export async function getLiveAnalyticsToday() {
   }
 
   const events = getLocalEvents()
-  const todayEvents = events.filter((e) => new Date(e.created_at) >= startOfDayUtc)
+  const todayEvents = events.filter((e) => new Date(e.created_at).getTime() >= cutoffMs)
 
   let uploadsToday = 0
   let successToday = 0
@@ -714,6 +721,11 @@ export async function getLiveAnalyticsToday() {
       }
       if (meta.is_trial) {
         trialUploadsToday++
+      }
+    } else if (name === 'upload_started') {
+      // Count started upload if not yet completed
+      if (!todayEvents.some((other) => other.id !== ev.id && other.event_name === 'upload_completed' && Math.abs(new Date(other.created_at) - new Date(ev.created_at)) < 60000)) {
+        uploadsToday++
       }
     } else if (name === 'upload_failed') {
       uploadsToday++
