@@ -116,7 +116,7 @@ git push origin main
 
 ## Phase 9 — Deployment
 - [x] Merge `dev` into `main` and `master` → commit + push
-- [x] Configure production cloud deployment blueprints (Railway `nixpacks.toml`, `railway.json`, Vercel `vercel.json`) → commit + push
+- [x] Configure production cloud deployment blueprints (Render `render.yaml`, GitHub Pages deployment) → commit + push
 - [x] Build and deploy live production build to `gh-pages` branch → commit + push
 - [x] Test live deployed link end-to-end → commit + push
 - [x] Update README.md with live deployment links → commit + push
