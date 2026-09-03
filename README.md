@@ -8,7 +8,7 @@
 
 ---
 
-## 🏛️ System Architecture
+##  System Architecture
 
 LectureScribe uses a dual-engine speech-to-text pipeline combining an on-device local Conformer-CTC microservice (**Griot Nano 1**) with cloud-accelerated **Groq Whisper AI** fallback, followed by LLM-powered note synthesis and interactive academic tutoring.
 
@@ -46,7 +46,7 @@ flowchart TD
 
 ---
 
-## 📁 Repository Structure
+##  Repository Structure
 
 ```text
 LectureScribe/
@@ -93,7 +93,7 @@ LectureScribe/
 
 ---
 
-## ⚡ Quick Start (Local Development)
+##  Quick Start (Local Development)
 
 ### Prerequisites
 - **Node.js**: v18+ (v20+ recommended)
@@ -133,7 +133,7 @@ You can run individual services or use root scripts:
 
 ---
 
-## 🔒 Security & Privacy Guarantees
+##  Security & Privacy Guarantees
 
 As documented in [`docs/MONITORING.md`](docs/MONITORING.md):
 - **Zero Content Leakage**: Admin dashboards structurally exclude user transcripts, lecture titles, audio files, names, and emails.
@@ -143,7 +143,7 @@ As documented in [`docs/MONITORING.md`](docs/MONITORING.md):
 
 ---
 
-## 🚀 Cloud Deployment
+##  Cloud Deployment
 
 - **Frontend**: Hosted on **GitHub Pages** (`https://kofi011.github.io/lecturescribe/`) via automated `npm run deploy:pages`.
 - **Backend & PostgreSQL**: Managed cloud deployment on **Render** configured via [`render.yaml`](render.yaml).
